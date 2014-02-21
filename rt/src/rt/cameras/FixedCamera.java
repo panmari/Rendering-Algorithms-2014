@@ -76,7 +76,7 @@ public class FixedCamera implements Camera {
 	public Ray makeWorldSpaceRay(int i, int j, int k, float[][] samples) {
 		// Make point on image plane in viewport coordinates, that is range [0,width-1] x [0,height-1]
 		// The assumption is that pixel [i,j] is the square [i,i+1] x [j,j+1] in viewport coordinates
-		Vector4f d = new Vector4f((float)i+samples[k][0],(float)j+samples[k][1],-1.f,1.f);
+		Vector4f d = new Vector4f(i+samples[k][0],j+samples[k][1],-1.f,1.f);
 		
 		// Transform it back to world coordinates
 		m.transform(d);
