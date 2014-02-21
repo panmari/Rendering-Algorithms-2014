@@ -30,6 +30,19 @@ public class PinholeCamera implements Camera {
 		m.setColumn(2, new Vector4f(w));
 		m.setColumn(3, new Vector4f(eye));
 		m.m32 = 1; // fourth column is actually a point
+		
+		// The viewport thingy
+		Matrix4f p = new Matrix4f();
+		float t = (float)Math.tan(Math.toRadians(fov)/2);
+		float r = aspect*t;
+		p.m00 = 2*r/width;
+		p.m02 = r;
+		p.m11 = 2*t/height;
+		p.m12 = t;
+		p.m22 = 1;
+		p.m33 = 1;
+		//p.invert();
+		m.mul(p);
 	}
 
 	@Override
@@ -42,8 +55,8 @@ public class PinholeCamera implements Camera {
 		m.transform(d);
 		
 		// Make ray consisting of origin and direction in world coordinates
-		Vector3f dir = new Vector3f();
-		dir.sub(new Vector3f(d.x, d.y, d.z), eye);
+		Vector3f dir = new Vector3f(d.x, d.y, d.z);
+		dir.sub(eye);
 		
 		return new Ray(new Vector3f(eye), dir);
 	}

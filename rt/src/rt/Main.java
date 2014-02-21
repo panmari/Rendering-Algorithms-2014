@@ -3,6 +3,7 @@ package rt;
 import javax.imageio.ImageIO;
 
 import rt.basicscenes.*;
+import rt.testscenes.CameraTest;
 
 import java.util.*;
 import java.awt.image.*;
@@ -18,7 +19,7 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new Dodecahedron();
+	public static Scene scene = new CameraTest();
 
 	static LinkedList<RenderTask> queue;
 	static Counter tasksLeft;
@@ -109,7 +110,7 @@ public class Main {
 	public static void main(String[] args)
 	{			
 		int taskSize = 32;	// Each task renders a square image block of this size
-		int nThreads = 8;	// Number of threads to be used for rendering
+		int nThreads = 4;	// Number of threads to be used for rendering
 				
 		int width = scene.getFilm().getWidth();
 		int height = scene.getFilm().getHeight();

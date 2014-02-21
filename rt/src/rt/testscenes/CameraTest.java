@@ -14,12 +14,12 @@ import rt.tonemappers.*;
 /**
  * Test scene for pinhole camera specifications.
  */
-public class Camera extends Scene {
+public class CameraTest extends Scene {
 
-	public Camera()
+	public CameraTest()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/Camera");
+		outputFilename = new String("../output/testscenes/Camera-mine");
 		
 		// Image width and height in pixels
 		width = 1280;
