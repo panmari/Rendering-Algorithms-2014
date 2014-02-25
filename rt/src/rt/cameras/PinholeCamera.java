@@ -23,13 +23,13 @@ public class PinholeCamera implements Camera {
 		u.cross(up, w);
 		u.normalize();
 		Vector3f v = new Vector3f();
-		v.cross(u, w);
+		v.cross(w, u);
 		
 		m.setColumn(0, new Vector4f(u));
 		m.setColumn(1, new Vector4f(v));
 		m.setColumn(2, new Vector4f(w));
 		m.setColumn(3, new Vector4f(eye));
-		m.m32 = 1; // fourth column is actually a point
+		m.m33 = 1; // fourth column is actually a point
 		
 		// The viewport thingy
 		Matrix4f p = new Matrix4f();
@@ -41,15 +41,15 @@ public class PinholeCamera implements Camera {
 		p.m12 = t;
 		p.m22 = 1;
 		p.m33 = 1;
-		//p.invert();
+		
 		m.mul(p);
 	}
 
 	@Override
-	public Ray makeWorldSpaceRay(int i, int j, int k, float[][] samples) {
+	public Ray makeWorldSpaceRay(int i, int j, float[] samples) {
 		// Make point on image plane in viewport coordinates, that is range [0,width-1] x [0,height-1]
 		// The assumption is that pixel [i,j] is the square [i,i+1] x [j,j+1] in viewport coordinates
-		Vector4f d = new Vector4f(i+samples[k][0],j+samples[k][1],-1.f,1.f);
+		Vector4f d = new Vector4f(i+ samples[0], j + samples[1], -1, 1);
 		
 		// Transform it back to world coordinates
 		m.transform(d);
