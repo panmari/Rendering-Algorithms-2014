@@ -29,6 +29,17 @@ public abstract class CSGSolid implements Intersectable {
 		HitRecord hitRecord;	// The hit record of the intersection
 		BelongsTo belongsTo;
 		
+		public IntervalBoundary() {
+			//whatev, set them manually
+		}
+		
+		public IntervalBoundary(float t, BoundaryType type, HitRecord hitRecord, BelongsTo belongsTo) {
+			this.t = t;
+			this.type = type;
+			this.hitRecord = hitRecord;
+			this.belongsTo = belongsTo;
+		}
+		
 		public int compareTo(IntervalBoundary b)
 		{
 			if(this.t < b.t) 
@@ -64,6 +75,8 @@ public abstract class CSGSolid implements Intersectable {
 		
 	/**
 	 * Compute the boundaries of the intersection intervals of this CSG solid with a ray. 
+	 * 
+	 * SM: Should probably return an empty list if the ray doesnt intersect the object
 	 * 
 	 * @param r the ray that intersects the CSG solid
 	 * @return boundaries of intersection intervals 
