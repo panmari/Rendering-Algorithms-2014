@@ -1,5 +1,6 @@
 package rt.testscenes;
 
+import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import rt.*;
@@ -19,12 +20,11 @@ public class Blinn extends Scene {
 	public Blinn()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/Blinn");
+		outputFilename = new String("../output/testscenes/Blinn-mine");
 		
 		// Image width and height in pixels
 		width = 512;
 		height = 512;
-		
 		// Number of samples per pixel
 		SPP = 1;
 		
@@ -39,6 +39,7 @@ public class Blinn extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
+		//integratorFactory = new DebugIntegratorFactory(); 
 		integratorFactory = new PointLightIntegratorFactory();
 		samplerFactory = new OneSamplerFactory();
 
@@ -46,14 +47,14 @@ public class Blinn extends Scene {
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.f);
 		
 		// Sphere with Blinn material
-		Sphere sphere = new Sphere();
-		sphere.material = new rt.materials.Blinn(new Spectrum(.8f, 0.f, 0.f), new Spectrum(.4f, .4f, .4f), 50.f);
+		Sphere sphere = new Sphere(new Point3f(0, 0, 0), 1);
+		//sphere.material = new rt.materials.Blinn(new Spectrum(.8f, 0.f, 0.f), new Spectrum(.4f, .4f, .4f), 50.f);
 		
 		IntersectableList intersectableList = new IntersectableList();
 		intersectableList.add(groundPlane);
 		intersectableList.add(sphere);
 		
-		root = intersectableList;
+		root = sphere; //intersectableList;
 		
 		// Light sources
 		LightGeometry pl1 = new PointLight(new Vector3f(.5f, .5f, 2.f), new Spectrum(1.f, 1.f, 1.f));

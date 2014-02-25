@@ -19,7 +19,7 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new CameraTestScene();
+	public static Scene scene = new Blinn();
 
 	static LinkedList<RenderTask> queue;
 	static Counter tasksLeft;

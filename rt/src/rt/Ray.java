@@ -15,4 +15,10 @@ public class Ray {
 		this.origin = new Vector3f(origin); 
 		this.direction = new Vector3f(direction);
 	}
+
+	public Point3f pointAt(float t) {
+		Point3f p = new Point3f(direction);
+		p.scaleAdd(t, origin);
+		return p;
+	}
 }
