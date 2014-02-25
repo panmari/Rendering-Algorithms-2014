@@ -3,7 +3,7 @@ package rt;
 import javax.imageio.ImageIO;
 
 import rt.basicscenes.*;
-import rt.testscenes.CameraTest;
+import rt.testscenes.*;
 
 import java.util.*;
 import java.awt.image.*;
@@ -19,7 +19,7 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new CameraTest();
+	public static Scene scene = new CameraTestScene();
 
 	static LinkedList<RenderTask> queue;
 	static Counter tasksLeft;
