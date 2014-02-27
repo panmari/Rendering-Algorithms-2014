@@ -53,7 +53,7 @@ public class RefractiveSphere extends Scene {
 		backPlane.material = grid;
 		
 		// A sphere for testing
-		CSGSphere sphere = new CSGSphere();
+		CSGSphere sphere = new CSGSphere(new Point3f(0,0,0), 1);
 		sphere.material = refractive;
 		
 		// Collect objects in intersectable list

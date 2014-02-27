@@ -2,16 +2,15 @@ package rt.intersectables;
 
 import java.util.ArrayList;
 
+import javax.vecmath.Point2f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
-import rt.Intersectable;
 import rt.Material;
+import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
-import rt.StaticVecmath;
-import rt.intersectables.CSGSolid.BoundaryType;
 import rt.materials.Diffuse;
 
 public class CSGSphere extends CSGSolid {
@@ -40,29 +39,15 @@ public class CSGSphere extends CSGSolid {
 		originCenter.sub(r.origin, center);
 		float b = 2*r.direction.dot(originCenter);
 		float c = originCenter.lengthSquared() - radius*radius;
-		float rootDisc = (float)Math.sqrt(b*b - 4*a*c);
-		if(rootDisc < 0)
+		Point2f t = MyMath.solveQuadratic(a, b, c);
+		
+		if(t == null) 	
 			return intervalBoundaries;
-		// numerical magic copied from PBRT:
-		float q;
-		if (b < 0)
-			q = (b - rootDisc)/-2;
-		else
-			q = (b + rootDisc)/-2;
-		float t0 = q/a;
-		float t1 = c/q;
 		
-		//make t0 always the intersection closer to the camera
-		if (t0 > t1) {
-			float swap = t0;
-			t0 = t1;
-			t1 = swap;
-		}
-		
-		IntervalBoundary b0 = new IntervalBoundary(t0, BoundaryType.START, 
-				makeHitRecord(t0, r), null);
-		IntervalBoundary b1 = new IntervalBoundary(t1, BoundaryType.END, 
-				makeHitRecord(t1, r), null);
+		IntervalBoundary b0 = new IntervalBoundary(t.x, BoundaryType.START, 
+				makeHitRecord(t.x, r), null);
+		IntervalBoundary b1 = new IntervalBoundary(t.y, BoundaryType.END, 
+				makeHitRecord(t.y, r), null);
 		intervalBoundaries.add(b0);
 		intervalBoundaries.add(b1);
 		return intervalBoundaries;
