@@ -13,6 +13,7 @@ import rt.tonemappers.*;
 import rt.materials.*;
 
 import javax.vecmath.Matrix4f;
+import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import org.omg.CORBA.TRANSACTION_MODE;
@@ -29,11 +30,12 @@ public class Instancing extends Scene {
 	 */
 	public Instancing()
 	{	
-		outputFilename = new String("../output/testscenes/Instancing");
+		outputFilename = new String("../output/testscenes/Instancing-mine");
 		
 		// Specify integrator to be used
 		integratorFactory = new PointLightIntegratorFactory();
-		
+		//integratorFactory = new DebugIntegratorFactory();
+
 		// Specify pixel sampler to be used
 		samplerFactory = new OneSamplerFactory();
 		
@@ -74,15 +76,14 @@ public class Instancing extends Scene {
 		objects.add(plane);
 		
 		// Add objects
-		Mesh mesh;
-		try
-		{
+		Intersectable mesh = null;
 			
+		//mesh = new CSGSphere(new Point3f(0,0,0), .3f);
+		try {
 			mesh = ObjReader.read("../obj/teapot.obj", 1.f);
-		} catch(IOException e) 
-		{
-			System.out.printf("Could not read .obj file\n");
-			return;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		Matrix4f t = new Matrix4f();
 		t.setIdentity();
@@ -94,10 +95,11 @@ public class Instancing extends Scene {
 		objects.add(instance);	
 		
 		// Instance two
+		t = new Matrix4f();
+		t.setIdentity();
 		t.setScale(0.5f);
 		t.setTranslation(new Vector3f(0.f, 0.25f, 0.f));
 		Matrix4f rot = new Matrix4f();
-		rot.setIdentity();
 		rot.rotX((float)Math.toRadians(30.f));
 		t.mul(rot);
 		instance = new Instance(mesh, t);

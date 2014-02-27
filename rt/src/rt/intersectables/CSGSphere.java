@@ -30,6 +30,17 @@ public class CSGSphere extends CSGSolid {
 		this.radius = radius;
 		material = new Diffuse(new Spectrum(7.f, 0.f, 0.f));
 	}
+	
+	/**
+	 * Creates canonical sphere (at origin 0,0,0 with radius 1
+	 * @param center, a point inn world coordinates
+	 * @param radius of resulting sphere
+	 */
+	public CSGSphere() {
+		this.center = new Point3f();
+		this.radius = 1;
+		material = new Diffuse(new Spectrum(7.f, 0.f, 0.f));
+	}
 
 	public ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
 		ArrayList<IntervalBoundary> intervalBoundaries = new ArrayList<>();

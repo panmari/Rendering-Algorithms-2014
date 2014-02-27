@@ -11,7 +11,6 @@ public class IntersectableList extends Aggregate {
 	
 	public boolean add(Intersectable i) {
 		return intersectibles.add(i);
-		
 	}
 	
 	@Override

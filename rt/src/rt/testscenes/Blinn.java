@@ -47,7 +47,7 @@ public class Blinn extends Scene {
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.f);
 		
 		// Sphere with Blinn material
-		CSGSolid sphere = new CSGCylinder(new Point3f(0, 0, 0), .5f);
+		CSGSolid sphere = new CSGInfinitCylinder(new Point3f(0, 0, 0), .5f);
 		//sphere.material = new rt.materials.Blinn(new Spectrum(.8f, 0.f, 0.f), new Spectrum(.4f, .4f, .4f), 50.f);
 		
 		IntersectableList intersectableList = new IntersectableList();

@@ -16,13 +16,13 @@ import rt.intersectables.CSGSolid.BoundaryType;
 import rt.intersectables.CSGSolid.IntervalBoundary;
 import rt.materials.Diffuse;
 
-public class CSGCylinder extends CSGSolid {
+public class CSGInfinitCylinder extends CSGSolid {
 
 	private Point3f center;
 	private float radius;
 	private Diffuse material;
 
-	public CSGCylinder(Point3f center, float radius) {
+	public CSGInfinitCylinder(Point3f center, float radius) {
 		this.center = center;
 		this.radius = radius;
 		this.material = new Diffuse(new Spectrum(5,0,0));
