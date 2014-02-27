@@ -5,6 +5,7 @@ import javax.vecmath.Point2f;
 public class MyMath {
 
 	/**
+	 * Assumes parameters given as ax² + bx + c = 0
 	 * @param a
 	 * @param b
 	 * @param c
@@ -13,9 +14,10 @@ public class MyMath {
 	 * @return, if solution has been saved in t0 and t1
 	 */
 	public static Point2f solveQuadratic(float a, float b, float c) {
-		float rootDisc = (float)Math.sqrt(b*b - 4*a*c);
-		if(rootDisc < 0)
+		float disc = b*b - 4*a*c;
+		if(disc < 0)
 			return null;
+		float rootDisc = (float)Math.sqrt(disc);
 		// numerical magic copied from PBRT:
 		float q;
 		if (b < 0)
