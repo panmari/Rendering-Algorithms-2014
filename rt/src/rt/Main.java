@@ -141,7 +141,7 @@ public class Main {
 		
 		// Wait for threads to end
 		int printed = 0;
-		System.out.printf("Rendering image:\n");
+		System.out.printf("Rendering scene %s:\n", scene.getClass().toString());
 		System.out.printf("0%%                                                50%%                                           100%%\n");
 		System.out.printf("|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------\n");
 		synchronized(tasksLeft)

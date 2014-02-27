@@ -12,44 +12,55 @@ import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
 import rt.StaticVecmath;
+import rt.intersectables.CSGSolid.BoundaryType;
+import rt.intersectables.CSGSolid.IntervalBoundary;
 import rt.materials.Diffuse;
 
 public class CSGCylinder extends CSGSolid {
 
 	private Point3f center;
-	private float height;
 	private float radius;
 	private Diffuse material;
 
-	public CSGCylinder(Point3f center, float height, float radius) {
+	public CSGCylinder(Point3f center, float radius) {
 		this.center = center;
-		this.height = height;
 		this.radius = radius;
-		this.material = new Diffuse(new Spectrum(5,5,5));
+		this.material = new Diffuse(new Spectrum(5,0,0));
 	}
 	
 	@Override
 	ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
-		Vector2f c = new Vector2f(center.x, center.y);
-		Vector2f d = new Vector2f(r.direction.x, r.direction.y);
-		Vector2f e = new Vector2f(r.origin.x, r.origin.y);
+		Vector2f center = new Vector2f(this.center.x, this.center.y);
+		Vector2f direction = new Vector2f(r.direction.x, r.direction.y);
+		Vector2f origin = new Vector2f(r.origin.x, r.origin.y);
 
-		float a = d.lengthSquared();
+		ArrayList<IntervalBoundary> intervalBoundaries = new ArrayList<>();
+		float a = direction.lengthSquared();
 		Vector2f originCenter = new Vector2f();
-		originCenter.sub(e, c);
-		float b = 2*d.dot(originCenter);
-		float cf = originCenter.lengthSquared() - radius*radius;
-		Point2f t = MyMath.solveQuadratic(a, b, cf);
-
-		return null;
+		originCenter.sub(origin, center);
+		float b = 2*direction.dot(originCenter);
+		float c = originCenter.lengthSquared() - radius*radius;
+		Point2f t = MyMath.solveQuadratic(a, b, c);
+		if (t == null)
+			return intervalBoundaries;
+		
+		IntervalBoundary b0 = new IntervalBoundary(t.x, BoundaryType.START, 
+				makeHitRecord(t.x, r), null);
+		IntervalBoundary b1 = new IntervalBoundary(t.y, BoundaryType.END, 
+				makeHitRecord(t.y, r), null);
+		intervalBoundaries.add(b0);
+		intervalBoundaries.add(b1);
+		return intervalBoundaries;
 	}
 	
 	private HitRecord makeHitRecord(float t, Ray r) {
+		
 		Point3f hitPoint = r.pointAt(t);
 		Vector3f normal = new Vector3f();
 		normal.sub(hitPoint, this.center);
+		normal.z = 0;
 		//normalize:
-		normal.scale(1/this.radius);
+		normal.normalize();
 		
 		Vector3f wIn = new Vector3f(r.direction);
 		wIn.normalize();

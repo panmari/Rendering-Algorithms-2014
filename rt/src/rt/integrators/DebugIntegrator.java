@@ -31,7 +31,7 @@ public class DebugIntegrator implements Integrator {
 			
 			if(hitRecord.t > 0.f)
 				// Ok, hit point was "in front" of ray origin
-				return new Spectrum(0.f,1.f,0.f);
+				return new Spectrum(hitRecord.normal);
 			else
 				// Weird, a hit point "behind" the ray origin was returned, 
 				// this shouldn't happen in general!			

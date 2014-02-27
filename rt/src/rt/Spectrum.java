@@ -1,5 +1,7 @@
 package rt;
 
+import javax.vecmath.Tuple3f;
+
 /**
  * Stores a spectrum of color values. In this implementation, we work with RGB colors.
  */
@@ -12,6 +14,16 @@ public class Spectrum {
 		r = 0.f;
 		g = 0.f;
 		b = 0.f;
+	}
+	
+	/**
+	 * Maps a vector with every coordinate in [0,1] to a valid Spectrum
+	 * @param v
+	 */
+	public Spectrum(Tuple3f v) {
+		this.r = (v.x + 1)/2;
+		this.g = (v.y + 1)/2;
+		this.b = (v.z + 1)/2;
 	}
 	
 	public Spectrum(float r, float g, float b)
