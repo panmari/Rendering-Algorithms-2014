@@ -21,8 +21,8 @@ public class Instance implements Intersectable {
 	public HitRecord intersect(Ray r) {
 		Point3f instanceOrigin = new Point3f(r.origin);
 		Vector3f instanceDir = new Vector3f(r.direction);
-		t.transform(instanceOrigin);
-		t.transform(instanceDir);
+		tinverse.transform(instanceOrigin);
+		tinverse.transform(instanceDir);
 		
 		Ray instanceRay = new Ray(instanceOrigin, instanceDir);
 		HitRecord instanceHitRecord = intersectable.intersect(instanceRay);
@@ -33,11 +33,13 @@ public class Instance implements Intersectable {
 	
 	private HitRecord transformBack(HitRecord h) {
 		Point3f tPosition = new Point3f(h.position);
-		tinverse.transform(tPosition);
+		t.transform(tPosition);
 		Vector3f tNormal = new Vector3f(h.normal);
-		tinverse.transform(tNormal);
+		//TODO: this is not as easy, eg with scale, thx @gidoca
+		t.transform(tNormal);
 		Vector3f tW = new Vector3f(h.w);
-		tinverse.transform(tW);
-		return new HitRecord(h.t,tPosition, tNormal, tW, h.intersectable, h.material, h.u, h.v);
+		t.transform(tW);
+		// does the t also need fixing?
+		return new HitRecord(h.t, tPosition, tNormal, tW, h.intersectable, h.material, h.u, h.v);
 	}
 }
