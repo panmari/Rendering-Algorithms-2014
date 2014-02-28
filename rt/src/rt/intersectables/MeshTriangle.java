@@ -50,7 +50,13 @@ public class MeshTriangle implements Intersectable {
 		t.setColumn(0, col0);
 		t.setColumn(1, col1);
 		t.setColumn(2, r.direction);
-		t.invert();
+		try {
+			t.invert();
+		} catch(SingularMatrixException e) {
+			//handles sliver triangles etc...
+			return null;
+		}
+		
 		Vector3f betaGammaT = new Vector3f();
 		betaGammaT.sub(a, r.origin);
 		t.transform(betaGammaT);
