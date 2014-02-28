@@ -11,40 +11,31 @@ import rt.HitRecord;
 import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
-import rt.StaticVecmath;
-import rt.intersectables.CSGSolid.BoundaryType;
-import rt.intersectables.CSGSolid.IntervalBoundary;
 import rt.materials.Diffuse;
 
-public class CSGInfiniteCylinder extends CSGSolid {
+public class CSGInfiniteDoubleCone extends CSGSolid {
 
-	private Point3f center;
-	private float radius;
 	private Diffuse material;
 
 	/**
-	 * An infinite cylinder centered around the z-axis with the given radius.
-	 * @param center
-	 * @param radius
+	 * Always centered at (0,0,0), the radius is restricted by x² + y² = z²
 	 */
-	public CSGInfiniteCylinder(float radius) {
-		this.center = new Point3f(0,0,0);
-		this.radius = radius;
+	public CSGInfiniteDoubleCone() {
 		this.material = new Diffuse(new Spectrum(1.f, 1.f, 1.f));
 	}
 	
 	@Override
 	ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
-		Vector2f center = new Vector2f(this.center.x, this.center.y);
 		Vector2f direction = new Vector2f(r.direction.x, r.direction.y);
-		Vector2f origin = new Vector2f(r.origin.x, r.origin.y);
-
+		
 		ArrayList<IntervalBoundary> intervalBoundaries = new ArrayList<>();
-		float a = direction.lengthSquared();
-		Vector2f originCenter = new Vector2f();
-		originCenter.sub(origin, center);
-		float b = 2*direction.dot(originCenter);
-		float c = originCenter.lengthSquared() - radius*radius;
+		float a = direction.lengthSquared() - r.direction.z*r.direction.z;
+		float b = 2*(r.direction.x * r.origin.x +
+				r.direction.y * r.origin.y -
+				r.direction.z * r.origin.z);
+		float c = r.origin.x * r.origin.x +
+				r.origin.y * r.origin.y - 
+				r.origin.z * r.origin.z;
 		Point2f t = MyMath.solveQuadratic(a, b, c);
 		if (t == null)
 			return intervalBoundaries;
@@ -60,10 +51,17 @@ public class CSGInfiniteCylinder extends CSGSolid {
 	
 	private HitRecord makeHitRecord(float t, Ray r) {	
 		Point3f hitPoint = r.pointAt(t);
-		Vector3f normal = new Vector3f();
-		normal.sub(hitPoint, this.center);
+		Vector3f normal = new Vector3f(hitPoint);
 		normal.z = 0;
-		//normalize:
+		normal.normalize(); //possibly same as division by hitPoint.z^2
+		//TODO: this possibly doesn't work yet..
+		float angle;
+		if (hitPoint.z > 0)
+			angle = 45;
+		else
+			angle = -45;
+		normal.z = (float) Math.tan(Math.toDegrees(angle));
+		//normalize again:
 		normal.normalize();
 		
 		Vector3f wIn = new Vector3f(r.direction);

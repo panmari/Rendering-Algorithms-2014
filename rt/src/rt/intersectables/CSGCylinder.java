@@ -13,6 +13,7 @@ public class CSGCylinder extends CSGSolid {
 
 	/**
 	 * A finite cylinder centered around the z-axis, cut off at height/2 and -height/2
+	 * TODO: materials can not be set for the whole cylinder at once
 	 * @param center
 	 * @param radius
 	 * @param height
@@ -29,7 +30,4 @@ public class CSGCylinder extends CSGSolid {
 	ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
 		return root.getIntervalBoundaries(r);
 	}
-	
-	
-
 }
