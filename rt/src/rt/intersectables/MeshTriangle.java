@@ -50,8 +50,6 @@ public class MeshTriangle implements Intersectable {
 		t.setColumn(0, col0);
 		t.setColumn(1, col1);
 		t.setColumn(2, r.direction);
-		//if (t.determinant() < 0.00001f)
-		//	return null;
 		t.invert();
 		Vector3f betaGammaT = new Vector3f();
 		betaGammaT.sub(a, r.origin);
@@ -72,8 +70,13 @@ public class MeshTriangle implements Intersectable {
 	}
 
 	private boolean isInside(Vector3f betaGammaT) {
+		if (betaGammaT.x < 0 || 
+				betaGammaT.x > 1 ||
+				betaGammaT.y < 0 || 
+				betaGammaT.y > 1)
+			return false;
 		float f = betaGammaT.x + betaGammaT.y;
-		return f > 0 && f < 1;
+		return f > 0 && f < 1 ;
 	}
 	
 }
