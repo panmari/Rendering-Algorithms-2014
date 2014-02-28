@@ -16,16 +16,21 @@ import rt.intersectables.CSGSolid.BoundaryType;
 import rt.intersectables.CSGSolid.IntervalBoundary;
 import rt.materials.Diffuse;
 
-public class CSGInfinitCylinder extends CSGSolid {
+public class CSGInfiniteCylinder extends CSGSolid {
 
 	private Point3f center;
 	private float radius;
 	private Diffuse material;
 
-	public CSGInfinitCylinder(Point3f center, float radius) {
-		this.center = center;
+	/**
+	 * An infinite cylinder centered around the z-axis with the given radius.
+	 * @param center
+	 * @param radius
+	 */
+	public CSGInfiniteCylinder(float radius) {
+		this.center = new Point3f(0,0,0);
 		this.radius = radius;
-		this.material = new Diffuse(new Spectrum(5,0,0));
+		this.material = new Diffuse(new Spectrum(1.f, 1.f, 1.f));
 	}
 	
 	@Override
