@@ -51,17 +51,13 @@ public class CSGInfiniteDoubleCone extends CSGSolid {
 	
 	private HitRecord makeHitRecord(float t, Ray r) {	
 		Point3f hitPoint = r.pointAt(t);
-		Vector3f normal = new Vector3f(hitPoint);
-		normal.z = 0;
-		normal.normalize(); //possibly same as division by hitPoint.z^2
-		//TODO: this possibly doesn't work yet..
-		float angle;
-		if (hitPoint.z > 0)
-			angle = 45;
-		else
-			angle = -45;
-		normal.z = (float) Math.tan(Math.toDegrees(angle));
-		//normalize again:
+		Vector3f normalCyl = new Vector3f(hitPoint);
+		normalCyl.z = 0;
+		Vector3f tangential1 = new Vector3f();
+		tangential1.cross(new Vector3f(0, 0, 1), normalCyl);
+		Vector3f tangential2 = new Vector3f(hitPoint);
+		Vector3f normal = new Vector3f();
+		normal.cross(tangential2, tangential1);
 		normal.normalize();
 		
 		Vector3f wIn = new Vector3f(r.direction);
