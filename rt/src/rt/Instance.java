@@ -9,12 +9,15 @@ public class Instance implements Intersectable {
 	private Matrix4f t;
 	private Matrix4f tinverse;
 	private Intersectable intersectable;
+	private Matrix4f tinverseTanspose;
 
 	public Instance(Intersectable i, Matrix4f t) {
 		this.intersectable = i;
 		this.t = t;
 		this.tinverse = new Matrix4f(t);
 		this.tinverse.invert();
+		this.tinverseTanspose = new Matrix4f(tinverse);
+		this.tinverseTanspose.transpose();
 	}
 
 	@Override
@@ -35,10 +38,9 @@ public class Instance implements Intersectable {
 		Point3f tPosition = new Point3f(h.position);
 		t.transform(tPosition);
 		Vector3f tNormal = new Vector3f(h.normal);
-		//TODO: this is not as easy, eg with scale, thx @gidoca
-		t.transform(tNormal);
+		tinverseTanspose.transform(tNormal);
 		Vector3f tW = new Vector3f(h.w);
-		t.transform(tW);
+		tinverseTanspose.transform(tW);
 		// does the t also need fixing?
 		return new HitRecord(h.t, tPosition, tNormal, tW, h.intersectable, h.material, h.u, h.v);
 	}
