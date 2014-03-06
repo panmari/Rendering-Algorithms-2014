@@ -50,16 +50,11 @@ public class MeshTriangle implements Intersectable {
 		t.setColumn(0, col0);
 		t.setColumn(1, col1);
 		t.setColumn(2, r.direction);
-		try {
-			t.invert();
-		} catch(SingularMatrixException e) {
-			//handles sliver triangles etc...
-			return null;
-		}
 		
-		Vector3f betaGammaT = new Vector3f();
-		betaGammaT.sub(a, r.origin);
-		t.transform(betaGammaT);
+		Vector3f rightHand = new Vector3f();
+		rightHand.sub(a, r.origin);
+		
+		Vector3f betaGammaT = getBetaGammaTCramer(t, rightHand);
 		
 		if (isInside(betaGammaT)) {
 			float tHit = betaGammaT.z;
@@ -73,7 +68,48 @@ public class MeshTriangle implements Intersectable {
 		else
 			return null;
 	}
+	
+	/**
+	 * thx @misch for doing the implmentation of cramers rule.
+	 * TODO: handle sliver triangles
+	 * @param matrix
+	 * @param rightHand
+	 * @return
+	 */
+	private Vector3f getBetaGammaTCramer(Matrix3f matrix, Vector3f rightHand) {
+		// Apply Cramer's rule
+		float detA = matrix.determinant();
 
+		Matrix3f matrix0 = new Matrix3f(matrix);
+		matrix0.setColumn(0, rightHand);
+		float detA0 = matrix0.determinant();
+
+		Matrix3f matrix1 = new Matrix3f(matrix);
+		matrix1.setColumn(1, rightHand);
+		float detA1 = matrix1.determinant();
+
+		Matrix3f matrix2 = new Matrix3f(matrix);
+		matrix2.setColumn(2, rightHand);
+		float detA2 = matrix2.determinant();
+		
+		float beta = detA0/detA;
+		float gamma = detA1/detA;
+		float t = detA2/detA;
+		return new Vector3f(beta, gamma, t);
+	}
+
+	Vector3f getBetaGammaTMatrixInversion(Matrix3f t, Vector3f rightHand) {
+		try {
+			t.invert();
+		} catch(SingularMatrixException e) {
+			//handles sliver triangles etc...
+			return null;
+		}
+	
+		t.transform(rightHand);
+		return rightHand;
+	}
+	
 	private Vector3f makeNormal(Vector3f betaGammaT) {
 		float normals[] = mesh.normals;
 
