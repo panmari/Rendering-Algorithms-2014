@@ -1,7 +1,5 @@
 package rt.testscenes;
 
-import java.io.IOException;
-
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
@@ -10,7 +8,6 @@ import rt.Intersectable;
 import rt.IntersectableList;
 import rt.LightGeometry;
 import rt.LightList;
-import rt.ObjReader;
 import rt.Scene;
 import rt.Spectrum;
 import rt.cameras.PinholeCamera;
@@ -27,16 +24,16 @@ import rt.tonemappers.ClampTonemapper;
 /**
  * Test scene for instancing and rendering triangle meshes.
  */
-public class Instancing extends Scene {
+public class InstancingDoubleCone extends Scene {
 
 	public IntersectableList objects;
 
 	/**
 	 * Timing: 8.5 sec on 12 core Xeon 2.5GHz, 24 threads
 	 */
-	public Instancing()
+	public InstancingDoubleCone()
 	{	
-		outputFilename = new String("../output/testscenes/Instancing-mine");
+		outputFilename = new String("../output/testscenes/Instancing-double-cone");
 		
 		// Specify integrator to be used
 		integratorFactory = new PointLightIntegratorFactory();
@@ -82,32 +79,20 @@ public class Instancing extends Scene {
 		objects.add(plane);
 		
 		// Add objects
-		Intersectable mesh = null;
-		try {
-			mesh = ObjReader.read("../obj/teapot.obj", 1.f);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		 Intersectable mesh = new CSGInfiniteDoubleCone();
+
 		Matrix4f t = new Matrix4f();
 		t.setIdentity();
+
 		
-		// Instance one
-		t.setScale(0.5f);
-		t.setTranslation(new Vector3f(0.f, -0.35f, 0.f));
-		Instance instance = new Instance(mesh, t);
-		objects.add(instance);	
-		
-		// Instance two
 		t = new Matrix4f();
 		t.setIdentity();
-		t.setScale(0.5f);
-		t.setTranslation(new Vector3f(0.f, 0.25f, 0.f));
+		t.setScale(0.1f);
+		//t.setTranslation(new Vector3f(0.f, 0.25f, 0.f));
 		Matrix4f rot = new Matrix4f();
-		rot.rotX((float)Math.toRadians(30.f));
+		rot.rotX((float)Math.toRadians(90.f));
 		t.mul(rot);
-		instance = new Instance(mesh, t);
+		Instance instance = new Instance(mesh, t);
 		objects.add(instance);
 				
 		root = objects;
@@ -115,10 +100,10 @@ public class Instancing extends Scene {
 		// List of lights
 		lightList = new LightList();
 		
-		LightGeometry light = new PointLight(new Vector3f(0.f,0.8f,0.8f), new Spectrum(3.f, 3.f, 3.f));
+		LightGeometry light = new PointLight(new Vector3f(0.f, -1.5f, 0.0f), new Spectrum(3.f, 3.f, 3.f));
 		lightList.add(light);
 		
-		light = new PointLight(new Vector3f(-0.8f,0.2f,1.f), new Spectrum(1.5f, 1.5f, 1.5f));
-		lightList.add(light);		
+		//light = new PointLight(new Vector3f(-0.8f,0.2f,1.f), new Spectrum(1.5f, 1.5f, 1.5f));
+		//lightList.add(light);		
 	}
 }
