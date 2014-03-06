@@ -28,15 +28,17 @@ public class CSGPlane extends CSGSolid {
 	 * @param normal the plane normal
 	 * @param d distance of the plane to the origin, along the normal direction (sign is important!)
 	 */
-	public CSGPlane(Vector3f normal, float d)
-	{		
+	public CSGPlane(Vector3f normal, float d) {		
+		this(normal, d, new Diffuse(new Spectrum(1.f, 1.f, 1.f)));
+	}		
+	
+	public CSGPlane(Vector3f normal, float d, Material material) {
 		this.normal = new Vector3f(normal);
 		this.normal.normalize();
 		this.d = d;
-		
-		material = new Diffuse(new Spectrum(1.f, 1.f, 1.f));
-	}		
-	
+		this.material = material;
+	}
+
 	public ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r)
 	{
 		ArrayList<IntervalBoundary> boundaries = new ArrayList<IntervalBoundary>();

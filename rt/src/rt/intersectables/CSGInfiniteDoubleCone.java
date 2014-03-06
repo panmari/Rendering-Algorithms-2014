@@ -8,6 +8,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
+import rt.Material;
 import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
@@ -15,15 +16,21 @@ import rt.materials.Diffuse;
 
 public class CSGInfiniteDoubleCone extends CSGSolid {
 
-	private Diffuse material;
+	private Material material;
 
 	/**
 	 * Always centered at (0,0,0), the radius is restricted by x² + y² = z²
 	 */
 	public CSGInfiniteDoubleCone() {
-		this.material = new Diffuse(new Spectrum(1.f, 1.f, 1.f));
+		this(new Diffuse(new Spectrum(1.f, 1.f, 1.f)));
 	}
 	
+	/**
+	 * Always centered at (0,0,0), the radius is restricted by x² + y² = z²
+	 */
+	public CSGInfiniteDoubleCone(Material m) {
+		this.material = m;
+	}
 	@Override
 	ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
 		Vector2f direction = new Vector2f(r.direction.x, r.direction.y);

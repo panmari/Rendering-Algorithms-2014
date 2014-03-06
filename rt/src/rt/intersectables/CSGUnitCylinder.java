@@ -5,9 +5,10 @@ import java.util.ArrayList;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
+import rt.Material;
 import rt.Ray;
 
-public class CSGCylinder extends CSGSolid {
+public class CSGUnitCylinder extends CSGSolid {
 
 	private CSGNode root;
 
@@ -18,10 +19,13 @@ public class CSGCylinder extends CSGSolid {
 	 * @param radius
 	 * @param height
 	 */
-	public CSGCylinder(float radius, float height) {
-		CSGPlane top = new CSGPlane(new Vector3f(0,0.f,1.f), -height/2);
-		CSGPlane bottom = new CSGPlane(new Vector3f(0,0.f,-1.f), -height/2);
-		CSGInfiniteCylinder cyl = new CSGInfiniteCylinder(radius);
+	public CSGUnitCylinder(Material m) {
+		float height = 1;
+		CSGPlane top = new CSGPlane(new Vector3f(0,0.f,1.f), -height);
+		top.material = m;
+		CSGPlane bottom = new CSGPlane(new Vector3f(0,0.f,-1.f), 0);
+		bottom.material = m;
+		CSGInfiniteCylinder cyl = new CSGInfiniteCylinder(m);
 		CSGNode n1 = new CSGNode(top, cyl, CSGNode.OperationType.INTERSECT);
 		root = new CSGNode(n1, bottom, CSGNode.OperationType.INTERSECT);
 	}

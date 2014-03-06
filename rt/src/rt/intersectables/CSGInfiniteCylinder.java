@@ -8,6 +8,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
+import rt.Material;
 import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
@@ -20,17 +21,17 @@ public class CSGInfiniteCylinder extends CSGSolid {
 
 	private Point3f center;
 	private float radius;
-	private Diffuse material;
+	private Material material;
 
 	/**
 	 * An infinite cylinder centered around the z-axis with the given radius.
 	 * @param center
 	 * @param radius
 	 */
-	public CSGInfiniteCylinder(float radius) {
+	public CSGInfiniteCylinder(Material m) {
 		this.center = new Point3f(0,0,0);
-		this.radius = radius;
-		this.material = new Diffuse(new Spectrum(1.f, 1.f, 1.f));
+		this.radius = 1;
+		this.material = m;
 	}
 	
 	@Override

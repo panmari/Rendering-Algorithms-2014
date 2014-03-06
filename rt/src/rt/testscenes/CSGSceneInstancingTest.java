@@ -6,19 +6,19 @@ import javax.vecmath.Vector3f;
 import rt.*;
 import rt.cameras.PinholeCamera;
 import rt.films.BoxFilterFilm;
-import rt.integrators.WhittedIntegratorFactory;
+import rt.integrators.PointLightIntegratorFactory;
 import rt.intersectables.*;
 import rt.lightsources.*;
 import rt.materials.*;
 import rt.samplers.*;
 import rt.tonemappers.ClampTonemapper;
 
-public class CSGScene extends Scene {
+public class CSGSceneInstancingTest extends Scene {
 	
-	public CSGScene()
+	public CSGSceneInstancingTest()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/CSGScene");
+		outputFilename = new String("../output/testscenes/CSGScene-mine");
 		
 		// Image width and height in pixels
 		width = 640;
@@ -38,10 +38,10 @@ public class CSGScene extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
-		integratorFactory = new WhittedIntegratorFactory();
-		samplerFactory = new UniformSamplerFactory();		
+		integratorFactory = new PointLightIntegratorFactory();
+		samplerFactory = new OneSamplerFactory();		
 		
-		Material refractive = new Refractive(1.3f);
+		Material refractive = new Diffuse(new Spectrum(1,1,1));
 		
 		// Make a conical "bowl" by subtracting cross-sections of two cones
 		CSGSolid outerCone = coneCrossSection(60.f, refractive);
@@ -97,11 +97,11 @@ public class CSGScene extends Scene {
 		soap = new CSGInstance(soap, trans);
 		
 		// Ground and back plane
-		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
+		//XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
 		Plane groundPlane = new Plane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
-		groundPlane.material = grid;
+		//groundPlane.material = grid;
 		Plane backPlane = new Plane(new Vector3f(0.f, 0.f, 1.f), 3.15f);
-		backPlane.material = grid;		
+		//backPlane.material = grid;		
 		
 		// Collect objects in intersectable list
 		IntersectableList intersectableList = new IntersectableList();
@@ -135,7 +135,7 @@ public class CSGScene extends Scene {
 	private CSGSolid coneCrossSection(float a, Material material)
 	{
 		// Makes a two-sided infinite cone with apex angle 90 degrees
-		CSGTwoSidedInfiniteCone doubleCone = new CSGTwoSidedInfiniteCone(material);
+		CSGInfiniteDoubleCone doubleCone = new CSGInfiniteDoubleCone(material);
 		// Scaling factor along the cone axis corresponding to apex angle
 		float s = (float)Math.tan((90-a/2)/180.f*(float)Math.PI);
 		
