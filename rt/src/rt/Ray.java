@@ -10,6 +10,11 @@ public class Ray {
 	public Vector3f origin;
 	public Vector3f direction;
 	
+	/**
+	 * Stores copies of the given tuples
+	 * @param origin
+	 * @param direction
+	 */
 	public Ray(Tuple3f origin, Tuple3f direction)
 	{
 		this.origin = new Vector3f(origin); 

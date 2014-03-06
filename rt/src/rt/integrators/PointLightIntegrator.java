@@ -49,11 +49,20 @@ public class PointLightIntegrator implements Integrator {
 				LightGeometry lightSource = it.next();
 				
 				// Make direction from hit point to light source position; this is only supposed to work with point lights
-				float dummySample[] = new float[2];
-				HitRecord lightHit = lightSource.sample(dummySample);
+				HitRecord lightHit = lightSource.sample(null);
 				Vector3f lightDir = StaticVecmath.sub(lightHit.position, hitRecord.position);
-				float d = lightDir.length();
+				float d2 = lightDir.lengthSquared();
+				float d = (float) Math.sqrt(d2);
 				lightDir.normalize();
+				
+				//TODO: fix shadows
+				Ray shadowRay = new Ray(hitRecord.position, lightDir);
+				HitRecord shadowHit = root.intersect(shadowRay);
+				if (shadowHit != null && 
+						shadowHit.t > 1e-3 && //prevents self intersection -> shadow acne
+						//shadowHit.t < d2 + 1e-3)
+						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2 + 1e-1) //only if closer than light
+					continue;
 				
 				// Evaluate the BRDF
 				brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);
@@ -71,7 +80,7 @@ public class PointLightIntegrator implements Integrator {
 				
 				// Geometry term: multiply with 1/(squared distance), only correct like this 
 				// for point lights (not area lights)!
-				s.mult(1.f/(d*d));
+				s.mult(1.f/(d2));
 				
 				// Accumulate
 				outgoing.add(s);
