@@ -10,6 +10,7 @@ public class Instance implements Intersectable {
 	private Matrix4f tinverse;
 	private Intersectable intersectable;
 	private Matrix4f tinverseTanspose;
+	public Material material;
 
 	public Instance(Intersectable i, Matrix4f t) {
 		this.intersectable = i;

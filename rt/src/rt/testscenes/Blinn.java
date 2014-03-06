@@ -1,6 +1,5 @@
 package rt.testscenes;
 
-import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import rt.*;
@@ -29,7 +28,7 @@ public class Blinn extends Scene {
 		SPP = 1;
 		
 		// Specify which camera, film, and tonemapper to use
-		Vector3f eye = new Vector3f(0.f, 3.f, 3.f);
+		Vector3f eye = new Vector3f(0.f, 0.f, 3.f);
 		Vector3f lookAt = new Vector3f(0.f, 0.f, 0.f);
 		Vector3f up = new Vector3f(0.f, 1.f, 0.f);
 		float fov = 60.f;
@@ -39,19 +38,18 @@ public class Blinn extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
-		integratorFactory = new DebugIntegratorFactory(); 
-		//integratorFactory = new PointLightIntegratorFactory();
+		//integratorFactory = new DebugIntegratorFactory(); 
+		integratorFactory = new PointLightIntegratorFactory();
 		samplerFactory = new OneSamplerFactory();
 
 		// Ground plane
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.f);
 		
-		// Sphere with Blinn material
-		CSGSolid sphere = new CSGInfinitCylinder(new Point3f(0, 0, 0), .5f);
-		//sphere.material = new rt.materials.Blinn(new Spectrum(.8f, 0.f, 0.f), new Spectrum(.4f, .4f, .4f), 50.f);
+		CSGSphere sphere = new CSGSphere();
+		sphere.material = new rt.materials.Blinn(new Spectrum(.8f, 0.f, 0.f), new Spectrum(.4f, .4f, .4f), 50.f);
 		
 		IntersectableList intersectableList = new IntersectableList();
-		//intersectableList.add(groundPlane);
+		intersectableList.add(groundPlane);
 		intersectableList.add(sphere);
 		
 		root = intersectableList;

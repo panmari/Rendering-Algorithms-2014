@@ -10,7 +10,6 @@ import rt.integrators.WhittedIntegratorFactory;
 import rt.intersectables.*;
 import rt.lightsources.*;
 import rt.materials.*;
-import rt.materials.XYZGrid;
 import rt.samplers.*;
 import rt.tonemappers.ClampTonemapper;
 

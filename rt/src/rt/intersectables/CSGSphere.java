@@ -1,5 +1,6 @@
 package rt.intersectables;
 
+import java.awt.Point;
 import java.util.ArrayList;
 
 import javax.vecmath.Point2f;
@@ -18,7 +19,8 @@ public class CSGSphere extends CSGSolid {
 	
 	private Point3f center;
 	private float radius;
-	private Material material;
+	public Material material;
+	
 	
 	/**
 	 * Creates a sphere
@@ -37,9 +39,7 @@ public class CSGSphere extends CSGSolid {
 	 * @param radius of resulting sphere
 	 */
 	public CSGSphere() {
-		this.center = new Point3f();
-		this.radius = 1;
-		material = new Diffuse(new Spectrum(1.f, 1.f, 1.f));
+		this(new Point3f(), 1);
 	}
 
 	public ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
