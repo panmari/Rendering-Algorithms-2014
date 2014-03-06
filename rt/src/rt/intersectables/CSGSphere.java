@@ -28,7 +28,7 @@ public class CSGSphere extends CSGSolid {
 	public CSGSphere(Point3f center, float radius) {
 		this.center = center;
 		this.radius = radius;
-		material = new Diffuse(new Spectrum(7.f, 0.f, 0.f));
+		material = new Diffuse(new Spectrum(1.f, 1.f, 1.f));
 	}
 	
 	/**
@@ -39,7 +39,7 @@ public class CSGSphere extends CSGSolid {
 	public CSGSphere() {
 		this.center = new Point3f();
 		this.radius = 1;
-		material = new Diffuse(new Spectrum(7.f, 0.f, 0.f));
+		material = new Diffuse(new Spectrum(1.f, 1.f, 1.f));
 	}
 
 	public ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
