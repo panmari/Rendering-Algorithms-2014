@@ -52,16 +52,16 @@ public class PointLightIntegrator implements Integrator {
 				HitRecord lightHit = lightSource.sample(null);
 				Vector3f lightDir = StaticVecmath.sub(lightHit.position, hitRecord.position);
 				float d2 = lightDir.lengthSquared();
-				float d = (float) Math.sqrt(d2);
 				lightDir.normalize();
 				
 				//TODO: fix shadows
-				Ray shadowRay = new Ray(hitRecord.position, lightDir);
+				Point3f shadowRayStart = new Point3f(lightDir);
+				shadowRayStart.scaleAdd(0.001f, hitRecord.position);
+				
+				Ray shadowRay = new Ray(shadowRayStart, lightDir);
 				HitRecord shadowHit = root.intersect(shadowRay);
-				if (shadowHit != null && 
-						shadowHit.t > 1e-3 && //prevents self intersection -> shadow acne
-						//shadowHit.t < d2 + 1e-3)
-						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2 + 1e-1) //only if closer than light
+				if (shadowHit != null &&
+						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
 					continue;
 				
 				// Evaluate the BRDF
@@ -80,7 +80,7 @@ public class PointLightIntegrator implements Integrator {
 				
 				// Geometry term: multiply with 1/(squared distance), only correct like this 
 				// for point lights (not area lights)!
-				s.mult(1.f/(d2));
+				s.mult(1.f/d2);
 				
 				// Accumulate
 				outgoing.add(s);

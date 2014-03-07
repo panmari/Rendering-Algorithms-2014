@@ -4,6 +4,8 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
+import rt.materials.Diffuse;
+
 public class Instance implements Intersectable {
 
 	private Matrix4f t;
@@ -19,6 +21,7 @@ public class Instance implements Intersectable {
 		this.tinverse.invert();
 		this.tinverseTanspose = new Matrix4f(tinverse);
 		this.tinverseTanspose.transpose();
+		this.material = new Diffuse(); //default material
 	}
 
 	@Override
@@ -46,6 +49,6 @@ public class Instance implements Intersectable {
 		tinverseTanspose.transform(tW);
 		tW.normalize();
 		// does the t also need fixing?
-		return new HitRecord(h.t, tPosition, tNormal, tW, h.intersectable, h.material, h.u, h.v);
+		return new HitRecord(h.t, tPosition, tNormal, tW, h.intersectable, this.material, h.u, h.v);
 	}
 }
