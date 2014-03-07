@@ -20,7 +20,7 @@ public class RefractiveSphere extends Scene {
 	public RefractiveSphere()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/RefractiveSphere");
+		outputFilename = new String("../output/testscenes/RefractiveSphere-mine");
 		
 		// Image width and height in pixels
 		width = 512;
@@ -40,10 +40,11 @@ public class RefractiveSphere extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
-		integratorFactory = new WhittedIntegratorFactory();
+		integratorFactory = new PointLightIntegratorFactory();
+		//integratorFactory = new WhittedIntegratorFactory();
 		samplerFactory = new RandomSamplerFactory();		
 		
-		Material refractive = new Refractive(1.3f);
+		Material refractive = new Diffuse(); //new Refractive(1.3f);
 
 		
 		// Ground and back plane

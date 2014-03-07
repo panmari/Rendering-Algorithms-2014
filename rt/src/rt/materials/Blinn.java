@@ -30,13 +30,11 @@ public class Blinn implements Material {
 		h.normalize(); //div by 2 should be same
 		Spectrum specularPart = new Spectrum(specular);
 		specularPart.mult((float)Math.pow(h.dot(hitRecord.normal), shinyness));
-		
-		Spectrum ambientPart = new Spectrum(diffuse);
-		
+				
 		Spectrum allParts = new Spectrum();
 		allParts.add(diffusePart);
 		allParts.add(specularPart);
-		//allParts.add(ambientPart);
+		//allParts.add(ambientPart); //we don't use an ambient part
 		return allParts;
 	}
 
@@ -83,8 +81,7 @@ public class Blinn implements Material {
 
 	@Override
 	public boolean castsShadows() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }
