@@ -14,7 +14,7 @@ public class Blinn implements Material {
 
 	public Blinn(Spectrum diffuse, Spectrum specular, float shinyness) {
 			this.diffuse = diffuse;
-			//this.diffuse.mult(1/(float)Math.PI);
+			this.diffuse.mult(1/(float)Math.PI);
 			this.specular = specular;
 			this.shinyness = shinyness;
 	}
@@ -36,7 +36,7 @@ public class Blinn implements Material {
 		Spectrum allParts = new Spectrum();
 		allParts.add(diffusePart);
 		allParts.add(specularPart);
-		allParts.add(ambientPart);
+		//allParts.add(ambientPart);
 		return allParts;
 	}
 

@@ -70,7 +70,7 @@ public class MeshTriangle implements Intersectable {
 	}
 	
 	/**
-	 * thx @misch for doing the implmentation of cramers rule.
+	 * thx @misch for doing the implementation of cramers rule.
 	 * TODO: handle sliver triangles
 	 * @param matrix
 	 * @param rightHand

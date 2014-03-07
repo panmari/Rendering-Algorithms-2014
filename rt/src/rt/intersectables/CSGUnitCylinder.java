@@ -13,8 +13,7 @@ public class CSGUnitCylinder extends CSGSolid {
 	private CSGNode root;
 
 	/**
-	 * A finite cylinder centered around the z-axis, cut off at height/2 and -height/2
-	 * TODO: materials can not be set for the whole cylinder at once
+	 * A finite cylinder centered around the z-axis, cut off at z=0 and z = height
 	 * @param center
 	 * @param radius
 	 * @param height

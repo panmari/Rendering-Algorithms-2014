@@ -14,7 +14,7 @@ public class PointLightIntegratorFactory implements IntegratorFactory {
 	}
 
 	public void prepareScene(Scene scene) {
-		// TODO Auto-generated method stub
+		// not needed for point lights
 	}
 
 }

@@ -86,7 +86,6 @@ public class Instancing extends Scene {
 		try {
 			mesh = ObjReader.read("../obj/teapot.obj", 1.f);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
