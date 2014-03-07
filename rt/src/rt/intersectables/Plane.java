@@ -42,7 +42,7 @@ public class Plane implements Intersectable {
 		if(tmp!=0)
 		{
 			float t = -(normal.dot(r.origin) + d) / tmp;
-			if(t < 0)
+			if(t <= 0)
 				return null;
 			Point3f position = r.pointAt(t);
 			Vector3f retNormal = new Vector3f(normal);
