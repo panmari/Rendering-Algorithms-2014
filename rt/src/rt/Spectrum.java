@@ -16,14 +16,8 @@ public class Spectrum {
 		b = 0.f;
 	}
 	
-	/**
-	 * Maps a vector with every coordinate in [0,1] to a valid Spectrum
-	 * @param v
-	 */
 	public Spectrum(Tuple3f v) {
-		this.r = (v.x + 1)/2;
-		this.g = (v.y + 1)/2;
-		this.b = (v.z + 1)/2;
+		this(v.x, v.y, v.z);
 	}
 	
 	public Spectrum(float r, float g, float b)

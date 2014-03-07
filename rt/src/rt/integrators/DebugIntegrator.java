@@ -1,5 +1,7 @@
 package rt.integrators;
 
+import javax.vecmath.Vector3f;
+
 import rt.HitRecord;
 import rt.Integrator;
 import rt.Ray;
@@ -29,10 +31,12 @@ public class DebugIntegrator implements Integrator {
 		
 		if(hitRecord != null)
 			
-			if(hitRecord.t > 0.f)
+			if(hitRecord.t > 0.f) {
 				// Ok, hit point was "in front" of ray origin
-				return new Spectrum(hitRecord.normal);
-			else
+				Vector3f s = new Vector3f(hitRecord.normal);
+				s.absolute();
+				return new Spectrum(s);
+			} else
 				// Weird, a hit point "behind" the ray origin was returned, 
 				// this shouldn't happen in general!			
 				return new Spectrum(1.f,0.f,0.f);
