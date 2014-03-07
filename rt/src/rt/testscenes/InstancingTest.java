@@ -45,7 +45,7 @@ public class InstancingTest extends Scene {
 			
 		// Make sphere and instances; the default sphere is a unit sphere
 		// placed at the origin
-		Sphere sphere = new Sphere();
+		CSGSphere sphere = new CSGSphere();
 		
 		Matrix4f translation = new Matrix4f();
 		translation.setIdentity();
