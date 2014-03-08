@@ -40,11 +40,11 @@ public class RefractiveSphere extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
-		integratorFactory = new PointLightIntegratorFactory();
-		//integratorFactory = new WhittedIntegratorFactory();
+		//integratorFactory = new PointLightIntegratorFactory();
+		integratorFactory = new WhittedIntegratorFactory();
 		samplerFactory = new RandomSamplerFactory();		
 		
-		Material refractive = new Diffuse(); //new Refractive(1.3f);
+		Material refractive = new Refractive(1.3f);
 
 		
 		// Ground and back plane

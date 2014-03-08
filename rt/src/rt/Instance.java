@@ -46,7 +46,7 @@ public class Instance implements Intersectable {
 		//normalize again, bc may contain scaling
 		tNormal.normalize();
 		Vector3f tW = new Vector3f(h.w);
-		tinverseTanspose.transform(tW);
+		t.transform(tW);
 		tW.normalize();
 		// does the t also need fixing?
 		return new HitRecord(h.t, tPosition, tNormal, tW, h.intersectable, this.material, h.u, h.v);
