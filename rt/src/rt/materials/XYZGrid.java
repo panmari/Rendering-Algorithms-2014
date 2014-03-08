@@ -37,9 +37,13 @@ public class XYZGrid implements Material {
 		t.x = t.x % tileSize;
 		t.y = t.y % tileSize;
 		t.z = t.z % tileSize;
+		float spacer = tileSize - betweenSize;
 		if (t.x  < betweenSize ||
 				t.y < betweenSize ||
-				t.z < betweenSize)
+				t.z < betweenSize ||
+				t.x > spacer ||
+				t.y > spacer ||
+				t.z > spacer)
 			return tileColor;
 		else return betweenColor;
 	}
