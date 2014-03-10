@@ -18,7 +18,7 @@ public class CSGSceneInstancingTest extends Scene {
 	public CSGSceneInstancingTest()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/CSGScene-mine");
+		outputFilename = new String("../output/testscenes/CSGSceneInstance-mine");
 		
 		// Image width and height in pixels
 		width = 640;

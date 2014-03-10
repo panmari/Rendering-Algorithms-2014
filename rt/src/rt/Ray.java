@@ -26,4 +26,8 @@ public class Ray {
 		p.scaleAdd(t, origin);
 		return p;
 	}
+	
+	public String toString() {
+		return "orig: " + origin + " dir: " + direction;
+	}
 }

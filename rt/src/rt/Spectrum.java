@@ -64,4 +64,8 @@ public class Spectrum {
 		b = Math.min(max,  b);
 		b = Math.max(min, b);
 	}
+	
+	public String toString() {
+		return String.format("(%.5f,%.5f,%.5f)",r,g,b);
+	}
 }

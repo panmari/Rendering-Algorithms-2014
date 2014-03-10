@@ -29,4 +29,8 @@ public class CSGInstance extends CSGSolid {
 			i.hitRecord = instanceHelper.transformBack(i.hitRecord);
 		return intervalBoundaries;
 	}
+	
+	public String toString() {
+		return "Instance from: " + csgSolid.toString();
+	}
 }

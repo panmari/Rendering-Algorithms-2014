@@ -14,7 +14,7 @@ public class InstanceHelper {
 	private Matrix4f tinverseTanspose;
 
 	public InstanceHelper(Matrix4f t) {
-		this.t = t;
+		this.t = new Matrix4f(t);
 		this.tinverse = new Matrix4f(t);
 		this.tinverse.invert();
 		this.tinverseTanspose = new Matrix4f(tinverse);
