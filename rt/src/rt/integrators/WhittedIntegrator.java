@@ -32,20 +32,23 @@ public class WhittedIntegrator implements Integrator {
 	public Spectrum integrate(Ray r) {
 
 		HitRecord hitRecord = root.intersect(r);
+		
+		//follow specular refraction until maxdepth
+		int depth = 0;
+		Spectrum brdfValueRefr = new Spectrum(1,1,1);
+
+		while(hitRecord != null && hitRecord.material.hasSpecularRefraction() && depth < 10) {
+			ShadingSample s = hitRecord.material.evaluateSpecularRefraction(hitRecord);
+			brdfValueRefr.mult(s.brdf);
+			Ray recursiveRay = new Ray(hitRecord.position, s.w);
+			hitRecord = root.intersect(recursiveRay);
+			depth++;
+		}
+		
 		if(hitRecord != null)
 		{
 			Spectrum outgoing = new Spectrum(0.f, 0.f, 0.f);
 			Spectrum brdfValue;
-			
-			//follow specular refraction until maxdepth
-			int depth = 0;
-			while(hitRecord.material.hasSpecularRefraction() && depth < 5) {
-				ShadingSample s = hitRecord.material.evaluateSpecularRefraction(hitRecord);
-				Ray recursiveRay = new Ray(hitRecord.position, s.w);
-				hitRecord = root.intersect(recursiveRay);
-				depth++;
-			}
-			
 			// Iterate over all light sources
 			Iterator<LightGeometry> it = lightList.iterator();
 			while(it.hasNext())
@@ -58,7 +61,15 @@ public class WhittedIntegrator implements Integrator {
 				float d2 = lightDir.lengthSquared();
 				lightDir.normalize();
 				
-				// Evaluate the BRDF
+				Point3f shadowRayStart = new Point3f(lightDir);
+				shadowRayStart.scaleAdd(0.001f, hitRecord.position);
+
+				Ray shadowRay = new Ray(shadowRayStart, lightDir);
+				HitRecord shadowHit = root.intersect(shadowRay);
+				if (shadowHit != null &&
+						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
+					continue;
+				
 				brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);
 				
 				// Multiply together factors relevant for shading, that is, brdf * emission * ndotl * geometry term
@@ -79,7 +90,7 @@ public class WhittedIntegrator implements Integrator {
 				// Accumulate
 				outgoing.add(s);
 			}
-			
+			//outgoing.mult(brdfValueRefr);
 			return outgoing;
 		} else 
 			return new Spectrum(0.f,0.f,0.f);
