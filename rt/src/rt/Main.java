@@ -6,6 +6,7 @@ import rt.basicscenes.*;
 import rt.testscenes.*;
 
 import java.util.*;
+import java.awt.Point;
 import java.awt.image.*;
 import java.io.*;
 
@@ -20,6 +21,7 @@ public class Main {
 	 * The scene to be rendered.
 	 */
 	public static Scene scene = new Instancing();
+	public static Point debugPixel;// = new Point(100,100);
 
 	static LinkedList<RenderTask> queue;
 	static Counter tasksLeft;
@@ -117,19 +119,24 @@ public class Main {
 
 		scene.prepare();
 		
-		// Make render tasks, split image into blocks to be rendered by the tasks
-		int nTasks = (int)Math.ceil((double)width/(double)taskSize) * (int)Math.ceil((double)height/(double)taskSize);
-		tasksLeft = new Counter(nTasks);
+		int nTasks;
 		queue = new LinkedList<RenderTask>();
-		for(int j=0; j<(int)Math.ceil((double)height/(double)taskSize); j++)
-		{
-			for(int i=0; i<(int)Math.ceil((double)width/(double)taskSize); i++)
-			{
-				RenderTask task = new RenderTask(scene, i*taskSize, Math.min((i+1)*taskSize,width), j*taskSize, Math.min((j+1)*taskSize,height));
-				queue.add(task);
+		// Make render tasks, split image into blocks to be rendered by the tasks
+		if (debugPixel != null) {
+			nTasks = 1;
+			RenderTask debugTask = new RenderTask(scene, debugPixel.x, debugPixel.x + 1, debugPixel.y, debugPixel.y + 1);
+			queue.add(debugTask);
+		} else {
+			nTasks = (int)Math.ceil((double)width/(double)taskSize) * (int)Math.ceil((double)height/(double)taskSize);
+			for(int j=0; j<(int)Math.ceil((double)height/(double)taskSize); j++) {
+				for(int i=0; i<(int)Math.ceil((double)width/(double)taskSize); i++) {
+					RenderTask task = new RenderTask(scene, i*taskSize, Math.min((i+1)*taskSize,width), j*taskSize, Math.min((j+1)*taskSize,height));
+					queue.add(task);
+				}
 			}
 		}
-		
+		tasksLeft = new Counter(nTasks);
+
 		Timer timer = new Timer();
 		timer.reset();
 		
