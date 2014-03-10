@@ -1,44 +1,35 @@
-package rt;
+package rt.intersectables;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
-import rt.materials.Diffuse;
+import rt.HitRecord;
+import rt.Ray;
 
-public class Instance implements Intersectable {
+public class InstanceHelper {
 
 	private Matrix4f t;
 	private Matrix4f tinverse;
-	private Intersectable intersectable;
 	private Matrix4f tinverseTanspose;
-	public Material material;
 
-	public Instance(Intersectable i, Matrix4f t) {
-		this.intersectable = i;
+	public InstanceHelper(Matrix4f t) {
 		this.t = t;
 		this.tinverse = new Matrix4f(t);
 		this.tinverse.invert();
 		this.tinverseTanspose = new Matrix4f(tinverse);
 		this.tinverseTanspose.transpose();
-		this.material = new Diffuse(); //default material
 	}
-
-	@Override
-	public HitRecord intersect(Ray r) {
+	
+	public Ray transform(Ray r) {
 		Point3f instanceOrigin = new Point3f(r.origin);
 		Vector3f instanceDir = new Vector3f(r.direction);
 		tinverse.transform(instanceOrigin);
 		tinverse.transform(instanceDir);
-		
-		Ray instanceRay = new Ray(instanceOrigin, instanceDir);
-		HitRecord instanceHitRecord = intersectable.intersect(instanceRay);
-		if (instanceHitRecord == null)
-			return null;
-		return transformBack(instanceHitRecord);
+		return new Ray(instanceOrigin, instanceDir);
 	}
 	
-	private HitRecord transformBack(HitRecord h) {
+	public HitRecord transformBack(HitRecord h) {
 		Point3f tPosition = new Point3f(h.position);
 		t.transform(tPosition);
 		Vector3f tNormal = new Vector3f(h.normal);
@@ -46,9 +37,10 @@ public class Instance implements Intersectable {
 		//normalize again, bc may contain scaling
 		tNormal.normalize();
 		Vector3f tW = new Vector3f(h.w);
-		t.transform(tW);
+		tinverseTanspose.transform(tW);
 		tW.normalize();
 		// does the t also need fixing?
-		return new HitRecord(h.t, tPosition, tNormal, tW, h.intersectable, this.material, h.u, h.v);
+		return new HitRecord(h.t, tPosition, tNormal, tW, h.intersectable, h.material, h.u, h.v);
 	}
+
 }

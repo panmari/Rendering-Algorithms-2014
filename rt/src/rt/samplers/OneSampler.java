@@ -6,8 +6,6 @@ import rt.Sampler;
  * Returns always one sample at 0.5 in all dimensions.
  */
 public class OneSampler implements Sampler {
-
-	int d;
 	
 	public OneSampler()
 	{

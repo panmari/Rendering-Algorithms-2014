@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
-import rt.Instance;
 import rt.Intersectable;
 import rt.IntersectableList;
 import rt.LightGeometry;
@@ -18,6 +17,7 @@ import rt.films.BoxFilterFilm;
 import rt.integrators.DebugIntegratorFactory;
 import rt.integrators.PointLightIntegratorFactory;
 import rt.intersectables.CSGInfiniteDoubleCone;
+import rt.intersectables.Instance;
 import rt.intersectables.Plane;
 import rt.lightsources.PointLight;
 import rt.materials.Diffuse;
