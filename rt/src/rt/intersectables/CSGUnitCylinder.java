@@ -2,11 +2,12 @@ package rt.intersectables;
 
 import java.util.ArrayList;
 
-import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import rt.Material;
 import rt.Ray;
+import rt.Spectrum;
+import rt.materials.Diffuse;
 
 public class CSGUnitCylinder extends CSGSolid {
 
@@ -27,6 +28,10 @@ public class CSGUnitCylinder extends CSGSolid {
 		CSGInfiniteCylinder cyl = new CSGInfiniteCylinder(m);
 		CSGNode n1 = new CSGNode(top, cyl, CSGNode.OperationType.INTERSECT);
 		root = new CSGNode(n1, bottom, CSGNode.OperationType.INTERSECT);
+	}
+
+	public CSGUnitCylinder() {
+		this(new Diffuse(new Spectrum(1,1,1)));
 	}
 
 	@Override
