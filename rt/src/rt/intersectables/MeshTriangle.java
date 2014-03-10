@@ -27,6 +27,10 @@ public class MeshTriangle implements Intersectable {
 		this.index = index;		
 	}
 	
+	public String toString() {
+		return "Triangle: " + index;
+	}
+	
 	public HitRecord intersect(Ray r)
 	{
 		float vertices[] = mesh.vertices;
@@ -55,8 +59,7 @@ public class MeshTriangle implements Intersectable {
 		rightHand.sub(a, r.origin);
 		
 		Vector3f betaGammaT = getBetaGammaTCramer(t, rightHand);
-		
-		if (isInside(betaGammaT)) {
+		if (betaGammaT != null && isInside(betaGammaT)) {
 			float tHit = betaGammaT.z;
 			Point3f position = r.pointAt(tHit);
 			Vector3f normal = makeNormal(betaGammaT);
@@ -77,9 +80,10 @@ public class MeshTriangle implements Intersectable {
 	 * @return
 	 */
 	private Vector3f getBetaGammaTCramer(Matrix3f matrix, Vector3f rightHand) {
-		// Apply Cramer's rule
 		float detA = matrix.determinant();
-
+		if(Math.abs(detA) < 0.0001f) {
+			return null;
+		}
 		Matrix3f matrix0 = new Matrix3f(matrix);
 		matrix0.setColumn(0, rightHand);
 		float detA0 = matrix0.determinant();
@@ -133,10 +137,10 @@ public class MeshTriangle implements Intersectable {
 	}
 
 	private boolean isInside(Vector3f betaGammaT) {
-		if (betaGammaT.x < 0 || 
-				betaGammaT.x > 1 ||
-				betaGammaT.y < 0 || 
-				betaGammaT.y > 1)
+		if (betaGammaT.x <= 0 || 
+				betaGammaT.x >= 1 ||
+				betaGammaT.y <= 0 || 
+				betaGammaT.y >= 1)
 			return false;
 		float f = betaGammaT.x + betaGammaT.y;
 		return f > 0 && f < 1 ;
