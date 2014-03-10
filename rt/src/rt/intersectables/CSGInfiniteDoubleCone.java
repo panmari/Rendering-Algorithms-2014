@@ -64,7 +64,7 @@ public class CSGInfiniteDoubleCone extends CSGSolid {
 		tangential1.cross(new Vector3f(0, 0, 1), normalCyl);
 		Vector3f tangential2 = new Vector3f(hitPoint);
 		Vector3f normal = new Vector3f();
-		normal.cross(tangential2, tangential1);
+		normal.cross(tangential1, tangential2);
 		normal.normalize();
 		
 		Vector3f wIn = new Vector3f(r.direction);
