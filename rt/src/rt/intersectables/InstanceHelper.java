@@ -36,8 +36,10 @@ public class InstanceHelper {
 		tinverseTanspose.transform(tNormal);
 		//normalize again, bc may contain scaling
 		tNormal.normalize();
+		
+		// only t is used for incoming light direction
 		Vector3f tW = new Vector3f(h.w);
-		tinverseTanspose.transform(tW);
+		t.transform(tW);
 		tW.normalize();
 		// does the t also need fixing?
 		return new HitRecord(h.t, tPosition, tNormal, tW, h.intersectable, h.material, h.u, h.v);
