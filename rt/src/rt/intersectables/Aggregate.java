@@ -16,13 +16,13 @@ public abstract class Aggregate implements Intersectable {
 		HitRecord hitRecord = null;
 		float t = Float.MAX_VALUE;
 		
-		// Intersect all objects in group, return closest hit
+		// Intersect all objects in group, return closest hit that lies in front of origin
 		Iterator<Intersectable> it = iterator();
 		while(it.hasNext())
 		{
 			Intersectable o = it.next();
 			HitRecord tmp = o.intersect(r);
-			if(tmp!=null && tmp.t<t)
+			if(tmp!=null && tmp.t<t && tmp.t > 0)
 			{
 				t = tmp.t;
 				hitRecord = tmp;
