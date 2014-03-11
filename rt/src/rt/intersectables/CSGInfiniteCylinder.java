@@ -50,10 +50,11 @@ public class CSGInfiniteCylinder extends CSGSolid {
 		if (t == null)
 			return intervalBoundaries;
 		
-		IntervalBoundary b0 = new IntervalBoundary(t.x, BoundaryType.START, 
-				makeHitRecord(t.x, r), null);
-		IntervalBoundary b1 = new IntervalBoundary(t.y, BoundaryType.END, 
-				makeHitRecord(t.y, r), null);
+		HitRecord h0 = makeHitRecord(t.x, r);
+		IntervalBoundary b0 = new IntervalBoundary(h0.t, findBoundaryType(h0, r), h0, null);
+		
+		HitRecord h1 = makeHitRecord(t.y, r);
+		IntervalBoundary b1 = new IntervalBoundary(h1.t, findBoundaryType(h1, r), h1, null);
 		intervalBoundaries.add(b0);
 		intervalBoundaries.add(b1);
 		return intervalBoundaries;

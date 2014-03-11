@@ -20,7 +20,7 @@ public abstract class CSGSolid implements Intersectable {
 	public enum BelongsTo { LEFT, RIGHT };
 	
 	/**
-	 * Boundary of an intersection interval.
+	 * Boundary of an intersection interval, can be sorted by t easily.
 	 */
 	class IntervalBoundary implements Comparable<IntervalBoundary>
 	{		
@@ -40,6 +40,10 @@ public abstract class CSGSolid implements Intersectable {
 			this.belongsTo = belongsTo;
 		}
 		
+		public String toString() {
+			return "t: " + t + " type: " + type;
+		}
+		
 		public int compareTo(IntervalBoundary b)
 		{
 			if(this.t < b.t) 
@@ -49,6 +53,12 @@ public abstract class CSGSolid implements Intersectable {
 			else
 				return 1;
 		}
+	}
+	
+	protected BoundaryType findBoundaryType(HitRecord h, Ray r) {
+		if (h.normal.dot(r.direction) < 0) //started inside double cone
+			return BoundaryType.START;
+		else return BoundaryType.END;
 	}
 	
 	public HitRecord intersect(Ray r) {

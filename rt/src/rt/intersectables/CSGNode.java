@@ -31,7 +31,7 @@ public class CSGNode extends CSGSolid {
 	 */
 	public ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r)
 	{
-		ArrayList<IntervalBoundary> combined = new ArrayList<IntervalBoundary>();
+		ArrayList<IntervalBoundary> combined = new ArrayList<>();
 		
 		// Get interval boundaries of left and right children
 		ArrayList<IntervalBoundary> leftIntervals = left.getIntervalBoundaries(r);

@@ -47,15 +47,16 @@ public class CSGInfiniteDoubleCone extends CSGSolid {
 		if (t == null)
 			return intervalBoundaries;
 		
-		IntervalBoundary b0 = new IntervalBoundary(t.x, BoundaryType.START, 
-				makeHitRecord(t.x, r), null);
-		IntervalBoundary b1 = new IntervalBoundary(t.y, BoundaryType.END, 
-				makeHitRecord(t.y, r), null);
+		HitRecord h0 = makeHitRecord(t.x, r);
+		IntervalBoundary b0 = new IntervalBoundary(h0.t, findBoundaryType(h0, r), h0, null);
+		
+		HitRecord h1 = makeHitRecord(t.y, r);
+		IntervalBoundary b1 = new IntervalBoundary(h1.t, findBoundaryType(h1, r), h1, null);
 		intervalBoundaries.add(b0);
 		intervalBoundaries.add(b1);
 		return intervalBoundaries;
 	}
-	
+
 	private HitRecord makeHitRecord(float t, Ray r) {	
 		Point3f hitPoint = r.pointAt(t);
 		Vector3f normalCyl = new Vector3f(hitPoint);
@@ -64,9 +65,11 @@ public class CSGInfiniteDoubleCone extends CSGSolid {
 		tangential1.cross(new Vector3f(0, 0, 1), normalCyl);
 		Vector3f tangential2 = new Vector3f(hitPoint);
 		Vector3f normal = new Vector3f();
-		normal.cross(tangential2, tangential1);
+		normal.cross(tangential1, tangential2);
 		normal.normalize();
-		
+		if (hitPoint.z < 0)
+			normal.z *= -1;
+
 		Vector3f wIn = new Vector3f(r.direction);
 		wIn.normalize();
 		wIn.negate();
