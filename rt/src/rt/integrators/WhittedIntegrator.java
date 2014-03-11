@@ -37,6 +37,18 @@ public class WhittedIntegrator implements Integrator {
 		int depth = 0;
 		Spectrum brdfValueRefr = new Spectrum(1,1,1);
 
+		while(hitRecord != null && hitRecord.material.hasSpecularReflection() && depth < 10) {
+			ShadingSample s = hitRecord.material.evaluateSpecularReflection(hitRecord);
+			brdfValueRefr.mult(s.brdf);
+			
+			Point3f posPlusEpsilon = new Point3f();
+			posPlusEpsilon.scaleAdd(0.0001f, s.w, hitRecord.position);
+			
+			Ray recursiveRay = new Ray(posPlusEpsilon, s.w);
+			hitRecord = root.intersect(recursiveRay);
+			depth++;
+		}
+		/*
 		while(hitRecord != null && hitRecord.material.hasSpecularRefraction() && depth < 10) {
 			ShadingSample s = hitRecord.material.evaluateSpecularRefraction(hitRecord);
 			brdfValueRefr.mult(s.brdf);
@@ -44,7 +56,7 @@ public class WhittedIntegrator implements Integrator {
 			hitRecord = root.intersect(recursiveRay);
 			depth++;
 		}
-		
+		*/
 		if(hitRecord != null)
 		{
 			Spectrum outgoing = new Spectrum(0.f, 0.f, 0.f);
@@ -66,7 +78,7 @@ public class WhittedIntegrator implements Integrator {
 
 				Ray shadowRay = new Ray(shadowRayStart, lightDir);
 				HitRecord shadowHit = root.intersect(shadowRay);
-				if (shadowHit != null &&
+				if (shadowHit != null && shadowHit.material.castsShadows() &&
 						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
 					continue;
 				
