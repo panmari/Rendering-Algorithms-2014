@@ -10,9 +10,7 @@ import rt.Material.ShadingSample;
 
 public class Refractive implements Material {
 
-	public float refractiveIndex;
-	private boolean goingOutside = false;
-	
+	public float refractiveIndex;	
 
 	public Refractive(float refractiveIndex) {
 		this.refractiveIndex = refractiveIndex;
@@ -51,31 +49,32 @@ public class Refractive implements Material {
 	public ShadingSample evaluateSpecularRefraction(HitRecord hitRecord) {
 		Vector3f i = new Vector3f(hitRecord.w);
 		i.negate();
-		float iThetaCos = i.dot(hitRecord.normal);
+		i.normalize();
+		float cosTheta_i = -i.dot(hitRecord.normal);
 		
-		Vector3f t = new Vector3f(i);
-		float n_1 = 1;
-		float n_2 = refractiveIndex;
-		/*
-		if(goingOutside) {
-			float swap = n_1;
-			n_1 = n_2;
-			n_2 = swap;
+		float n_1, n_2;
+		if (hitRecord.normal.dot(hitRecord.w) > 0) { //going inside
+			n_1 = 1;
+			n_2 = refractiveIndex;
+		} else { //going outside
+			n_1 = refractiveIndex;
+			n_2 = 1;
 		}
-		goingOutside = !goingOutside;
-		*/
+		Vector3f t = new Vector3f(i);
 		float refractiveRatio = n_1/n_2;
 		t.scale(refractiveRatio);
 		Vector3f nScaled = new Vector3f(hitRecord.normal);
-		float tThetaSin2 = refractiveRatio*refractiveRatio*(1- iThetaCos*iThetaCos);
-		nScaled.scale(refractiveRatio*iThetaCos - (float)Math.sqrt(1 - tThetaSin2));
+		float sin2theta_t = refractiveRatio*refractiveRatio*(1 - cosTheta_i*cosTheta_i);
+		if (sin2theta_t > 1) //total internal refraction
+			return new ShadingSample(new Spectrum(0,0,0), new Spectrum(0,0,0), t, true, 1);
+		nScaled.scale(refractiveRatio*cosTheta_i - (float)Math.sqrt(1 - sin2theta_t));
 		t.add(nScaled);
 		
 		//schlick approximation:
 		float r_0 = (n_1 - n_1) / (n_1 + n_2);
 		r_0 *= r_0; //square 
 		//TODO: possibly refactor Math.pow to something simpler
-		float r_schlick = r_0 + (1 - r_0)*(float)Math.pow(1 - iThetaCos, 5); 
+		float r_schlick = r_0 + (1 - r_0)*(float)Math.pow(1 - cosTheta_i, 5); 
 		Spectrum brdf = new Spectrum(1,1,1);
 		brdf.mult(1 - r_schlick);
 		return new ShadingSample(brdf, new Spectrum(0,0,0), t, true, 1);
