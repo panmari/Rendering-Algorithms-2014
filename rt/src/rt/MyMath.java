@@ -15,7 +15,7 @@ public class MyMath {
 	 */
 	public static Point2f solveQuadratic(float a, float b, float c) {
 		float disc = b*b - 4*a*c;
-		if(disc < 0)
+		if(disc <= 0)
 			return null;
 		float rootDisc = (float)Math.sqrt(disc);
 		// numerical magic copied from PBRT:
