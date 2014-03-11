@@ -9,6 +9,7 @@ public class Ray {
 
 	public Vector3f origin;
 	public Vector3f direction;
+	public int depth;
 	
 	/**
 	 * Stores copies of the given tuples
@@ -17,8 +18,19 @@ public class Ray {
 	 */
 	public Ray(Tuple3f origin, Tuple3f direction)
 	{
+		this(origin, direction, 0);
+	}
+	
+	/**
+	 * Stores copies of the given tuples
+	 * @param origin
+	 * @param direction
+	 */
+	public Ray(Tuple3f origin, Tuple3f direction, int depth)
+	{
 		this.origin = new Vector3f(origin); 
 		this.direction = new Vector3f(direction);
+		this.depth = depth;
 	}
 
 	public Point3f pointAt(float t) {

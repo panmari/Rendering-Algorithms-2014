@@ -16,7 +16,7 @@ public class Reflective implements Material {
 	 * Makes a mirror that only reflects red light
 	 */
 	public Reflective() {
-		this(new Spectrum(1,0,0));
+		this(new Spectrum(1,1,1));
 	}
 	
 	public Reflective(Spectrum ks) {
