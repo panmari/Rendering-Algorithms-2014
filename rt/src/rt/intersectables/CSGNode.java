@@ -134,4 +134,7 @@ public class CSGNode extends CSGSolid {
 		return combined;
 	}
 
+	public String toString() {
+		return "Node, L: " + this.left + " R: " + this.right;
+	}
 }

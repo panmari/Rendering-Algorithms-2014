@@ -31,6 +31,6 @@ public class CSGInstance extends CSGSolid {
 	}
 	
 	public String toString() {
-		return "Instance from: " + csgSolid.toString();
+		return "Instance: " + csgSolid.toString();
 	}
 }
