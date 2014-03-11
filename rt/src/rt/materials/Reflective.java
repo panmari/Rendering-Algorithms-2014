@@ -26,7 +26,7 @@ public class Reflective implements Material {
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut,
 			Vector3f wIn) {
-		return new Spectrum(1,0,0);
+		return new Spectrum(ks);
 	}
 
 	@Override
@@ -50,7 +50,9 @@ public class Reflective implements Material {
 		Vector3f nScaled = new Vector3f(hitRecord.normal);
 		nScaled.scale(2*cosTheta_i);
 		r.add(nScaled);
-		return new ShadingSample(new Spectrum(ks), new Spectrum(0,0,0), r, false, 1);
+		
+		Spectrum brdf = new Spectrum(ks);
+		return new ShadingSample(brdf, new Spectrum(0,0,0), r, false, 1);
 	}
 
 	@Override
