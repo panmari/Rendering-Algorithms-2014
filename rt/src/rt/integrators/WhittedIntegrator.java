@@ -44,7 +44,7 @@ public class WhittedIntegrator implements Integrator {
 			reflectedPart = new Spectrum(s.brdf);
 			
 			Point3f posPlusEpsilon = new Point3f();
-			posPlusEpsilon.scaleAdd(1e-5f, s.w, hitRecord.position);
+			posPlusEpsilon.scaleAdd(0, s.w, hitRecord.position);
 			
 			Ray recursiveRay = new Ray(posPlusEpsilon, s.w, r.depth + 1);
 			reflectedPart.mult(integrate(recursiveRay));
@@ -54,7 +54,7 @@ public class WhittedIntegrator implements Integrator {
 			refractedPart = new Spectrum(s.brdf);
 			
 			Point3f posPlusEpsilon = new Point3f();
-			posPlusEpsilon.scaleAdd(1e-5f, s.w, hitRecord.position);
+			posPlusEpsilon.scaleAdd(0, s.w, hitRecord.position);
 			
 			Ray recursiveRay = new Ray(posPlusEpsilon, s.w, r.depth + 1);
 			refractedPart.mult(integrate(recursiveRay));
@@ -66,7 +66,6 @@ public class WhittedIntegrator implements Integrator {
 			refractPlusReflect.add(reflectedPart);
 			return refractPlusReflect;
 		}
-			
 		Spectrum outgoing = new Spectrum(0.f, 0.f, 0.f);
 		Spectrum brdfValue;
 		// Iterate over all light sources
@@ -80,16 +79,13 @@ public class WhittedIntegrator implements Integrator {
 			Vector3f lightDir = StaticVecmath.sub(lightHit.position, hitRecord.position);
 			float d2 = lightDir.lengthSquared();
 			lightDir.normalize();
-			/*		
-			Point3f shadowRayStart = new Point3f(lightDir);
-			shadowRayStart.scaleAdd(0.001f, hitRecord.position);
+					
+			Ray shadowRay = new Ray(hitRecord.position, lightDir);
+			HitRecord shadowHit = root.intersect(shadowRay);
+			if (shadowHit != null && //shadowHit.material.castsShadows() &&
+					StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
+				continue;
 
-				Ray shadowRay = new Ray(shadowRayStart, lightDir);
-				HitRecord shadowHit = root.intersect(shadowRay);
-				if (shadowHit != null && shadowHit.material.castsShadows() &&
-						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
-					continue;
-				*/
 			brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);
 			
 			// Multiply together factors relevant for shading, that is, brdf * emission * ndotl * geometry term
