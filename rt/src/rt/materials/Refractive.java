@@ -10,16 +10,18 @@ import rt.Material.ShadingSample;
 
 public class Refractive implements Material {
 
-	public float refractiveIndex;	
+	public float refractiveIndex;
+	public Spectrum ks;
 
 	public Refractive(float refractiveIndex) {
 		this.refractiveIndex = refractiveIndex;
+		this.ks = new Spectrum(1,1,1);
 	}
 
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut,
 			Vector3f wIn) {
-		return new Spectrum(1,0,0);
+		return ks;
 	}
 
 	@Override
@@ -77,7 +79,7 @@ public class Refractive implements Material {
 		float r_schlick = r_0 + (1 - r_0)*(float)Math.pow(1 - cosTheta_i, 5); 
 		Spectrum brdf = new Spectrum(1,1,1);
 		brdf.mult(1 - r_schlick);
-		return new ShadingSample(brdf, new Spectrum(0,0,0), t, true, 1);
+		return new ShadingSample(ks, new Spectrum(0,0,0), t, true, 1);
 	}
 
 	@Override

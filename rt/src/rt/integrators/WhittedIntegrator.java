@@ -52,7 +52,11 @@ public class WhittedIntegrator implements Integrator {
 		if(hitRecord.material.hasSpecularRefraction() && r.depth < MAX_DEPTH) {
 			ShadingSample s = hitRecord.material.evaluateSpecularRefraction(hitRecord);
 			refractedPart = new Spectrum(s.brdf);
-			Ray recursiveRay = new Ray(hitRecord.position, s.w, r.depth + 1);
+			
+			Point3f posPlusEpsilon = new Point3f();
+			posPlusEpsilon.scaleAdd(1e-5f, s.w, hitRecord.position);
+			
+			Ray recursiveRay = new Ray(posPlusEpsilon, s.w, r.depth + 1);
 			refractedPart.mult(integrate(recursiveRay));
 		}
 		
@@ -76,10 +80,10 @@ public class WhittedIntegrator implements Integrator {
 			Vector3f lightDir = StaticVecmath.sub(lightHit.position, hitRecord.position);
 			float d2 = lightDir.lengthSquared();
 			lightDir.normalize();
-			
+			/*		
 			Point3f shadowRayStart = new Point3f(lightDir);
 			shadowRayStart.scaleAdd(0.001f, hitRecord.position);
-/*
+
 				Ray shadowRay = new Ray(shadowRayStart, lightDir);
 				HitRecord shadowHit = root.intersect(shadowRay);
 				if (shadowHit != null && shadowHit.material.castsShadows() &&
