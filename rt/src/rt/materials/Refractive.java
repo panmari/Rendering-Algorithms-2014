@@ -40,14 +40,19 @@ public class Refractive implements Material {
 		Vector3f i = new Vector3f(hitRecord.w);
 		i.negate();
 		i.normalize();
-		float cosTheta_i = -i.dot(hitRecord.normal);
+		Vector3f normal = new Vector3f(hitRecord.normal);
+		if (hitRecord.normal.dot(hitRecord.w) > 0) { //going inside
+		} else { //going outside
+			normal.negate();
+		}
+		float cosTheta_i = -i.dot(normal);
 		Vector3f r = new Vector3f(i);
-		Vector3f nScaled = new Vector3f(hitRecord.normal);
+		Vector3f nScaled = new Vector3f(normal);
 		nScaled.scale(2*cosTheta_i);
 		r.add(nScaled);
 		
 		Spectrum brdf = new Spectrum(ks);
-		brdf.mult(makeBrdfSchlick(hitRecord));
+		brdf.mult(rSchlick(hitRecord));
 		return new ShadingSample(brdf, new Spectrum(0,0,0), r, false, 1);
 	}
 
@@ -61,7 +66,8 @@ public class Refractive implements Material {
 		Vector3f i = new Vector3f(hitRecord.w);
 		i.negate();
 		i.normalize();
-		float cosTheta_i = -i.dot(hitRecord.normal);
+		Vector3f normal = new Vector3f(hitRecord.normal);
+
 		
 		float n_1, n_2;
 		if (hitRecord.normal.dot(hitRecord.w) > 0) { //going inside
@@ -70,20 +76,21 @@ public class Refractive implements Material {
 		} else { //going outside
 			n_1 = refractiveIndex;
 			n_2 = 1;
+			normal.negate();
 		}
+		float cosTheta_i = -i.dot(normal);
+
 		Vector3f t = new Vector3f(i);
 		float refractiveRatio = n_1/n_2;
 		t.scale(refractiveRatio);
-		Vector3f nScaled = new Vector3f(hitRecord.normal);
+		Vector3f nScaled = new Vector3f(normal);
 		float sin2theta_t = refractiveRatio*refractiveRatio*(1 - cosTheta_i*cosTheta_i);
-		if (sin2theta_t > 1) //total internal refraction
-			return new ShadingSample(new Spectrum(0,0,0), new Spectrum(0,0,0), null, true, 1);
 		nScaled.scale(refractiveRatio*cosTheta_i - (float)Math.sqrt(1 - sin2theta_t));
 		t.add(nScaled);
 		
 		
 		Spectrum brdf = new Spectrum(ks);
-		brdf.mult(1 - makeBrdfSchlick(hitRecord));
+		brdf.mult(1 - rSchlick(hitRecord));
 		return new ShadingSample(brdf, new Spectrum(0,0,0), t, true, 1);
 	}
 	
@@ -103,11 +110,11 @@ public class Refractive implements Material {
 		return false;
 	}
 	
-	private float makeBrdfSchlick(HitRecord hitRecord) {
+	private float rSchlick(HitRecord hitRecord) {
 		Vector3f i = new Vector3f(hitRecord.w);
 		i.negate();
 		i.normalize();
-		float cosTheta_i = -i.dot(hitRecord.normal);
+		Vector3f normal = new Vector3f(hitRecord.normal);
 		
 		float n_1, n_2;
 		if (hitRecord.normal.dot(hitRecord.w) > 0) { //going inside
@@ -116,7 +123,10 @@ public class Refractive implements Material {
 		} else { //going outside
 			n_1 = refractiveIndex;
 			n_2 = 1;
+			normal.negate();
 		}
+		float cosTheta_i = -i.dot(normal);
+
 		float refractiveRatio = n_1/n_2;
 
 		float sin2theta_t = refractiveRatio*refractiveRatio*(1 - cosTheta_i*cosTheta_i);
@@ -125,14 +135,14 @@ public class Refractive implements Material {
 		float r_0 = (n_1 - n_2) / (n_1 + n_2);
 		r_0 *= r_0; //square 
 		
-		//TODO: possibly refactor Math.pow to something simpler
-		float rSchlick;
+		float x;
 		if (n_1 <= n_2)
-			rSchlick = r_0 + (1 - r_0)*(float)Math.pow(1 - cosTheta_i, 5);
+			x = 1 - cosTheta_i;
 		else {
 			float cosTheta_t = (float)Math.sqrt(1 - sin2theta_t);
-			rSchlick = r_0 + (1 - r_0)*(float)Math.pow(1 - cosTheta_t, 5);
+			x = 1 - cosTheta_t;
 		}
+		float rSchlick = r_0 + (1 - r_0)*x*x*x*x*x;
 		return rSchlick; 
 	}
 

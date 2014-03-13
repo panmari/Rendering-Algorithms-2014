@@ -22,7 +22,7 @@ public abstract class Aggregate implements Intersectable {
 		{
 			Intersectable o = it.next();
 			HitRecord tmp = o.intersect(r);
-			if(tmp!=null && tmp.t<t && tmp.t > 1e-5f)
+			if(tmp!=null && tmp.t<t)
 			{
 				t = tmp.t;
 				hitRecord = tmp;

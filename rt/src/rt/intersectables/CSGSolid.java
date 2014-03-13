@@ -56,7 +56,7 @@ public abstract class CSGSolid implements Intersectable {
 	}
 	
 	protected BoundaryType findBoundaryType(HitRecord h, Ray r) {
-		if (h.normal.dot(r.direction) < 0) //started inside double cone
+		if (h.normal.dot(r.direction) < 0) //started inside double cone, alternatively h.t < 0
 			return BoundaryType.START;
 		else return BoundaryType.END;
 	}

@@ -28,7 +28,22 @@ public class Ray {
 	 */
 	public Ray(Tuple3f origin, Tuple3f direction, int depth)
 	{
-		this.origin = new Vector3f(origin); 
+		this(origin, direction, 0, false);
+	}
+	
+	/**
+	 * Stores copies of the given tuples
+	 * @param origin
+	 * @param direction
+	 */
+	public Ray(Tuple3f origin, Tuple3f direction, int depth, boolean epsilon)
+	{
+		Vector3f o = new Vector3f();
+		if (epsilon) {
+			o.scaleAdd(1e-5f, direction, origin);
+		} else
+			o.set(origin);
+		this.origin = o; 
 		this.direction = new Vector3f(direction);
 		this.depth = depth;
 	}
