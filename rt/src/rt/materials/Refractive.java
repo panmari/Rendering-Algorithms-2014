@@ -121,8 +121,8 @@ public class Refractive implements Material {
 
 		float sin2theta_t = refractiveRatio*refractiveRatio*(1 - cosTheta_i*cosTheta_i);
 		if (sin2theta_t > 1) //total internal refraction
-			return Float.NaN;
-		float r_0 = (n_1 - n_1) / (n_1 + n_2);
+			return 1;
+		float r_0 = (n_1 - n_2) / (n_1 + n_2);
 		r_0 *= r_0; //square 
 		
 		//TODO: possibly refactor Math.pow to something simpler

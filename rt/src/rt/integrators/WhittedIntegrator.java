@@ -21,7 +21,7 @@ public class WhittedIntegrator implements Integrator {
 
 	LightList lightList;
 	Intersectable root;
-	private final int MAX_DEPTH = 2;
+	private final int MAX_DEPTH = 4;
 	
 	public WhittedIntegrator(Scene scene)
 	{
@@ -46,7 +46,9 @@ public class WhittedIntegrator implements Integrator {
 			reflectedPart = new Spectrum(s.brdf);
 						
 			Ray recursiveRay = new Ray(hitRecord.position, s.w, r.depth + 1);
-			reflectedPart.mult(integrate(recursiveRay));
+			Spectrum spec = integrate(recursiveRay);
+			if (spec != null)
+				reflectedPart.mult(spec);
 		}
 		if(hitRecord.material.hasSpecularRefraction() && r.depth < MAX_DEPTH) {
 			ShadingSample s = hitRecord.material.evaluateSpecularRefraction(hitRecord);
@@ -55,14 +57,19 @@ public class WhittedIntegrator implements Integrator {
 			refractedPart = new Spectrum(s.brdf);
 						
 			Ray recursiveRay = new Ray(hitRecord.position, s.w, r.depth + 1);
-			refractedPart.mult(integrate(recursiveRay));
+			Spectrum spec = integrate(recursiveRay);
+			if (spec != null)
+				refractedPart.mult(spec);
 		}
 		
-		if (hitRecord.material.hasSpecularRefraction() || hitRecord.material.hasSpecularReflection()) {
-			Spectrum refractPlusReflect = new Spectrum();
-			refractPlusReflect.add(refractedPart);
-			refractPlusReflect.add(reflectedPart);
-			return refractPlusReflect;
+		if ((hitRecord.material.hasSpecularRefraction() || hitRecord.material.hasSpecularReflection())) {
+			if (r.depth < MAX_DEPTH) {		
+				Spectrum refractPlusReflect = new Spectrum();
+				refractPlusReflect.add(refractedPart);
+				//refractPlusReflect.add(reflectedPart);
+				return refractPlusReflect;
+			} else
+				return null;
 		}
 		Spectrum outgoing = new Spectrum(0.f, 0.f, 0.f);
 		Spectrum brdfValue;
