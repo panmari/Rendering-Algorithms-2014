@@ -52,6 +52,21 @@ public class CSGInfiniteDoubleCone extends CSGSolid {
 		
 		HitRecord h1 = makeHitRecord(t.y, r);
 		IntervalBoundary b1 = new IntervalBoundary(h1.t, findBoundaryType(h1, r), h1, null);
+		
+		if ((b0.hitRecord.position.z < 0 && b1.hitRecord.position.z > 0) ||
+				(b0.hitRecord.position.z > 0 && b1.hitRecord.position.z < 0)) //starts inside -> two more
+		{
+			IntervalBoundary b2, b3;
+			if (b0.hitRecord.position.z > 0){
+				b2 = new IntervalBoundary(Float.NEGATIVE_INFINITY, BoundaryType.START, null, null);
+				b3 = new IntervalBoundary(Float.POSITIVE_INFINITY, BoundaryType.END, null, null);
+			} else {
+				b2 = new IntervalBoundary(Float.POSITIVE_INFINITY, BoundaryType.START, null, null);
+				b3 = new IntervalBoundary(Float.NEGATIVE_INFINITY, BoundaryType.END, null, null);
+			}
+			intervalBoundaries.add(b2);
+			intervalBoundaries.add(b3);
+		}
 		intervalBoundaries.add(b0);
 		intervalBoundaries.add(b1);
 		return intervalBoundaries;
