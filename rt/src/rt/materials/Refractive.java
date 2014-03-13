@@ -10,6 +10,7 @@ import rt.Material.ShadingSample;
 
 public class Refractive implements Material {
 
+	private static final boolean USE_ZWICKER_SCHLICK = true;
 	public float refractiveIndex;
 	public Spectrum ks;
 
@@ -65,7 +66,6 @@ public class Refractive implements Material {
 	public ShadingSample evaluateSpecularRefraction(HitRecord hitRecord) {
 		Vector3f i = new Vector3f(hitRecord.w);
 		i.negate();
-		i.normalize();
 		Vector3f normal = new Vector3f(hitRecord.normal);
 
 		
@@ -107,7 +107,7 @@ public class Refractive implements Material {
 
 	@Override
 	public boolean castsShadows() {
-		return false;
+		return true;
 	}
 	
 	private float rSchlick(HitRecord hitRecord) {
@@ -136,7 +136,7 @@ public class Refractive implements Material {
 		r_0 *= r_0; //square 
 		
 		float x;
-		if (n_1 <= n_2)
+		if (n_1 <= n_2 || USE_ZWICKER_SCHLICK)
 			x = 1 - cosTheta_i;
 		else {
 			float cosTheta_t = (float)Math.sqrt(1 - sin2theta_t);
