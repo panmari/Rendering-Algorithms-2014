@@ -21,9 +21,9 @@ public class CSGUnitCone extends CSGSolid {
 	 */
 	public CSGUnitCone(Material m) {
 		float height = 1;
-		CSGPlane top = new CSGPlane(new Vector3f(0,0.f,1.f), -height);
+		CSGPlane top = new CSGPlane(new Vector3f(0,0.f,-1.f), -height);
 		top.material = m;
-		CSGPlane bottom = new CSGPlane(new Vector3f(0,0.f,-1.f), 0);
+		CSGPlane bottom = new CSGPlane(new Vector3f(0,0.f,1.f), 0);
 		bottom.material = m;
 		CSGInfiniteDoubleCone cone = new CSGInfiniteDoubleCone(m);
 		CSGNode n1 = new CSGNode(top, cone, CSGNode.OperationType.INTERSECT);
