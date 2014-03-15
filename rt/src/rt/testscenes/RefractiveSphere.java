@@ -42,7 +42,7 @@ public class RefractiveSphere extends Scene {
 		// Specify which integrator and sampler to use
 		//integratorFactory = new PointLightIntegratorFactory();
 		integratorFactory = new WhittedIntegratorFactory();
-		samplerFactory = new RandomSamplerFactory();		
+		samplerFactory = new UniformSamplerFactory();		
 		
 		Material refractive = new Refractive(1.3f);
 

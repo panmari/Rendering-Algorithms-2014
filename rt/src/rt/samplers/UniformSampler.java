@@ -15,8 +15,8 @@ public class UniformSampler implements Sampler {
 		float offset = 1.f/(k*2);
 		float samples[][] = new float[k*k][d];
 		for (int i = 0; i < k*k; i++) {
-			samples[i][0] = dist + offset*i;
-			samples[i][1] = dist + offset*(i / k); //integer division here!
+			samples[i][0] = offset + dist*(i % k);
+			samples[i][1] = offset + dist*(i / k); //integer division here!
 		}
 
 		return samples;
