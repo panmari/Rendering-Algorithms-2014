@@ -32,14 +32,17 @@ public class CSGInfiniteDoubleCone extends CSGSolid {
 		this.material = m;
 	}
 	@Override
-	ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
-		Vector2f direction = new Vector2f(r.direction.x, r.direction.y);
-		
+	ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {		
 		ArrayList<IntervalBoundary> intervalBoundaries = new ArrayList<>();
-		float a = direction.lengthSquared() - r.direction.z*r.direction.z;
+		// d_x^2 + d_y^2 - d_z^2
+		float a = r.direction.x * r.direction.x +
+				r.direction.y * r.direction.y -
+				r.direction.z*r.direction.z;
+		//2*(o_x*d_x + o_y*d_y - o_z*d_z)
 		float b = 2*(r.direction.x * r.origin.x +
 				r.direction.y * r.origin.y -
 				r.direction.z * r.origin.z);
+		//o_x^2 + o_y^2 - o_z^2
 		float c = r.origin.x * r.origin.x +
 				r.origin.y * r.origin.y - 
 				r.origin.z * r.origin.z;
