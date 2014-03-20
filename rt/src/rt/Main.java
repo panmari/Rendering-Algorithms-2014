@@ -20,8 +20,8 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new RefractiveSphere();
-	public static Point debugPixel;// = new Point(250, 160);
+	public static Scene scene = new CSGScene();
+	public static Point debugPixel;// = new Point(220, 185);
 	
 	static LinkedList<RenderTask> queue;
 	static Counter tasksLeft;
@@ -152,7 +152,7 @@ public class Main {
 		
 		// Wait for threads to end
 		int printed = 0;
-		System.out.printf("Rendering scene %s:\n", scene.getClass().toString());
+		System.out.printf("Rendering scene %s to file %s: \n", scene.getClass().toString(), scene.outputFilename);
 		System.out.printf("0%%                                                50%%                                           100%%\n");
 		System.out.printf("|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------\n");
 		synchronized(tasksLeft)

@@ -9,6 +9,9 @@ public class Spectrum {
 
 	public float r, g, b;
 	
+	/**
+	 * Creates a spectrum with all channels set to 0
+	 */
 	public Spectrum()
 	{
 		r = 0.f;
