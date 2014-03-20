@@ -39,30 +39,34 @@ public class WhittedIntegrator implements Integrator {
 		//follow specular refraction until maxdepth
 		Spectrum reflectedPart = new Spectrum(0,0,0);
 		Spectrum refractedPart = new Spectrum(0,0,0);
+		
 		if(hitRecord.material.hasSpecularReflection() && r.depth < MAX_DEPTH) {
 			ShadingSample s = hitRecord.material.evaluateSpecularReflection(hitRecord);
-			reflectedPart = new Spectrum(s.brdf);
-						
-			Ray recursiveRay = new Ray(hitRecord.position, s.w, r.depth + 1, true);
-			Spectrum spec = integrate(recursiveRay);
-			reflectedPart.mult(spec);
-		}
-		if(hitRecord.material.hasSpecularRefraction() && r.depth < MAX_DEPTH) {
-			ShadingSample s = hitRecord.material.evaluateSpecularRefraction(hitRecord);
-			refractedPart = new Spectrum(s.brdf);
-						
-			Ray recursiveRay = new Ray(hitRecord.position, s.w, r.depth + 1, true);
-			Spectrum spec = integrate(recursiveRay);
-			refractedPart.mult(spec);
+			if(s != null) {
+				reflectedPart = new Spectrum(s.brdf);
+				Ray recursiveRay = new Ray(hitRecord.position, s.w, r.depth + 1, true);
+				Spectrum spec = integrate(recursiveRay);
+				reflectedPart.mult(spec);
+			}
 		}
 		
-		if ((hitRecord.material.hasSpecularRefraction() || hitRecord.material.hasSpecularReflection())) {
+		if(hitRecord.material.hasSpecularRefraction() && r.depth < MAX_DEPTH) {
+			ShadingSample s = hitRecord.material.evaluateSpecularRefraction(hitRecord);
+			if(s != null) { // not TIR
+				refractedPart = new Spectrum(s.brdf);
+				Ray recursiveRay = new Ray(hitRecord.position, s.w, r.depth + 1, true);
+				Spectrum spec = integrate(recursiveRay);
+				refractedPart.mult(spec);
+			} 
+		}
+		
+		if (hitRecord.material.hasSpecularRefraction() || hitRecord.material.hasSpecularReflection()) {
 			Spectrum refractPlusReflect = new Spectrum();
 			refractPlusReflect.add(refractedPart);
 			refractPlusReflect.add(reflectedPart);
 			return refractPlusReflect;
 		}
-		Spectrum outgoing = new Spectrum(0.f, 0.f, 0.f);
+		Spectrum outgoing = new Spectrum();
 		Spectrum brdfValue;
 		// Iterate over all light sources
 		Iterator<LightGeometry> it = lightList.iterator();

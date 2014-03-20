@@ -8,7 +8,7 @@ import rt.Spectrum;
 
 public class Refractive implements Material {
 
-	private static final boolean USE_ZWICKER_SCHLICK = true;
+	private static final boolean USE_ZWICKER_SCHLICK = false;
 	public float refractiveIndex;
 	public Spectrum ks;
 
@@ -37,14 +37,16 @@ public class Refractive implements Material {
 	@Override
 	public ShadingSample evaluateSpecularReflection(HitRecord hitRecord) {
 		RefractionHandler rf = new RefractionHandler(hitRecord);
-
+		float reflectedPart = rSchlick(rf);
+		if (reflectedPart < 1e-5) //don't further trace this ray if impact too low
+			return null;
 		Vector3f r = new Vector3f(rf.i);
 		Vector3f nScaled = new Vector3f(rf.normal);
 		nScaled.scale(2*rf.cosTheta_i);
 		r.add(nScaled);
 		
 		Spectrum brdf = new Spectrum(ks);
-		brdf.mult(rSchlick(rf));
+		brdf.mult(reflectedPart);
 		return new ShadingSample(brdf, new Spectrum(0,0,0), r, false, 1);
 	}
 
@@ -56,7 +58,9 @@ public class Refractive implements Material {
 	@Override
 	public ShadingSample evaluateSpecularRefraction(HitRecord hitRecord) {
 		RefractionHandler rf = new RefractionHandler(hitRecord);
-
+		if (rf.totalInternalRefraction) //don't further track ray if energy is lost
+			return null;
+		
 		Vector3f t = new Vector3f(rf.i);
 		t.scale(rf.refractiveRatio);
 		Vector3f nScaled = new Vector3f(rf.normal);
@@ -85,7 +89,7 @@ public class Refractive implements Material {
 	}
 	
 	private float rSchlick(RefractionHandler rf) {
-		if (rf.sin2Theta_t > 1) //total internal refraction
+		if (rf.totalInternalRefraction) //total internal refraction
 			return 1;
 		float r_0 = (rf.n_1 - rf.n_2) / (rf.n_1 + rf.n_2);
 		r_0 *= r_0; //square 
@@ -120,6 +124,7 @@ public class Refractive implements Material {
 		float n_1, n_2;
 		float refractiveRatio, cosTheta_i, sin2Theta_t;
 		Vector3f normal, i;
+		boolean totalInternalRefraction = false;
 		
 		RefractionHandler(HitRecord hitRecord) {
 			normal = new Vector3f(hitRecord.normal);
@@ -136,6 +141,9 @@ public class Refractive implements Material {
 			i.negate();
 			cosTheta_i = -i.dot(normal);
 			sin2Theta_t = refractiveRatio*refractiveRatio*(1 - cosTheta_i*cosTheta_i);
+			if(sin2Theta_t > 1)
+				this.totalInternalRefraction = true;
+
 		}
 	}
 }
