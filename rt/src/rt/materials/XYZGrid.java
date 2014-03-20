@@ -93,7 +93,7 @@ public class XYZGrid implements Material {
 	@Override
 	public boolean castsShadows() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

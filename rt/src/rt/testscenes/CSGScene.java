@@ -18,7 +18,7 @@ public class CSGScene extends Scene {
 	public CSGScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/CSGScene");
+		outputFilename = new String("../output/testscenes/CSGScene-mine");
 		
 		// Image width and height in pixels
 		width = 640;
@@ -55,11 +55,11 @@ public class CSGScene extends Scene {
 		// Place it in the scene
 		Matrix4f rot = new Matrix4f();
 		rot.setIdentity();
-		rot.rotX(-(float)Math.PI/2.f);
+		rot.rotX(-(float)Math.PI/2f + 1e-3f);
 		Matrix4f trans = new Matrix4f();
 		trans.setIdentity();
 		trans.setTranslation(new Vector3f(-1.5f, -1.5f, 0.f));
-		trans.mul(rot);		
+		trans.mul(rot);
 		doubleCone = new CSGInstance(doubleCone, trans);
 		
 		// Something like a"soap bar"
