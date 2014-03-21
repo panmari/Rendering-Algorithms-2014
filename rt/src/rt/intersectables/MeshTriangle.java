@@ -43,12 +43,12 @@ public class MeshTriangle implements Intersectable {
 		Point3f c = new Point3f(vertices[v2*3], vertices[v2*3 + 1], vertices[v2*3 + 2]);
 	
 		Point3f bottomLeft = new Point3f(a);
-		MyMath.elementWiseMin(bottomLeft, b);
-		MyMath.elementWiseMin(bottomLeft, c);
+		MyMath.elementwiseMin(bottomLeft, b);
+		MyMath.elementwiseMin(bottomLeft, c);
 		
 		Point3f topRight = new Point3f(a);
-		MyMath.elementWiseMax(topRight, b);
-		MyMath.elementWiseMax(topRight, c);
+		MyMath.elementwiseMax(topRight, b);
+		MyMath.elementwiseMax(topRight, c);
 
 		this.boundingBox = new BoundingBox(bottomLeft, topRight);
 	}
@@ -59,8 +59,8 @@ public class MeshTriangle implements Intersectable {
 	
 	public HitRecord intersect(Ray r)
 	{
-		return boundingBox.intersect(r);
-		/*
+		//return boundingBox.intersect(r);
+		
 		float vertices[] = mesh.vertices;
 		
 		// Access the triangle vertices as follows (same for the normals):		
@@ -98,7 +98,6 @@ public class MeshTriangle implements Intersectable {
 		}
 		else
 			return null;
-			*/
 	}
 	
 	/**

@@ -7,6 +7,7 @@ import javax.vecmath.*;
 import rt.Material;
 import rt.Ray;
 import rt.Spectrum;
+import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
 /**
@@ -93,5 +94,13 @@ public class CSGDodecahedron extends CSGSolid {
 	ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r)
 	{
 		return root.getIntervalBoundaries(r);
+	}
+	
+	/**
+	 * Very simple for a sphere with radius 1.
+	 */
+	@Override
+	public BoundingBox getBoundingBox() {
+		return new BoundingBox(new Point3f(-1,-1,-1), new Point3f(1,1,1));
 	}
 }

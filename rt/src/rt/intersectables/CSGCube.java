@@ -6,6 +6,7 @@ import rt.HitRecord;
 import rt.Intersectable;
 import rt.Ray;
 import rt.Spectrum;
+import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
 /**
@@ -40,6 +41,14 @@ public class CSGCube implements Intersectable {
 
 	public HitRecord intersect(Ray r) {
 		return root.intersect(r);
+	}
+
+	/**
+	 * Very simple for a sphere with radius 1.
+	 */
+	@Override
+	public BoundingBox getBoundingBox() {
+		return new BoundingBox(new Point3f(-1,-1,-1), new Point3f(1,1,1));
 	}
 
 }

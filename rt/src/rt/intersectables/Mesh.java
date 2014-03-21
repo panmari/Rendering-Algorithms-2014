@@ -67,8 +67,8 @@ public class Mesh extends Aggregate {
 		for(int i=0; i<indices.length/3; i++) {
 			MeshTriangle newTriangle = new MeshTriangle(this, i);
 			triangles[i] = newTriangle;
-			MyMath.elementWiseMin(bottomLeft, newTriangle.getBoundingBox().min);
-			MyMath.elementWiseMax(topRight, newTriangle.getBoundingBox().max);
+			MyMath.elementwiseMin(bottomLeft, newTriangle.getBoundingBox().min);
+			MyMath.elementwiseMax(topRight, newTriangle.getBoundingBox().max);
 		}
 		this.boundingBox = new BoundingBox(bottomLeft, topRight);
 	}

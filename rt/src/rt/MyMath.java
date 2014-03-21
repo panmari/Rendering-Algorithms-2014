@@ -50,7 +50,7 @@ public class MyMath {
 	 * @param min
 	 * @param other
 	 */
-	public static void elementWiseMin(Tuple3f min, Tuple3f other) {
+	public static void elementwiseMin(Tuple3f min, Tuple3f other) {
 		min.x = Math.min(min.x, other.x);
 		min.y = Math.min(min.y, other.y);
 		min.z = Math.min(min.z, other.z);
@@ -61,7 +61,7 @@ public class MyMath {
 	 * @param max
 	 * @param other
 	 */
-	public static void elementWiseMax(Tuple3f max, Tuple3f other) {
+	public static void elementwiseMax(Tuple3f max, Tuple3f other) {
 		max.x = Math.max(max.x, other.x);
 		max.y = Math.max(max.y, other.y);
 		max.z = Math.max(max.z, other.z);
