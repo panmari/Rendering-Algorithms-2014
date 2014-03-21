@@ -39,16 +39,12 @@ public class Textured implements Material {
 	 */
 	public Spectrum getBilinearInterpolatedColor(float x, float y) {
 		Point2f scaled = new Point2f(getScaledX(x), getScaledY(y));
-		int[][][] imagePixels = new int[2][2][];
-		//the first coordinate signifies the top/bottom, the second left/right
-		imagePixels[0][0] = getRGBOfHexaColor(texture.getRGB(floor(scaled.x), floor(scaled.y)));
-		imagePixels[0][1] = getRGBOfHexaColor(texture.getRGB(ceil(scaled.x), floor(scaled.y)));
-		imagePixels[1][0] = getRGBOfHexaColor(texture.getRGB(floor(scaled.x), ceil(scaled.y)));
-		imagePixels[1][1] = getRGBOfHexaColor(texture.getRGB(ceil(scaled.x), ceil(scaled.y)));
+
+		int[] imagePixels = texture.getRGB(floor(scaled.x), floor(scaled.y), 2, 2, null, 0, 2);
 		float horzCoeff = ceil(scaled.x) - scaled.x;
 		int[][] weightedTopBot = new int[2][];
 		for (int i = 0; i < 2; i++) {
-			weightedTopBot[i] = interpolateBetween(imagePixels[i][0], imagePixels[i][1], horzCoeff);
+			weightedTopBot[i] = interpolateBetween(getRGBOfHexaColor(imagePixels[i]), getRGBOfHexaColor(imagePixels[i + 2]), horzCoeff);
 		}
 		float vertCoeff = ceil(scaled.y) - scaled.y;
 		int[] result = interpolateBetween(weightedTopBot[0], weightedTopBot[1], vertCoeff);
