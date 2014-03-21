@@ -5,6 +5,7 @@ import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
 import rt.Material;
+import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
 import rt.materials.Diffuse;
@@ -116,7 +117,11 @@ public class CSGPlane extends CSGSolid {
 			Vector3f wIn = new Vector3f(r.direction);
 			wIn.negate();
 		
-			return new HitRecord(t, position, retNormal, wIn, null, material, 0.f, 0.f); 
+			//use projection to x/z plane to decide on texture coordinate
+			//TODO: do this better
+			float u = Math.abs(position.x % 1);
+			float v = Math.abs(position.z % 1);
+			return new HitRecord(t, position, retNormal, wIn, null, material, u, v); 
 		} else
 		{
 			return null;

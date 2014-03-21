@@ -11,6 +11,9 @@ import javax.vecmath.Vector3f;
 import rt.HitRecord;
 import rt.Material;
 import rt.Spectrum;
+import static rt.MyMath.floor;
+import static rt.MyMath.ceil;
+
 
 public class Textured implements Material {
 
@@ -76,14 +79,6 @@ public class Textured implements Material {
 
 	private float getScaledY(float y) {
 		return (1 - y)*(height - 1);
-	}
-
-	private int floor(float f) {
-		return (int) f;
-	}
-
-	private int ceil(float f) {
-		return (int) Math.ceil(f);
 	}
 	
 	@Override

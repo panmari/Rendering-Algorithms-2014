@@ -52,9 +52,9 @@ public class TextureTestScene extends Scene {
 		
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
-		Plane groundPlane = new Plane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
-		groundPlane.material = grid;
-		Plane backPlane = new Plane(new Vector3f(0.f, 0.f, 1.f), 3.15f);
+		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
+		groundPlane.material = chessTexture;
+		CSGPlane backPlane = new CSGPlane(new Vector3f(0.f, 0.f, 1.f), 3.15f);
 		backPlane.material = grid;		
 		
 		// Collect objects in intersectable list

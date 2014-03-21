@@ -35,4 +35,12 @@ public class MyMath {
 		}
 		return new Point2f(t0, t1);
 	}
+	
+	public static int floor(float f) {
+		return (int) f;
+	}
+	
+	public static int ceil(float f) {
+		return (int) Math.ceil(f);
+	}
 }
