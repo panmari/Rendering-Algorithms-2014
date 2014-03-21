@@ -80,6 +80,10 @@ public class CSGSphere extends CSGSolid {
 		Vector3f wIn = new Vector3f(r.direction);
 		wIn.normalize();
 		wIn.negate();
-		return new HitRecord(t, hitPoint, normal, wIn, this, this.material, 0, 0);
+		
+		float u = 0.5f + (float)(Math.atan2(hitPoint.z, hitPoint.x)/(2*Math.PI));
+		float v = 0.5f - (float)(Math.asin(hitPoint.y)/Math.PI);
+
+		return new HitRecord(t, hitPoint, normal, wIn, this, this.material, u, v);
 	}
 }
