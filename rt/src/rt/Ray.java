@@ -40,7 +40,7 @@ public class Ray {
 	{
 		Vector3f o = new Vector3f();
 		if (epsilon) {
-			o.scaleAdd(1e-5f, direction, origin);
+			o.scaleAdd(1e-4f, direction, origin);
 		} else
 			o.set(origin);
 		this.origin = o; 

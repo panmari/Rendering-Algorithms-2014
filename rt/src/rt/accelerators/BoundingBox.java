@@ -52,14 +52,11 @@ public class BoundingBox implements Intersectable {
         if ((tmin > tzmax) || (tzmin > tmax))
             return null;
         
+        //TODO: possibly just give back a dummy entry
         if (tzmin > tmin)
             tmin = tzmin;
         if (tzmax < tmax)
             tmax = tzmax;
-        /*
-        if (tmin > r.tmin) r.tmin = tmin;
-        if (tmax < r.tmax) r.tmax = tmax;
-        */
         Vector3f w = new Vector3f(r.direction);
         w.normalize();
         w.negate();

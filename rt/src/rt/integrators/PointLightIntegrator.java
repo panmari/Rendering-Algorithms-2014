@@ -54,11 +54,7 @@ public class PointLightIntegrator implements Integrator {
 				float d2 = lightDir.lengthSquared();
 				lightDir.normalize();
 				
-				//TODO: fix shadows
-				Point3f shadowRayStart = new Point3f(lightDir);
-				shadowRayStart.scaleAdd(0.001f, hitRecord.position);
-				
-				Ray shadowRay = new Ray(shadowRayStart, lightDir);
+				Ray shadowRay = new Ray(hitRecord.position, lightDir, 0, true);
 				HitRecord shadowHit = root.intersect(shadowRay);
 				if (shadowHit != null &&
 						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light

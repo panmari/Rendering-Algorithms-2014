@@ -2,11 +2,13 @@ package rt.intersectables;
 
 import java.util.ArrayList;
 
+import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import rt.Material;
 import rt.Ray;
 import rt.Spectrum;
+import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
 public class CSGUnitCylinder extends CSGSolid {
@@ -37,5 +39,13 @@ public class CSGUnitCylinder extends CSGSolid {
 	@Override
 	ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
 		return root.getIntervalBoundaries(r);
+	}
+	
+	/**
+	 * Again very simple
+	 */
+	@Override
+	public BoundingBox getBoundingBox() {
+		return new BoundingBox(new Point3f(-1,-1,-1), new Point3f(1,1,1));
 	}
 }

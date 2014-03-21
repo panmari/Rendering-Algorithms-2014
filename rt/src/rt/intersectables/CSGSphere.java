@@ -12,6 +12,7 @@ import rt.Material;
 import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
+import rt.accelerators.BoundingBox;
 import rt.intersectables.CSGSolid.IntervalBoundary;
 import rt.materials.Diffuse;
 
@@ -85,5 +86,13 @@ public class CSGSphere extends CSGSolid {
 		float v = 0.5f - (float)(Math.asin(hitPoint.y)/Math.PI);
 
 		return new HitRecord(t, hitPoint, normal, wIn, this, this.material, u, v);
+	}
+
+	/**
+	 * Very simple for a sphere with radius 1.
+	 */
+	@Override
+	public BoundingBox getBoundingBox() {
+		return new BoundingBox(new Point3f(-1,-1,-1), new Point3f(1,1,1));
 	}
 }
