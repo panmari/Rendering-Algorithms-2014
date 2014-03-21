@@ -82,5 +82,11 @@ public class Diffuse implements Material {
 	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
 		return new ShadingSample();
 	}
+
+	@Override
+	public void evaluateBumpMap(Vector3f normal, float u, float v) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

@@ -17,34 +17,52 @@ import static rt.MyMath.ceil;
 
 public class Textured implements Material {
 
-	BufferedImage texture;
-	int width, height;
+	private BufferedImage texture;
+	private BufferedImage bumpMap;
 
-	public Textured(String fileName) throws IOException {
-		texture = ImageIO.read(new File(fileName));
-		width = texture.getWidth();
-		height = texture.getHeight();
+	public Textured(String textureFileName, String bumpMapFileName) {
+		try {
+			texture = ImageIO.read(new File(textureFileName));
+			if (bumpMapFileName != null)
+				bumpMap = ImageIO.read(new File(textureFileName));
+		} catch (IOException e) {
+			System.err.println("Could not load texture: ");
+			e.printStackTrace();
+		}
+	}
+	
+	public Textured(String textureFileName) {
+		this(textureFileName, null);
 	}
 
-	public Spectrum getNearestNeighbourColor(float x, float y) {
-		int[] result = getRGBOfHexaColor(texture.getRGB(Math.round(getScaledX(x)), Math.round(getScaledY(y))));
+	/**
+	 * Not in use
+	 * @param x
+	 * @param y
+	 * @param texture
+	 * @return
+	 */
+	public Spectrum getNearestNeighbourColor(float x, float y, BufferedImage texture) {
+		int[] result = getRGBOfHexaColor(texture.getRGB(Math.round(getScaledX(x, texture.getWidth())), 
+				Math.round(getScaledY(y, texture.getHeight()))));
 		return new Spectrum(result[0]/255f, result[1]/255f, result[2]/255f);
 	}
 
 	/**
-	 * this is ugly & slow, refactor pls!
 	 * @param x
 	 * @param y
 	 * @return
 	 */
-	public Spectrum getBilinearInterpolatedColor(float x, float y) {
-		Point2f scaled = new Point2f(getScaledX(x), getScaledY(y));
+	public Spectrum getBilinearInterpolated(float x, float y, BufferedImage texture) {
+		Point2f scaled = new Point2f(	getScaledX(x, texture.getWidth()), 
+										getScaledY(y, texture.getHeight()));
 
 		int[] imagePixels = texture.getRGB(floor(scaled.x), floor(scaled.y), 2, 2, null, 0, 2);
 		float vertCoeff = ceil(scaled.y) - scaled.y;
 		int[][] weightedTopBot = new int[2][];
 		for (int i = 0; i < 2; i++) {
-			weightedTopBot[i] = interpolateBetween(getRGBOfHexaColor(imagePixels[i]), getRGBOfHexaColor(imagePixels[i + 2]), vertCoeff);
+			weightedTopBot[i] = interpolateBetween(getRGBOfHexaColor(imagePixels[i]), 
+					getRGBOfHexaColor(imagePixels[i + 2]), vertCoeff);
 		}
 		float horzCoeff =  ceil(scaled.x) - scaled.x;
 		int[] result = interpolateBetween(weightedTopBot[0], weightedTopBot[1], horzCoeff);
@@ -69,18 +87,18 @@ public class Textured implements Material {
 		return rgb;
 	}
 
-	private float getScaledX(float x) {
+	private float getScaledX(float x, int width) {
 		return x*(width - 1);
 	}
 
-	private float getScaledY(float y) {
+	private float getScaledY(float y, int height) {
 		return (1 - y)*(height - 1);
 	}
 	
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut,
 			Vector3f wIn) {
-		return getBilinearInterpolatedColor(hitRecord.u, hitRecord.v);
+		return getBilinearInterpolated(hitRecord.u, hitRecord.v, texture);
 	}
 
 	@Override
@@ -121,6 +139,17 @@ public class Textured implements Material {
 	@Override
 	public boolean castsShadows() {
 		return true;
+	}
+
+	@Override
+	public void evaluateBumpMap(Vector3f normal, float u, float v) {
+		if (bumpMap != null) {
+			Spectrum nSpec = getBilinearInterpolated(u, v, bumpMap);
+			Vector3f n = new Vector3f(nSpec.r, nSpec.g, nSpec.b);
+			n.scale(2);
+			n.sub(new Vector3f(1,1,1));
+			normal.set(n);
+		}
 	}
 
 }
