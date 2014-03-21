@@ -18,4 +18,9 @@ public class IntersectableList extends Aggregate {
 		return intersectibles.iterator();
 	}
 
+	@Override
+	public int size() {
+		return intersectibles.size();
+	}
+
 }

@@ -85,7 +85,7 @@ public class Refractive implements Material {
 
 	@Override
 	public boolean castsShadows() {
-		return true;
+		return false;
 	}
 	
 	private float rSchlick(RefractionHandler rf) {

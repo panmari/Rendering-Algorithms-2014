@@ -90,5 +90,10 @@ public class Mesh extends Aggregate {
 		{
 		}
 	}
+
+	@Override
+	public int size() {
+		return triangles.length;
+	}
 		
 }
