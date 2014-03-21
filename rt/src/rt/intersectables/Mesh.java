@@ -44,6 +44,8 @@ public class Mesh extends Aggregate {
 	 * A material.
 	 */
 	public Material material;
+
+	private BoundingBox boundingBox;
 	
 	/**
 	 * Make a mesh from arrays with vertices, normals, and indices.
@@ -65,10 +67,10 @@ public class Mesh extends Aggregate {
 		for(int i=0; i<indices.length/3; i++) {
 			MeshTriangle newTriangle = new MeshTriangle(this, i);
 			triangles[i] = newTriangle;
-			MyMath.elementWiseMin(bottomLeft, newTriangle.getBoundingBox().bottomLeft);
-			MyMath.elementWiseMax(topRight, newTriangle.getBoundingBox().topRight);
+			MyMath.elementWiseMin(bottomLeft, newTriangle.getBoundingBox().min);
+			MyMath.elementWiseMax(topRight, newTriangle.getBoundingBox().max);
 		}
-		
+		this.boundingBox = new BoundingBox(bottomLeft, topRight);
 	}
 	
 	public Iterator<Intersectable> iterator() {
@@ -110,7 +112,7 @@ public class Mesh extends Aggregate {
 
 	@Override
 	public BoundingBox getBoundingBox() {
-		return null;
+		return this.boundingBox;
 	}
 		
 }
