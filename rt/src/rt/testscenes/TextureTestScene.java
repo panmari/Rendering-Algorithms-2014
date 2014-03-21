@@ -44,9 +44,9 @@ public class TextureTestScene extends Scene {
 		samplerFactory = new OneSamplerFactory();		
 		Material chessTexture = null;
 		
-		try {
-			chessTexture = new Textured("../textures/chessboard.jpg");
-		} catch (IOException e) { }
+		
+		chessTexture = new Textured("../textures/chessboard.jpg");
+		
 		
 		CSGSolid sphere = new CSGSphere(chessTexture);
 		

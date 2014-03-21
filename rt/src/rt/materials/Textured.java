@@ -20,10 +20,15 @@ public class Textured implements Material {
 	BufferedImage texture;
 	int width, height;
 
-	public Textured(String fileName) throws IOException {
+	public Textured(String fileName) {
+		try {
 		texture = ImageIO.read(new File(fileName));
 		width = texture.getWidth();
 		height = texture.getHeight();
+		} catch (IOException e) {
+			System.err.println("Could not load texture: " + fileName);
+			e.printStackTrace();
+		}
 	}
 
 	public Spectrum getNearestNeighbourColor(float x, float y) {
