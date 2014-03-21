@@ -2,9 +2,13 @@ package rt.intersectables;
 
 import java.util.Iterator;
 
+import javax.vecmath.Point3f;
+
 import rt.Intersectable;
 import rt.Material;
+import rt.MyMath;
 import rt.Spectrum;
+import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
 /**
@@ -53,10 +57,18 @@ public class Mesh extends Aggregate {
 		this.indices = indices;
 		triangles = new MeshTriangle[indices.length/3];		
 		
+		Point3f bottomLeft = new Point3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
+		Point3f topRight = new Point3f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
+
 		// A triangle simply stores a triangle index and refers back to the mesh 
 		// to look up the vertex data
-		for(int i=0; i<indices.length/3; i++)
-			triangles[i] = new MeshTriangle(this, i);
+		for(int i=0; i<indices.length/3; i++) {
+			MeshTriangle newTriangle = new MeshTriangle(this, i);
+			triangles[i] = newTriangle;
+			MyMath.elementWiseMin(bottomLeft, newTriangle.getBoundingBox().bottomLeft);
+			MyMath.elementWiseMax(topRight, newTriangle.getBoundingBox().topRight);
+		}
+		
 	}
 	
 	public Iterator<Intersectable> iterator() {
@@ -94,6 +106,11 @@ public class Mesh extends Aggregate {
 	@Override
 	public int size() {
 		return triangles.length;
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		return null;
 	}
 		
 }

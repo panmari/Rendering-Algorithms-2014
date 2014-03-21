@@ -2,9 +2,13 @@
 
 import javax.vecmath.*;
 
+import com.google.common.collect.ImmutableList;
+
 import rt.HitRecord;
 import rt.Intersectable;
+import rt.MyMath;
 import rt.Ray;
+import rt.accelerators.BoundingBox;
 
 /**
  * Defines a triangle by referring back to a {@link Mesh}
@@ -14,6 +18,7 @@ public class MeshTriangle implements Intersectable {
 
 	private Mesh mesh;
 	private int index;
+	private BoundingBox boundingBox;
 	
 	/**
 	 * Make a triangle.
@@ -24,7 +29,28 @@ public class MeshTriangle implements Intersectable {
 	public MeshTriangle(Mesh mesh, int index)
 	{
 		this.mesh = mesh;
-		this.index = index;		
+		this.index = index;
+		
+		float vertices[] = mesh.vertices;
+
+		int v0 = mesh.indices[index*3];
+		int v1 = mesh.indices[index*3+1];
+		int v2 = mesh.indices[index*3+2];
+		
+		// 2. Access x,y,z coordinates for each vertex
+		Point3f a = new Point3f(vertices[v0*3], vertices[v0*3 + 1], vertices[v0*3 + 2]);
+		Point3f b = new Point3f(vertices[v1*3], vertices[v1*3 + 1], vertices[v1*3 + 2]);
+		Point3f c = new Point3f(vertices[v2*3], vertices[v2*3 + 1], vertices[v2*3 + 2]);
+	
+		Point3f bottomLeft = new Point3f(a);
+		MyMath.elementWiseMin(bottomLeft, b);
+		MyMath.elementWiseMin(bottomLeft, c);
+		
+		Point3f topRight = new Point3f(a);
+		MyMath.elementWiseMax(topRight, b);
+		MyMath.elementWiseMax(topRight, c);
+
+		this.boundingBox = new BoundingBox(bottomLeft, topRight);
 	}
 	
 	public String toString() {
@@ -33,6 +59,8 @@ public class MeshTriangle implements Intersectable {
 	
 	public HitRecord intersect(Ray r)
 	{
+		return boundingBox.intersect(r);
+		/*
 		float vertices[] = mesh.vertices;
 		
 		// Access the triangle vertices as follows (same for the normals):		
@@ -70,6 +98,7 @@ public class MeshTriangle implements Intersectable {
 		}
 		else
 			return null;
+			*/
 	}
 	
 	/**
@@ -143,7 +172,12 @@ public class MeshTriangle implements Intersectable {
 				betaGammaT.y >= 1)
 			return false;
 		float f = betaGammaT.x + betaGammaT.y;
-		return f > 0 && f < 1 ;
+		return f > 0 && f < 1;
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		return boundingBox;
 	}
 	
 }

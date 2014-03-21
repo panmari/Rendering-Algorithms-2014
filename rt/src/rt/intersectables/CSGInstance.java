@@ -6,6 +6,7 @@ import javax.vecmath.Matrix4f;
 
 import rt.Material;
 import rt.Ray;
+import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
 public class CSGInstance extends CSGSolid {
@@ -34,5 +35,11 @@ public class CSGInstance extends CSGSolid {
 	
 	public String toString() {
 		return "Instance: " + csgSolid.toString();
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

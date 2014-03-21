@@ -8,6 +8,7 @@ import rt.Material;
 import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
+import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
 import java.util.ArrayList;
@@ -126,5 +127,11 @@ public class CSGPlane extends CSGSolid {
 		{
 			return null;
 		}
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

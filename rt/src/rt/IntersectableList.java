@@ -3,6 +3,7 @@ package rt;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import rt.accelerators.BoundingBox;
 import rt.intersectables.Aggregate;
 
 public class IntersectableList extends Aggregate {
@@ -21,6 +22,12 @@ public class IntersectableList extends Aggregate {
 	@Override
 	public int size() {
 		return intersectibles.size();
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
