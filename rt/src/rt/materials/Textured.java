@@ -41,13 +41,13 @@ public class Textured implements Material {
 		Point2f scaled = new Point2f(getScaledX(x), getScaledY(y));
 
 		int[] imagePixels = texture.getRGB(floor(scaled.x), floor(scaled.y), 2, 2, null, 0, 2);
-		float horzCoeff = ceil(scaled.x) - scaled.x;
+		float vertCoeff = ceil(scaled.y) - scaled.y;
 		int[][] weightedTopBot = new int[2][];
 		for (int i = 0; i < 2; i++) {
-			weightedTopBot[i] = interpolateBetween(getRGBOfHexaColor(imagePixels[i]), getRGBOfHexaColor(imagePixels[i + 2]), horzCoeff);
+			weightedTopBot[i] = interpolateBetween(getRGBOfHexaColor(imagePixels[i]), getRGBOfHexaColor(imagePixels[i + 2]), vertCoeff);
 		}
-		float vertCoeff = ceil(scaled.y) - scaled.y;
-		int[] result = interpolateBetween(weightedTopBot[0], weightedTopBot[1], vertCoeff);
+		float horzCoeff =  ceil(scaled.x) - scaled.x;
+		int[] result = interpolateBetween(weightedTopBot[0], weightedTopBot[1], horzCoeff);
 
 		return new Spectrum(result[0]/255f, result[1]/255f, result[2]/255f);
 	}
