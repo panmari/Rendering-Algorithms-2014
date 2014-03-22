@@ -3,19 +3,15 @@ package rt.accelerators;
 import java.util.List;
 
 import rt.Intersectable;
-import rt.accelerators.BSPAccelerator.Axis;
 
 public class BSPNode {
 
-	public List<Intersectable> intersectables;
-	public BoundingBox boundingBox;
-	public Axis splitAxis;
+	List<Intersectable> intersectables;
+	BoundingBox boundingBox;
 	BSPNode left, right;
 
-	public BSPNode(List<Intersectable> intersectable, BoundingBox boundingBox, Axis splitAxis) {
-		this.intersectables = intersectables;
+	public BSPNode(BoundingBox boundingBox) {
 		this.boundingBox = boundingBox;
-		this.splitAxis = splitAxis;
 	}
 
 }

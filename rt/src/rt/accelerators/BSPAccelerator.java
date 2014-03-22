@@ -27,13 +27,11 @@ public class BSPAccelerator implements Intersectable {
 	 * @param a
 	 */
 	public BSPAccelerator(Aggregate a) {
-		List<Intersectable> intersectables = new ArrayList<>();
-		Iterator<Intersectable> iter = a.iterator();
 		this.n = a.size();
 		this.MAX_DEPTH = (int) Math.round(8 + 1.3f*Math.log(n));
 
-		BSPNode root = new BSPNode(Lists.newArrayList(a.iterator()), a.getBoundingBox(), Axis.x);
-		buildTree(root, 0);
+		this.root = new BSPNode(a.getBoundingBox());
+		buildTree(root, Lists.newArrayList(a.iterator()), Axis.x, 0);
 	}
 	
 	/**
@@ -42,11 +40,12 @@ public class BSPAccelerator implements Intersectable {
 	 * @param b
 	 * @return
 	 */
-	private BSPNode buildTree(BSPNode node, int depth) {
-		if (depth > MAX_DEPTH || node.intersectables.size() < MIN_NR_PRIMITIVES)
+	private BSPNode buildTree(BSPNode node, List<Intersectable> iList, Axis currentSplitAxis, int depth) {
+		if (depth > MAX_DEPTH || iList.size() < MIN_NR_PRIMITIVES) {
+			node.intersectables = iList;
 			return null;
+		}
 
-		Axis currentSplitAxis = node.splitAxis.getNext();
 		BoundingBox b = node.boundingBox;
 		// split bounding box in middle along of some axis, make a new box each
 		Point3f leftBoxMax = new Point3f(b.max);
@@ -59,20 +58,16 @@ public class BSPAccelerator implements Intersectable {
 		List<Intersectable> leftIntersectables = new ArrayList<>();
 		List<Intersectable> rightIntersectables = new ArrayList<>();
 		//add intersectable to bounding box that crosses it
-		for (Intersectable i: iList) {
+		for (Intersectable i: node.intersectables) {
 			if (i.getBoundingBox().intersect(leftBox))
 				leftIntersectables.add(i);
 			if (i.getBoundingBox().intersect(rightBox))
 				rightIntersectables.add(i);
 		}
 		
-		node.left = new BSPNode(leftIntersectables, leftBox, currentSplitAxis);
-		
-		//TODO: 
-		// call build tree again with left -> smaller than split
-		// right -> higher than split
-		// at beginning of method, check for end criteria -> make leaf if met
-		
+		node.left = buildTree(new BSPNode(leftBox), leftIntersectables, currentSplitAxis.getNext(), depth + 1);
+		node.right = buildTree(new BSPNode(rightBox), leftIntersectables, currentSplitAxis.getNext(), depth + 1);
+		return node;
 	}
 	@Override
 	public HitRecord intersect(Ray r) {
@@ -87,5 +82,10 @@ public class BSPAccelerator implements Intersectable {
 			int ordinalNext = (this.ordinal() + 1) % Axis.values().length;
 			return Axis.values()[ordinalNext];
 		}
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		return root.boundingBox;
 	}
 }
