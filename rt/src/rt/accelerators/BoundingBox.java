@@ -62,6 +62,22 @@ public class BoundingBox implements Intersectable {
         w.negate();
 		return new HitRecord(tmin, r.pointAt(tmin), new Vector3f(1,0,0), w, this, new Diffuse(), 0,0);
 	}
+	
+	/**
+	 * see http://rbrundritt.wordpress.com/2009/10/03/determining-if-two-bounding-boxes-overlap/
+	 * @param other
+	 * @return
+	 */
+	public boolean intersect(BoundingBox other) {
+		float rabx = Math.abs(min.x + max.x - other.min.x - other.max.x);
+		float raby = Math.abs(min.y + max.y - other.min.y - other.max.y);
+		float rabz = Math.abs(min.z + max.z - other.min.z - other.max.z);
+
+		float raxPrbx = max.x - min.x + other.min.x - other.max.x;
+		float rayPrby = max.y - min.y + other.min.y - other.max.y;
+		float razPrbz = max.z - min.z + other.min.z - other.max.z;
+		return rabx <= raxPrbx && raby <= rayPrby && rabz <= razPrbz;
+	}
 
 	@Override
 	public BoundingBox getBoundingBox() {

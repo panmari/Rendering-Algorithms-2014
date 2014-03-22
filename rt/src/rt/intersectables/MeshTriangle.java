@@ -130,7 +130,13 @@ public class MeshTriangle implements Intersectable {
 		return new Vector3f(beta, gamma, t);
 	}
 
-	Vector3f getBetaGammaTMatrixInversion(Matrix3f t, Vector3f rightHand) {
+	/**
+	 * Not in use, much slower than cramer
+	 * @param t
+	 * @param rightHand
+	 * @return
+	 */
+	private Vector3f getBetaGammaTMatrixInversion(Matrix3f t, Vector3f rightHand) {
 		try {
 			t.invert();
 		} catch(SingularMatrixException e) {
