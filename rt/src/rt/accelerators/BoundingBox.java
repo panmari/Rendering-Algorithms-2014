@@ -1,5 +1,6 @@
 package rt.accelerators;
 
+import javax.vecmath.Point2f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
@@ -10,7 +11,7 @@ import rt.intersectables.CSGNode;
 import rt.intersectables.CSGPlane;
 import rt.materials.Diffuse;
 
-public class BoundingBox implements Intersectable {
+public class BoundingBox {
 
 	public Point3f min;
 	public Point3f max;
@@ -25,9 +26,9 @@ public class BoundingBox implements Intersectable {
 	/**
 	 * See
 	 * http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
+	 * @return a point2f with the two t values of the intersections, the smaller one on x. Null if there is no intersection.
 	 */
-	@Override
-	public HitRecord intersect(Ray r) {
+	public Point2f intersect(Ray r) {
 		Vector3f invdir = new Vector3f(1/r.direction.x,
 				1/r.direction.y,
 				1/r.direction.z);
@@ -52,15 +53,11 @@ public class BoundingBox implements Intersectable {
         if ((tmin > tzmax) || (tzmin > tmax))
             return null;
         
-        //TODO: possibly just give back a dummy entry
         if (tzmin > tmin)
             tmin = tzmin;
         if (tzmax < tmax)
             tmax = tzmax;
-        Vector3f w = new Vector3f(r.direction);
-        w.normalize();
-        w.negate();
-		return new HitRecord(tmin, r.pointAt(tmin), new Vector3f(1,0,0), w, this, new Diffuse(), 0,0);
+		return new Point2f(tmin, tmax);
 	}
 	
 	/**
@@ -77,11 +74,6 @@ public class BoundingBox implements Intersectable {
 		float distCentersy = max.y - min.y + other.max.y - other.min.y;
 		float distCentersz = max.z - min.z + other.max.z - other.min.z;
 		return sizex2 <= distCentersx && sizey2 <= distCentersy && sizez2 <= distCentersz;
-	}
-
-	@Override
-	public BoundingBox getBoundingBox() {
-		return this;
 	}
 	
 	public String toString() {
