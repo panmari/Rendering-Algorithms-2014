@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import javax.vecmath.Point2f;
 import javax.vecmath.Point3f;
+import javax.vecmath.Vector3f;
 
 import com.google.common.collect.Lists;
 
@@ -31,8 +33,8 @@ public class BSPAccelerator implements Intersectable {
 		this.n = a.size();
 		this.MAX_DEPTH = (int) Math.round(8 + 1.3f*Math.log(n));
 
-		this.root = new BSPNode(a.getBoundingBox());
-		buildTree(root, Lists.newArrayList(a.iterator()), Axis.x, 0);
+		this.root = new BSPNode(a.getBoundingBox(), Axis.x);
+		buildTree(root, Lists.newArrayList(a.iterator()), 0);
 	}
 	
 	/**
@@ -41,7 +43,7 @@ public class BSPAccelerator implements Intersectable {
 	 * @param b
 	 * @return
 	 */
-	private BSPNode buildTree(BSPNode node, List<Intersectable> iList, Axis currentSplitAxis, int depth) {
+	private BSPNode buildTree(BSPNode node, List<Intersectable> iList, int depth) {
 		if (depth > MAX_DEPTH || iList.size() < MIN_NR_PRIMITIVES) {
 			node.intersectables = iList;
 			return node;
@@ -52,7 +54,7 @@ public class BSPAccelerator implements Intersectable {
 		Point3f leftBoxMax = new Point3f(b.max);
 		Point3f rightBoxMin = new Point3f(b.min);
 
-		switch (currentSplitAxis) {
+		switch (node.splitAxis) {
 			case x:
 				leftBoxMax.x = (b.min.x + b.max.x)/2;
 				rightBoxMin.x = (b.min.x + b.max.x)/2;
@@ -80,49 +82,100 @@ public class BSPAccelerator implements Intersectable {
 				rightIntersectables.add(i);
 		}
 		
-		node.left = buildTree(new BSPNode(leftBox), leftIntersectables, currentSplitAxis.getNext(), depth + 1);
-		node.right = buildTree(new BSPNode(rightBox), rightIntersectables, currentSplitAxis.getNext(), depth + 1);
+		Axis nextSplitAxis = node.splitAxis.getNext();
+		node.left = buildTree(new BSPNode(leftBox, nextSplitAxis), leftIntersectables, depth + 1);
+		node.right = buildTree(new BSPNode(rightBox, nextSplitAxis), rightIntersectables, depth + 1);
 		return node;
 	}
 	@Override
 	public HitRecord intersect(Ray r) {
-		Stack<BSPNode> nodeStack = new Stack<>();
-		nodeStack.push(root);
+		Point2f ts = root.boundingBox.intersect(r);
+		if (ts == null)
+			return null;
+		
+		Stack<StackNode> nodeStack = new Stack<>();
+		BSPNode node = root;
 		HitRecord nearestHit = null;
-		float nearestT = Float.POSITIVE_INFINITY;
-		while (!nodeStack.empty()) {
-			BSPNode currentNode = nodeStack.pop();
-			if (currentNode.intersectables != null) {
-				for (Intersectable i: currentNode.intersectables) {
-					HitRecord currentHit = i.intersect(r);
-					if (currentHit != null && nearestT > currentHit.t && currentHit.t > 0) {
-						nearestT = currentHit.t;
-						nearestHit = currentHit;
+		float tNearestHit = Float.POSITIVE_INFINITY;	
+		float tmin = ts.x, tmax = ts.y;
+		while (node != null) {
+			if (tNearestHit < tmin)
+				break;
+			if (!node.isLeaf()) {
+				Vector3f splitAxisNormal = node.splitAxis.normal;
+				float tmp = splitAxisNormal.dot(r.direction);
+				float tSplitAxis;
+				//if (tmp != 0) //TODO: handle this case
+					tSplitAxis = -(splitAxisNormal.dot(r.origin) + node.splitAxisDistance) / tmp;
+				BSPNode first, second;
+				if( r.origin.get(node.splitAxis.ordinal()) < node.splitAxisDistance ) {
+					first = node.left;
+					second = node.right;
+				} else {
+					first = node.left;
+					second = node.right;
+				}
+				// process children
+				if( tSplitAxis > tmax || tSplitAxis < 0 || 
+						(Math.abs(tSplitAxis) < 1e-5 && first.boundingBox.intersect(r) != null)) {
+					node = first;
+				}
+				else if(tSplitAxis < tmin || 
+						(Math.abs(tSplitAxis) < 1e-5 && second.boundingBox.intersect(r) != null)) {
+					node = second;
+				} else {
+					node = first;
+					nodeStack.push(new StackNode(second, tSplitAxis, tmax));
+					tmax = tSplitAxis;
+				}
+			} else {
+				for (Intersectable i: node.intersectables) {
+					HitRecord tmp = i.intersect(r);
+					if(tmp != null && tmp.t < tNearestHit && tmp.t > 0) {
+						tNearestHit = tmp.t;
+						nearestHit = tmp;
 					}
 				}
+				StackNode s = nodeStack.pop();
+				node = s.node;
+				tmin = s.tmin;
+				tmax = s.tmax;
 			}
-			//TODO: refactor ugly null checks
-			if (currentNode.left != null && currentNode.left.boundingBox.intersect(r) != null) {
-				nodeStack.push(currentNode.left);
-			} 
-			if (currentNode.right != null && currentNode.right.boundingBox.intersect(r) != null) {
-				nodeStack.push(currentNode.right);
-			} 
 		}
 		return nearestHit;
 	}
-
+	
 	enum Axis{
-		x, y, z;
+		x(new Vector3f(1, 0, 0)), 
+		y(new Vector3f(0, 1, 0)), 
+		z(new Vector3f(0, 0, 1));
+		
+		private final Vector3f normal;
+
+		Axis(Vector3f normal){
+			this.normal = normal;
+		}
 		
 		public Axis getNext() {
 			int ordinalNext = (this.ordinal() + 1) % Axis.values().length;
 			return Axis.values()[ordinalNext];
 		}
 	}
+	
+	class StackNode {
+		final float tmin, tmax;
+		final BSPNode node;
+		StackNode(BSPNode node, float tmin, float tmax) {
+			this.node = node;
+			this.tmin = tmin;
+			this.tmax = tmax;
+		}
+	}
+
 
 	@Override
 	public BoundingBox getBoundingBox() {
 		return root.boundingBox;
 	}
 }
+	

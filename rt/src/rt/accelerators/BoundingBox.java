@@ -13,9 +13,9 @@ import rt.materials.Diffuse;
 
 public class BoundingBox {
 
-	public Point3f min;
-	public Point3f max;
-	public Point3f[] bounds;
+	final public Point3f min;
+	final public Point3f max;
+	final public Point3f[] bounds;
 	
 	public BoundingBox(Point3f bottomLeft, Point3f topRight) {
 		this.min = bottomLeft;
