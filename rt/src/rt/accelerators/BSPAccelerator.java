@@ -29,7 +29,7 @@ public class BSPAccelerator implements Intersectable {
 	 */
 	public BSPAccelerator(Aggregate a) {
 		this.n = a.size();
-		this.MAX_DEPTH = 2;//(int) Math.round(8 + 1.3f*Math.log(n));
+		this.MAX_DEPTH = (int) Math.round(8 + 1.3f*Math.log(n));
 
 		this.root = new BSPNode(a.getBoundingBox());
 		buildTree(root, Lists.newArrayList(a.iterator()), Axis.x, 0);
@@ -50,10 +50,24 @@ public class BSPAccelerator implements Intersectable {
 		BoundingBox b = node.boundingBox;
 		// split bounding box in middle along of some axis, make a new box each
 		Point3f leftBoxMax = new Point3f(b.max);
-		leftBoxMax.x = (b.min.x + b.max.x)/2;
-		BoundingBox leftBox = new BoundingBox(new Point3f(b.min), leftBoxMax);
 		Point3f rightBoxMin = new Point3f(b.min);
-		rightBoxMin.x = (b.min.x + b.max.x)/2;
+
+		switch (currentSplitAxis) {
+			case x:
+			leftBoxMax.x = (b.min.x + b.max.x)/2;
+			rightBoxMin.x = (b.min.x + b.max.x)/2;
+				break;
+			case y:
+				leftBoxMax.y = (b.min.y + b.max.y)/2;
+				rightBoxMin.y = (b.min.y + b.max.y)/2;
+				break;
+			case z:
+				leftBoxMax.z = (b.min.z + b.max.z)/2;
+				rightBoxMin.z = (b.min.z + b.max.z)/2;
+				break;
+		}
+		
+		BoundingBox leftBox = new BoundingBox(new Point3f(b.min), leftBoxMax);
 		BoundingBox rightBox = new BoundingBox(rightBoxMin, new Point3f(b.max));
 		
 		List<Intersectable> leftIntersectables = new ArrayList<>();
