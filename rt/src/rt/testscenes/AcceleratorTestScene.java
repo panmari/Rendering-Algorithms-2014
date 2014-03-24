@@ -53,7 +53,7 @@ public class AcceleratorTestScene extends Scene {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		BSPAccelerator accMesh = new BSPAccelerator(mesh);
+		Intersectable accMesh = new BSPAccelerator(mesh);
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
