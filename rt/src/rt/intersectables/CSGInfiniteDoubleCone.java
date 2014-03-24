@@ -12,6 +12,7 @@ import rt.Material;
 import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
+import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
 public class CSGInfiniteDoubleCone extends CSGSolid {
@@ -86,6 +87,12 @@ public class CSGInfiniteDoubleCone extends CSGSolid {
 		wIn.normalize();
 		wIn.negate();
 		return new HitRecord(t, hitPoint, normal, wIn, this, this.material, 0, 0);
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		return new BoundingBox(new Point3f(Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY), 
+				new Point3f(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
 	}
 
 }

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import javax.vecmath.Point3f;
+
 import rt.Ray;
+import rt.accelerators.BoundingBox;
 
 /**
  * A CSG node combines two CSG solids using a set operation, such as intersection,
@@ -136,5 +139,12 @@ public class CSGNode extends CSGSolid {
 
 	public String toString() {
 		return "Node, L: " + this.left + " R: " + this.right;
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		//TODO: make something smarter
+		return new BoundingBox(new Point3f(Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY), 
+				new Point3f(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
 	}
 }

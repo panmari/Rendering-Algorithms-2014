@@ -6,6 +6,7 @@ import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
 import rt.Ray;
+import rt.accelerators.BoundingBox;
 
 public class InstanceHelper {
 
@@ -27,6 +28,14 @@ public class InstanceHelper {
 		tinverse.transform(instanceOrigin);
 		tinverse.transform(instanceDir);
 		return new Ray(instanceOrigin, instanceDir);
+	}
+	
+	public BoundingBox transform(BoundingBox b) {
+		Point3f instanceMin = new Point3f(b.min);
+		Point3f instanceMax = new Point3f(b.max);
+		t.transform(instanceMin);
+		t.transform(instanceMax);
+		return new BoundingBox(instanceMin, instanceMax);
 	}
 	
 	public HitRecord transformBack(HitRecord h) {

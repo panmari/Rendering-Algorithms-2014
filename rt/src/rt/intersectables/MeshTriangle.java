@@ -42,15 +42,15 @@ public class MeshTriangle implements Intersectable {
 		Point3f b = new Point3f(vertices[v1*3], vertices[v1*3 + 1], vertices[v1*3 + 2]);
 		Point3f c = new Point3f(vertices[v2*3], vertices[v2*3 + 1], vertices[v2*3 + 2]);
 	
-		Point3f bottomLeft = new Point3f(a);
-		MyMath.elementwiseMin(bottomLeft, b);
-		MyMath.elementwiseMin(bottomLeft, c);
+		Point3f min = new Point3f(a);
+		MyMath.elementwiseMin(min, b);
+		MyMath.elementwiseMin(min, c);
 		
-		Point3f topRight = new Point3f(a);
-		MyMath.elementwiseMax(topRight, b);
-		MyMath.elementwiseMax(topRight, c);
+		Point3f max = new Point3f(a);
+		MyMath.elementwiseMax(max, b);
+		MyMath.elementwiseMax(max, c);
 
-		this.boundingBox = new BoundingBox(bottomLeft, topRight);
+		this.boundingBox = new BoundingBox(min, max);
 	}
 	
 	public String toString() {

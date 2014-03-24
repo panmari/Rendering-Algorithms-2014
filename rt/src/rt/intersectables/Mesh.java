@@ -59,18 +59,18 @@ public class Mesh extends Aggregate {
 		this.indices = indices;
 		triangles = new MeshTriangle[indices.length/3];		
 		
-		Point3f bottomLeft = new Point3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
-		Point3f topRight = new Point3f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
+		Point3f min = new Point3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
+		Point3f max = new Point3f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
 
 		// A triangle simply stores a triangle index and refers back to the mesh 
 		// to look up the vertex data
 		for(int i=0; i<indices.length/3; i++) {
 			MeshTriangle newTriangle = new MeshTriangle(this, i);
 			triangles[i] = newTriangle;
-			MyMath.elementwiseMin(bottomLeft, newTriangle.getBoundingBox().min);
-			MyMath.elementwiseMax(topRight, newTriangle.getBoundingBox().max);
+			MyMath.elementwiseMin(min, newTriangle.getBoundingBox().min);
+			MyMath.elementwiseMax(max, newTriangle.getBoundingBox().max);
 		}
-		this.boundingBox = new BoundingBox(bottomLeft, topRight);
+		this.boundingBox = new BoundingBox(min, max);
 	}
 	
 	public Iterator<Intersectable> iterator() {

@@ -13,6 +13,7 @@ import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
 import rt.StaticVecmath;
+import rt.accelerators.BoundingBox;
 import rt.intersectables.CSGSolid.BoundaryType;
 import rt.intersectables.CSGSolid.IntervalBoundary;
 import rt.materials.Diffuse;
@@ -72,6 +73,11 @@ public class CSGInfiniteCylinder extends CSGSolid {
 		wIn.normalize();
 		wIn.negate();
 		return new HitRecord(t, hitPoint, normal, wIn, this, this.material, 0, 0);
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		return new BoundingBox(new Point3f(-1,-1, Float.NEGATIVE_INFINITY), new Point3f(1,1, Float.POSITIVE_INFINITY));
 	}
 
 }

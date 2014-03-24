@@ -3,6 +3,7 @@ package rt.intersectables;
 import java.util.ArrayList;
 
 import javax.vecmath.Matrix4f;
+import javax.vecmath.Point3f;
 
 import rt.Material;
 import rt.Ray;
@@ -39,7 +40,8 @@ public class CSGInstance extends CSGSolid {
 
 	@Override
 	public BoundingBox getBoundingBox() {
-		// TODO Auto-generated method stub
-		return null;
+		//TODO: make something smarter
+		return new BoundingBox(new Point3f(Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY), 
+				new Point3f(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
 	}
 }

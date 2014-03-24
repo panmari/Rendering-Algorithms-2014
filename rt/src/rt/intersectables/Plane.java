@@ -7,6 +7,7 @@ import rt.Intersectable;
 import rt.Material;
 import rt.Ray;
 import rt.Spectrum;
+import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
 /**
@@ -54,6 +55,13 @@ public class Plane implements Intersectable {
 		{
 			return null;
 		}
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		//TODO: do something smarter in case plane is axis aligned
+		return new BoundingBox(new Point3f(Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY), 
+				new Point3f(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
 	}
 
 }

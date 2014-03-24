@@ -1,10 +1,13 @@
 package rt.intersectables;
 
 import javax.vecmath.Matrix4f;
+import javax.vecmath.Point3f;
+
 import rt.HitRecord;
 import rt.Intersectable;
 import rt.Material;
 import rt.Ray;
+import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
 public class Instance implements Intersectable {
@@ -26,5 +29,10 @@ public class Instance implements Intersectable {
 		if (instanceHitRecord == null)
 			return null;
 		return instanceHelper.transformBack(instanceHitRecord);
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		return instanceHelper.transform(intersectable.getBoundingBox());
 	}
 }

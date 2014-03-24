@@ -54,8 +54,8 @@ public class BSPAccelerator implements Intersectable {
 
 		switch (currentSplitAxis) {
 			case x:
-			leftBoxMax.x = (b.min.x + b.max.x)/2;
-			rightBoxMin.x = (b.min.x + b.max.x)/2;
+				leftBoxMax.x = (b.min.x + b.max.x)/2;
+				rightBoxMin.x = (b.min.x + b.max.x)/2;
 				break;
 			case y:
 				leftBoxMax.y = (b.min.y + b.max.y)/2;
