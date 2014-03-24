@@ -2,6 +2,7 @@ package rt.testscenes;
 
 import java.io.IOException;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
 import rt.*;
@@ -49,11 +50,13 @@ public class AcceleratorTestScene extends Scene {
 		// Add objects
 		Aggregate mesh = null;
 		try {
-			mesh = ObjReader.read("../obj/teapot.obj", 1.f);
+			mesh = ObjReader.read("../obj/dragon.obj", 2.2f);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Intersectable accMesh = new BSPAccelerator(mesh);
+		Matrix4f t = new Matrix4f();
+		t.rotX((float) (-Math.PI/2));
+		Intersectable accMesh = new Instance(new BSPAccelerator(mesh),t);
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
