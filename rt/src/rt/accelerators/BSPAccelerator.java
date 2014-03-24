@@ -106,14 +106,14 @@ public class BSPAccelerator implements Intersectable {
 				float tmp = splitAxisNormal.dot(r.direction);
 				float tSplitAxis;
 				//if (tmp != 0) //TODO: handle this case
-					tSplitAxis = -(splitAxisNormal.dot(r.origin) + node.splitAxisDistance) / tmp;
+					tSplitAxis = -(splitAxisNormal.dot(r.origin) - node.splitAxisDistance) / tmp;
 				BSPNode first, second;
 				if( r.origin.get(node.splitAxis.ordinal()) < node.splitAxisDistance ) {
 					first = node.left;
 					second = node.right;
 				} else {
-					first = node.left;
-					second = node.right;
+					first = node.right;
+					second = node.left;
 				}
 				// process children
 				if( tSplitAxis > tmax || tSplitAxis < 0 || 

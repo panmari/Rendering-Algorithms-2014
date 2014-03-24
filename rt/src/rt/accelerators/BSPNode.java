@@ -24,7 +24,9 @@ public class BSPNode {
 	}
 
 	public String toString() {
-		return intersectables.toString();
+		if (isLeaf())
+			return intersectables.toString();
+		else return "" + splitAxis + ", dist: " + splitAxisDistance;
 	}
 	
 	public boolean isLeaf() {
