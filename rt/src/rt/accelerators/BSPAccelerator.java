@@ -136,10 +136,13 @@ public class BSPAccelerator implements Intersectable {
 						nearestHit = tmp;
 					}
 				}
-				StackNode s = nodeStack.pop();
-				node = s.node;
-				tmin = s.tmin;
-				tmax = s.tmax;
+				if(!nodeStack.empty()) {
+					StackNode s = nodeStack.pop();
+					node = s.node;
+					tmin = s.tmin;
+					tmax = s.tmax;
+				} else
+					break;
 			}
 		}
 		return nearestHit;

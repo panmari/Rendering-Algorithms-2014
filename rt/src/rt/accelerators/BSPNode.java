@@ -19,7 +19,7 @@ public class BSPNode {
 	public BSPNode(BoundingBox boundingBox, Axis splitAxis) {
 		this.boundingBox = boundingBox;
 		this.splitAxis = splitAxis;
-		this.splitAxisDistance = (boundingBox.max.get(splitAxis.ordinal()) +
+		this.splitAxisDistance = (boundingBox.min.get(splitAxis.ordinal()) +
 				boundingBox.max.get(splitAxis.ordinal()))/2;
 	}
 
