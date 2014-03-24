@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 import javax.vecmath.Point3f;
 
@@ -51,14 +52,14 @@ public class BSPAccelerator implements Intersectable {
 		Point3f leftBoxMax = new Point3f(b.max);
 		leftBoxMax.x = (b.min.x + b.max.x)/2;
 		BoundingBox leftBox = new BoundingBox(b.min, leftBoxMax);
-		Point3f rightBoxMin = new Point3f(b.max);
+		Point3f rightBoxMin = new Point3f(b.min);
 		rightBoxMin.x = (b.min.x + b.max.x)/2;
 		BoundingBox rightBox = new BoundingBox(rightBoxMin, b.max);
 		
 		List<Intersectable> leftIntersectables = new ArrayList<>();
 		List<Intersectable> rightIntersectables = new ArrayList<>();
 		//add intersectable to bounding box that crosses it
-		for (Intersectable i: node.intersectables) {
+		for (Intersectable i: iList) {
 			if (i.getBoundingBox().intersect(leftBox))
 				leftIntersectables.add(i);
 			if (i.getBoundingBox().intersect(rightBox))
@@ -66,13 +67,35 @@ public class BSPAccelerator implements Intersectable {
 		}
 		
 		node.left = buildTree(new BSPNode(leftBox), leftIntersectables, currentSplitAxis.getNext(), depth + 1);
-		node.right = buildTree(new BSPNode(rightBox), leftIntersectables, currentSplitAxis.getNext(), depth + 1);
+		node.right = buildTree(new BSPNode(rightBox), rightIntersectables, currentSplitAxis.getNext(), depth + 1);
 		return node;
 	}
 	@Override
 	public HitRecord intersect(Ray r) {
-		//traverse stupidly everything
-		return null;
+		Stack<BSPNode> nodeStack = new Stack<>();
+		nodeStack.push(root);
+		HitRecord nearestHit = null;
+		float nearestT = Float.POSITIVE_INFINITY;
+		while (!nodeStack.empty()) {
+			BSPNode currentNode = nodeStack.pop();
+			if (currentNode.intersectables != null) {
+				for (Intersectable i: currentNode.intersectables) {
+					HitRecord currentHit = i.intersect(r);
+					if (currentHit != null && nearestT > currentHit.t && currentHit.t > 0) {
+						nearestT = currentHit.t;
+						nearestHit = currentHit;
+					}
+				}
+			}
+			//TODO: refactor ugly null checks
+			if (currentNode.left != null ) {//&& currentNode.left.boundingBox.intersect(r) != null) {
+				nodeStack.push(currentNode.left);
+			} 
+			if (currentNode.right != null) {// && currentNode.right.boundingBox.intersect(r) != null) {
+				nodeStack.push(currentNode.right);
+			} 
+		}
+		return nearestHit;
 	}
 
 	enum Axis{

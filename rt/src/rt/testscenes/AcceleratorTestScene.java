@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.vecmath.Vector3f;
 
 import rt.*;
+import rt.accelerators.BSPAccelerator;
 import rt.cameras.PinholeCamera;
 import rt.films.BoxFilterFilm;
 import rt.integrators.*;
@@ -46,13 +47,13 @@ public class AcceleratorTestScene extends Scene {
 		chessTexture = new Textured("../textures/grass-texture.jpg");
 		
 		// Add objects
-		Intersectable mesh = null;
+		Aggregate mesh = null;
 		try {
 			mesh = ObjReader.read("../obj/teapot.obj", 1.f);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		BSPAccelerator accMesh = new BSPAccelerator(mesh);
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
@@ -62,7 +63,7 @@ public class AcceleratorTestScene extends Scene {
 		
 		// Collect objects in intersectable list
 		IntersectableList intersectableList = new IntersectableList();
-		intersectableList.add(mesh);	
+		intersectableList.add(accMesh);	
 		intersectableList.add(groundPlane);
 		intersectableList.add(backPlane);
 		

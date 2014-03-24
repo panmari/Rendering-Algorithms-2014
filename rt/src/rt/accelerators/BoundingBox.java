@@ -69,19 +69,23 @@ public class BoundingBox implements Intersectable {
 	 * @return
 	 */
 	public boolean intersect(BoundingBox other) {
-		float rabx = Math.abs(min.x + max.x - other.min.x - other.max.x);
-		float raby = Math.abs(min.y + max.y - other.min.y - other.max.y);
-		float rabz = Math.abs(min.z + max.z - other.min.z - other.max.z);
+		float sizex2 = Math.abs(min.x + max.x - (other.min.x + other.max.x));
+		float sizey2 = Math.abs(min.y + max.y - (other.min.y + other.max.y));
+		float sizez2 = Math.abs(min.z + max.z - (other.min.z + other.max.z));
 
-		float raxPrbx = max.x - min.x + other.min.x - other.max.x;
-		float rayPrby = max.y - min.y + other.min.y - other.max.y;
-		float razPrbz = max.z - min.z + other.min.z - other.max.z;
-		return rabx <= raxPrbx && raby <= rayPrby && rabz <= razPrbz;
+		float distCentersx = max.x - min.x + other.max.x - other.min.x;
+		float distCentersy = max.y - min.y + other.max.y - other.min.y;
+		float distCentersz = max.z - min.z + other.max.z - other.min.z;
+		return sizex2 <= distCentersx && sizey2 <= distCentersy && sizez2 <= distCentersz;
 	}
 
 	@Override
 	public BoundingBox getBoundingBox() {
 		return this;
+	}
+	
+	public String toString() {
+		return "min: " + this.min + ", max: " + this.max;
 	}
 
 }
