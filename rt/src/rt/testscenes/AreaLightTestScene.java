@@ -42,7 +42,7 @@ public class AreaLightTestScene extends Scene {
 		
 		// Specify which integrator and sampler to use
 		integratorFactory = new AreaLightIntegratorFactory();
-		samplerFactory = new OneSamplerFactory();				
+		samplerFactory = new UniformSamplerFactory();				
 		
 		CSGSolid sphere = new CSGSphere();
 		
@@ -63,7 +63,7 @@ public class AreaLightTestScene extends Scene {
 		root = intersectableList;
 		
 		// Light sources
-		AreaLight areaLight = new AreaLight(new Point3f(0, 5, 0), new Vector3f(1,0,0), new Vector3f(0,0,1), new Spectrum(14,14,14));
+		AreaLight areaLight = new AreaLight(new Point3f(0, 3, 0), new Vector3f(1,0,0), new Vector3f(0,0,1), new Spectrum(14,14,14));
 		lightList = new LightList();
 		lightList.add(areaLight);
 	}
