@@ -1,6 +1,5 @@
 package rt.lightsources;
 
-import java.util.Random;
 import javax.vecmath.Vector3f;
 import rt.*;
 import rt.accelerators.BoundingBox;
@@ -13,12 +12,10 @@ public class PointLight implements LightGeometry {
 
 	Vector3f position;
 	PointLightMaterial pointLightMaterial;
-	Random rand;
 	
 	public PointLight(Vector3f position, Spectrum emission)
 	{
 		this.position = new Vector3f(position);
-		this.rand = new Random();
 		pointLightMaterial = new PointLightMaterial(emission);
 	}
 	
@@ -45,7 +42,6 @@ public class PointLight implements LightGeometry {
 
 	@Override
 	public BoundingBox getBoundingBox() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
