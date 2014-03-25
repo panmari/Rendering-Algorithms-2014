@@ -38,7 +38,8 @@ public class TorranceSparrow implements Material {
 		float D = (float) ((e + 2)*Math.pow(w_h.dot(normal),e)/(2*Math.PI));
 		
 		//fresnel term
-		float cosTheta_i =  normal.dot(wIn);
+		float cosTheta_i = normal.dot(wIn);
+		float cosTheta_o = normal.dot(wOut);
 		float cosTheta_i2 = cosTheta_i*cosTheta_i;
 		Spectrum r1 = new Spectrum(nkterm);
 		r1.mult(cosTheta_i2);
@@ -64,7 +65,7 @@ public class TorranceSparrow implements Material {
 		
 		Spectrum r = new Spectrum(r1); 
 		r.add(r2);
-		r.mult(1/2f);
+		r.mult(1/(2f * 4 * cosTheta_i * cosTheta_o));
 		r.mult(G*D);
 		return r;
 	}

@@ -65,7 +65,7 @@ public class BoundingBox {
 	 * @param other
 	 * @return
 	 */
-	public boolean intersect(BoundingBox other) {
+	public boolean isOverlapping(BoundingBox other) {
 		float sizex2 = Math.abs(min.x + max.x - (other.min.x + other.max.x));
 		float sizey2 = Math.abs(min.y + max.y - (other.min.y + other.max.y));
 		float sizez2 = Math.abs(min.z + max.z - (other.min.z + other.max.z));

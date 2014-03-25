@@ -77,9 +77,9 @@ public class BSPAccelerator implements Intersectable {
 		List<Intersectable> rightIntersectables = new ArrayList<>();
 		//add intersectable to bounding box that crosses it
 		for (Intersectable i: iList) {
-			if (i.getBoundingBox().intersect(leftBox))
+			if (i.getBoundingBox().isOverlapping(leftBox))
 				leftIntersectables.add(i);
-			if (i.getBoundingBox().intersect(rightBox))
+			if (i.getBoundingBox().isOverlapping(rightBox))
 				rightIntersectables.add(i);
 		}
 		
@@ -108,6 +108,7 @@ public class BSPAccelerator implements Intersectable {
 				float tmp = splitAxisNormal.dot(r.direction);
 				float tSplitAxis = -(splitAxisNormal.dot(r.origin) - node.splitAxisDistance) / tmp;
 				BSPNode first, second;
+				boolean towardsFirst, towardsSecond;
 				if (getDimension(r.origin, node.splitAxis) < node.splitAxisDistance ) {
 					first = node.left;
 					second = node.right;
@@ -168,11 +169,10 @@ public class BSPAccelerator implements Intersectable {
 					}
 				}
 			}
-			//TODO: refactor ugly null checks
-			if (currentNode.left != null && currentNode.left.boundingBox.intersect(r) != null) {
+			if (currentNode.left.boundingBox.intersect(r) != null) {
 				nodeStack.push(currentNode.left);
 			} 
-			if (currentNode.right != null && currentNode.right.boundingBox.intersect(r) != null) {
+			if (currentNode.right.boundingBox.intersect(r) != null) {
 				nodeStack.push(currentNode.right);
 			} 
 		}
