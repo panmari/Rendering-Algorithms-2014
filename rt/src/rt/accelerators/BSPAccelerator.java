@@ -104,11 +104,10 @@ public class BSPAccelerator implements Intersectable {
 			if (tNearestHit < tmin)
 				break;
 			if (!node.isLeaf()) {
-				Vector3f splitAxisNormal = node.splitAxis.getNormal();
-				float tmp = splitAxisNormal.dot(r.direction);
-				float tSplitAxis = -(splitAxisNormal.dot(r.origin) - node.splitAxisDistance) / tmp;
+				float tSplitAxis = (node.splitAxisDistance - getDimension(r.origin, node.splitAxis))/
+										getDimension(r.direction, node.splitAxis);
 				BSPNode first, second;
-				boolean towardsFirst, towardsSecond;
+
 				if (getDimension(r.origin, node.splitAxis) < node.splitAxisDistance ) {
 					first = node.left;
 					second = node.right;
