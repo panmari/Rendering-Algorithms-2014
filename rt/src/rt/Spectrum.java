@@ -77,4 +77,22 @@ public class Spectrum {
 	public String toString() {
 		return String.format("(%.5f,%.5f,%.5f)",r,g,b);
 	}
+
+	public void div(Spectrum divisor) {
+		this.r /= divisor.r;
+		this.g /= divisor.g;
+		this.b /= divisor.b;
+	}
+
+	public void add(float f) {
+		this.r += f;
+		this.g += f;
+		this.b += f;
+	}
+
+	public void sub(Spectrum s) {
+		this.r -= s.r;
+		this.g -= s.g;
+		this.b -= s.b;
+	}
 }

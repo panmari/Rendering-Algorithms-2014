@@ -20,7 +20,7 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new AreaLightTestScene();
+	public static Scene scene = new TorranceSparrowTestScene();
 	public static Point debugPixel;// = new Point(220, 185);
 	
 	static LinkedList<RenderTask> queue;

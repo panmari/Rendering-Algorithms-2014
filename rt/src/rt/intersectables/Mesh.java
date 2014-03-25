@@ -45,7 +45,7 @@ public class Mesh extends Aggregate {
 	 */
 	public Material material;
 
-	private BoundingBox boundingBox;
+	private final BoundingBox boundingBox;
 	
 	/**
 	 * Make a mesh from arrays with vertices, normals, and indices.

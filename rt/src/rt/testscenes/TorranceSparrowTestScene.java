@@ -1,9 +1,5 @@
 package rt.testscenes;
 
-import java.io.IOException;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import rt.*;
@@ -16,12 +12,12 @@ import rt.materials.*;
 import rt.samplers.*;
 import rt.tonemappers.ClampTonemapper;
 
-public class AreaLightTestScene extends Scene {
+public class TorranceSparrowTestScene extends Scene {
 	
-	public AreaLightTestScene()
+	public TorranceSparrowTestScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/AreaLightTestScene");
+		outputFilename = new String("../output/testscenes/TorranceSparrowTestScene");
 		
 		// Image width and height in pixels
 		width = 640;
@@ -41,15 +37,20 @@ public class AreaLightTestScene extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
-		integratorFactory = new AreaLightIntegratorFactory();
-		samplerFactory = new UniformSamplerFactory();				
+		integratorFactory = new PointLightIntegratorFactory();
+		samplerFactory = new OneSamplerFactory();		
+		Material chessTexture = null;
 		
-		CSGSolid sphere = new CSGSphere();
+		
+		chessTexture = new Textured("../textures/chessboard.jpg");
+		
+		
+		CSGSolid sphere = new CSGSphere(new TorranceSparrow(null, 2));
 		
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
-		groundPlane.material = grid;
+		groundPlane.material = chessTexture;
 		CSGPlane backPlane = new CSGPlane(new Vector3f(0.f, 0.f, 1.f), 3.15f);
 		backPlane.material = grid;		
 		
@@ -63,8 +64,15 @@ public class AreaLightTestScene extends Scene {
 		root = intersectableList;
 		
 		// Light sources
-		AreaLight areaLight = new AreaLight(new Point3f(0, 2, 0), new Vector3f(1,0,0), new Vector3f(0,0,1), new Spectrum(14,14,14));
+		Vector3f lightPos = new Vector3f(eye);
+		lightPos.add(new Vector3f(-1.f, 0.f, 0.f));
+		LightGeometry pointLight1 = new PointLight(lightPos, new Spectrum(14.f, 14.f, 14.f));
+		lightPos.add(new Vector3f(2.f, 0.f, 0.f));
+		LightGeometry pointLight2 = new PointLight(lightPos, new Spectrum(14.f, 14.f, 14.f));
+		LightGeometry pointLight3 = new PointLight(new Vector3f(0.f, 5.f, 1.f), new Spectrum(24.f, 24.f, 24.f));
 		lightList = new LightList();
-		lightList.add(areaLight);
+		lightList.add(pointLight1);
+		lightList.add(pointLight2);
+		lightList.add(pointLight3);
 	}
 }
