@@ -6,6 +6,7 @@ import java.util.Stack;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point3f;
+import javax.vecmath.Tuple3f;
 import javax.vecmath.Vector3f;
 
 import com.google.common.collect.Lists;
@@ -13,8 +14,10 @@ import com.google.common.collect.Lists;
 import rt.HitRecord;
 import rt.Intersectable;
 import rt.Ray;
+import rt.StaticVecmath.Axis;
 import rt.intersectables.Aggregate;
 import sun.org.mozilla.javascript.internal.Node;
+import static rt.StaticVecmath.getDimension;
 
 public class BSPAccelerator implements Intersectable {
 
@@ -85,6 +88,7 @@ public class BSPAccelerator implements Intersectable {
 		node.right = buildTree(new BSPNode(rightBox, nextSplitAxis), rightIntersectables, depth + 1);
 		return node;
 	}
+	
 	@Override
 	public HitRecord intersect(Ray r) {
 		Point2f ts = root.boundingBox.intersect(r);
@@ -100,13 +104,11 @@ public class BSPAccelerator implements Intersectable {
 			if (tNearestHit < tmin)
 				break;
 			if (!node.isLeaf()) {
-				Vector3f splitAxisNormal = node.splitAxis.normal;
+				Vector3f splitAxisNormal = node.splitAxis.getNormal();
 				float tmp = splitAxisNormal.dot(r.direction);
-				float tSplitAxis;
-				//if (tmp != 0) //TODO: handle this case
-					tSplitAxis = -(splitAxisNormal.dot(r.origin) - node.splitAxisDistance) / tmp;
+				float tSplitAxis = -(splitAxisNormal.dot(r.origin) - node.splitAxisDistance) / tmp;
 				BSPNode first, second;
-				if( r.origin.get(node.splitAxis.ordinal()) < node.splitAxisDistance ) {
+				if (getDimension(r.origin, node.splitAxis) < node.splitAxisDistance ) {
 					first = node.left;
 					second = node.right;
 				} else {
@@ -146,21 +148,35 @@ public class BSPAccelerator implements Intersectable {
 		return nearestHit;
 	}
 	
-	enum Axis{
-		x(new Vector3f(1, 0, 0)), 
-		y(new Vector3f(0, 1, 0)), 
-		z(new Vector3f(0, 0, 1));
-		
-		private final Vector3f normal;
-
-		Axis(Vector3f normal){
-			this.normal = normal;
+	/**
+	 * Not in use, slower than code above...
+	 * @return
+	 */
+	public HitRecord primitiveIntersect(Ray r) {
+		Stack<BSPNode> nodeStack = new Stack<>();
+		nodeStack.push(root);
+		HitRecord nearestHit = null;
+		float nearestT = Float.POSITIVE_INFINITY;
+		while (!nodeStack.empty()) {
+			BSPNode currentNode = nodeStack.pop();
+			if (currentNode.intersectables != null) {
+				for (Intersectable i: currentNode.intersectables) {
+					HitRecord currentHit = i.intersect(r);
+					if (currentHit != null && nearestT > currentHit.t && currentHit.t > 0) {
+						nearestT = currentHit.t;
+						nearestHit = currentHit;
+					}
+				}
+			}
+			//TODO: refactor ugly null checks
+			if (currentNode.left != null && currentNode.left.boundingBox.intersect(r) != null) {
+				nodeStack.push(currentNode.left);
+			} 
+			if (currentNode.right != null && currentNode.right.boundingBox.intersect(r) != null) {
+				nodeStack.push(currentNode.right);
+			} 
 		}
-		
-		public Axis getNext() {
-			int ordinalNext = (this.ordinal() + 1) % Axis.values().length;
-			return Axis.values()[ordinalNext];
-		}
+		return nearestHit;
 	}
 	
 	class StackNode {

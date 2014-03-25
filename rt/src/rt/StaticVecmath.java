@@ -24,4 +24,36 @@ public class StaticVecmath {
 		r.negate();
 		return r;
 	}
+	
+	public static float getDimension(Tuple3f tuple, Axis dimension) {
+		switch (dimension) {
+    	case x:
+    		return tuple.x;
+    	case y:
+    		return tuple.y;
+    	default:
+    		return tuple.z;
+    	}
+	}
+	
+	public enum Axis{
+		x(new Vector3f(1, 0, 0)), 
+		y(new Vector3f(0, 1, 0)), 
+		z(new Vector3f(0, 0, 1));
+		
+		private final Vector3f normal;
+
+		Axis(Vector3f normal){
+			this.normal = normal;
+		}
+		
+		public Vector3f getNormal() {
+			return normal;
+		}
+		
+		public Axis getNext() {
+			int ordinalNext = (this.ordinal() + 1) % Axis.values().length;
+			return Axis.values()[ordinalNext];
+		}
+	}
 }

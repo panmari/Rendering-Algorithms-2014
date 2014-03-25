@@ -3,7 +3,8 @@ package rt.accelerators;
 import java.util.List;
 
 import rt.Intersectable;
-import rt.accelerators.BSPAccelerator.Axis;
+import rt.StaticVecmath.Axis;
+import static rt.StaticVecmath.getDimension;
 
 public class BSPNode {
 
@@ -19,8 +20,8 @@ public class BSPNode {
 	public BSPNode(BoundingBox boundingBox, Axis splitAxis) {
 		this.boundingBox = boundingBox;
 		this.splitAxis = splitAxis;
-		this.splitAxisDistance = (boundingBox.min.get(splitAxis.ordinal()) +
-				boundingBox.max.get(splitAxis.ordinal()))/2;
+		this.splitAxisDistance = (getDimension(boundingBox.min, splitAxis) +
+				getDimension(boundingBox.max, splitAxis))/2;
 	}
 
 	public String toString() {
