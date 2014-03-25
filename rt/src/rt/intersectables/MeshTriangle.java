@@ -109,9 +109,12 @@ public class MeshTriangle implements Intersectable {
 	 */
 	private Vector3f getBetaGammaTCramer(Matrix3f matrix, Vector3f rightHand) {
 		float detA = matrix.determinant();
-		if(Math.abs(detA) < 0.0001f) {
+		//TODO: possibly detect sliver triangles at some point
+		/*
+		if(Math.abs(detA) < 1e-6f) {
 			return null;
 		}
+		*/
 		Matrix3f matrix0 = new Matrix3f(matrix);
 		matrix0.setColumn(0, rightHand);
 		float detA0 = matrix0.determinant();

@@ -36,7 +36,7 @@ public class StaticVecmath {
     	}
 	}
 	
-	public enum Axis{
+	public static enum Axis{
 		x(new Vector3f(1, 0, 0)), 
 		y(new Vector3f(0, 1, 0)), 
 		z(new Vector3f(0, 0, 1));
