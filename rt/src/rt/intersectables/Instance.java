@@ -28,7 +28,9 @@ public class Instance implements Intersectable {
 		HitRecord instanceHitRecord = intersectable.intersect(instanceRay);
 		if (instanceHitRecord == null)
 			return null;
-		return instanceHelper.transformBack(instanceHitRecord);
+		HitRecord h = instanceHelper.transformBack(instanceHitRecord);
+		h.material = this.material;
+		return h;
 	}
 
 	@Override

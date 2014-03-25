@@ -8,15 +8,13 @@ import rt.Spectrum;
 
 public class TorranceSparrow implements Material {
 
-	private Spectrum brdf;
 	private float e;
 	private Spectrum n, k;
 	private Spectrum nkterm;
 
-	public TorranceSparrow(Spectrum brdf, float smoothness) {
-			this.brdf = brdf;
-			this.n = new Spectrum(0.25f,0.306f,1.426f);
-			this.k = new Spectrum(3,2.88f,1.846f);
+	public TorranceSparrow(Spectrum n, Spectrum k, float smoothness) {
+			this.n = n;
+			this.k = k;
 			this.nkterm = new Spectrum(n);
 			this.nkterm.mult(n);
 			Spectrum kSquare = new Spectrum(k);

@@ -54,9 +54,11 @@ public class AcceleratorTestScene extends Scene {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		Material gold = new TorranceSparrow(new Spectrum(0.25f,0.306f,1.426f), new Spectrum(3,2.88f,1.846f), 2);
 		Matrix4f t = new Matrix4f();
 		t.rotX((float) (-Math.PI/2));
-		Intersectable accMesh = new Instance(new BSPAccelerator(mesh),t);
+		Instance accMesh = new Instance(new BSPAccelerator(mesh),t);
+		accMesh.material = gold;
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
