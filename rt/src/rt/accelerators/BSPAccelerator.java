@@ -168,12 +168,12 @@ public class BSPAccelerator implements Intersectable {
 					}
 				}
 			}
-			if (currentNode.left.boundingBox.intersect(r) != null) {
+			else {
+			if (currentNode.left.boundingBox.intersect(r) != null)
 				nodeStack.push(currentNode.left);
-			} 
-			if (currentNode.right.boundingBox.intersect(r) != null) {
+			if (currentNode.right.boundingBox.intersect(r) != null) 
 				nodeStack.push(currentNode.right);
-			} 
+			}
 		}
 		return nearestHit;
 	}
