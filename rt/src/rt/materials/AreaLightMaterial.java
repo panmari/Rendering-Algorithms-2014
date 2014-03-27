@@ -86,5 +86,10 @@ public class AreaLightMaterial implements Material {
 		return null;
 	}
 
+	@Override
+	public void evaluateBumpMap(HitRecord hitRecord) {
+		// TODO Auto-generated method stub
+	}
+
 
 }

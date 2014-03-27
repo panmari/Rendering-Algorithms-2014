@@ -146,4 +146,10 @@ public class Refractive implements Material {
 
 		}
 	}
+
+	@Override
+	public void evaluateBumpMap(HitRecord h) {
+		// TODO Auto-generated method stub
+		
+	}
 }

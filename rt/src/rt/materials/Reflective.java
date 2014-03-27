@@ -81,4 +81,10 @@ public class Reflective implements Material {
 		return false;
 	}
 
+	@Override
+	public void evaluateBumpMap(HitRecord h) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

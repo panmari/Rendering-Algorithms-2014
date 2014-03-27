@@ -42,12 +42,8 @@ public class TextureTestScene extends Scene {
 		// Specify which integrator and sampler to use
 		integratorFactory = new PointLightIntegratorFactory();
 		samplerFactory = new OneSamplerFactory();		
-		Material chessTexture = null;
 		
-		
-		chessTexture = new Textured("../textures/chessboard.jpg");
-		
-		
+		Material chessTexture = new Textured("../textures/chessboard.jpg", "../normalmaps/normal.gif");
 		CSGSolid sphere = new CSGSphere(chessTexture);
 		
 		// Ground and back plane

@@ -120,4 +120,11 @@ public class Glossy implements Material {
 		return true;
 	}
 
+
+	@Override
+	public void evaluateBumpMap(HitRecord hitRecord) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

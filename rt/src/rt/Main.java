@@ -19,7 +19,7 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new GlossyScene();
+	public static Scene scene = new TextureTestScene();
 	public static Point debugPixel;// = new Point(220, 185);
 	
 	static LinkedList<RenderTask> queue;

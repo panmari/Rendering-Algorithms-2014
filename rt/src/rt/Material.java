@@ -123,4 +123,10 @@ public interface Material {
 	 * Indicate whether the material casts shadows or not. 
 	 */
 	public boolean castsShadows();
+	
+	/**
+	 * Will adapt the normal according to the bump map present in this material.
+	 * Does nothing, if no bump map present.
+	 */
+	void evaluateBumpMap(HitRecord hitRecord);
 }

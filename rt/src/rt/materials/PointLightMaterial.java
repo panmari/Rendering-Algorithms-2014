@@ -85,5 +85,11 @@ public class PointLightMaterial implements Material {
 		return null;
 	}
 
+	@Override
+	public void evaluateBumpMap(HitRecord h) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }
