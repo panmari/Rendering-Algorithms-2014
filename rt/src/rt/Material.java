@@ -128,5 +128,5 @@ public interface Material {
 	 * Will adapt the normal according to the bump map present in this material.
 	 * Does nothing, if no bump map present.
 	 */
-	public void evaluateBumpMap(Vector3f normal, float u, float v);
+	void evaluateBumpMap(HitRecord hitRecord);
 }

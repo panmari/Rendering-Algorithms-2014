@@ -73,7 +73,9 @@ public class HitRecord  {
 		this.material = material;
 		this.u = u;
 		this.v = v;
-		
+	}
+	
+	public Matrix3f getTangentialMatrix() {
 		// Make tangent frame: t1, t2, normal is a right handed frame
 		t1 = new Vector3f(1,0,0);
 		t1.cross(t1, normal);
@@ -85,6 +87,11 @@ public class HitRecord  {
 		t1.normalize();
 		t2 = new Vector3f();
 		t2.cross(normal, t1);
+		Matrix3f m = new Matrix3f();
+		m.setColumn(0, t1);
+		m.setColumn(1, t2);
+		m.setColumn(2, normal);
+		return m;
 	}
 	
 }

@@ -120,10 +120,7 @@ public class CSGPlane extends CSGSolid {
 			//use projection to x/z plane to decide on texture coordinate
 			//TODO: do this better
 			float u = Math.abs(position.x % 1);
-			float v = Math.abs(position.z % 1);
-			
-			material.evaluateBumpMap(retNormal, u, v);
-			
+			float v = Math.abs(position.z % 1);			
 			return new HitRecord(t, position, retNormal, wIn, null, material, u, v); 
 		} else
 		{

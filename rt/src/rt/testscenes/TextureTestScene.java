@@ -2,7 +2,6 @@ package rt.testscenes;
 
 import java.io.IOException;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
 import rt.*;

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
@@ -24,7 +25,7 @@ public class Textured implements Material {
 		try {
 			texture = ImageIO.read(new File(textureFileName));
 			if (bumpMapFileName != null)
-				bumpMap = ImageIO.read(new File(textureFileName));
+				bumpMap = ImageIO.read(new File(bumpMapFileName));
 		} catch (IOException e) {
 			System.err.println("Could not load texture: ");
 			e.printStackTrace();
@@ -142,13 +143,15 @@ public class Textured implements Material {
 	}
 
 	@Override
-	public void evaluateBumpMap(Vector3f normal, float u, float v) {
+	public void evaluateBumpMap(HitRecord hitRecord) {
 		if (bumpMap != null) {
-			Spectrum nSpec = getBilinearInterpolated(u, v, bumpMap);
+			Matrix3f m = hitRecord.getTangentialMatrix();
+			Spectrum nSpec = getBilinearInterpolated(hitRecord.u, hitRecord.v, bumpMap);
 			Vector3f n = new Vector3f(nSpec.r, nSpec.g, nSpec.b);
 			n.scale(2);
 			n.sub(new Vector3f(1,1,1));
-			normal.set(n);
+			m.transform(n);
+			hitRecord.normal = n;
 		}
 	}
 

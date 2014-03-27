@@ -97,7 +97,7 @@ public class XYZGrid implements Material {
 	}
 
 	@Override
-	public void evaluateBumpMap(Vector3f normal, float u, float v) {
+	public void evaluateBumpMap(HitRecord h) {
 		// TODO Auto-generated method stub
 		
 	}

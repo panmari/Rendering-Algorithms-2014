@@ -41,7 +41,7 @@ public class PointLightIntegrator implements Integrator {
 		{
 			Spectrum outgoing = new Spectrum(0.f, 0.f, 0.f);
 			Spectrum brdfValue;
-			
+			hitRecord.material.evaluateBumpMap(hitRecord);
 			// Iterate over all light sources
 			Iterator<LightGeometry> it = lightList.iterator();
 			while(it.hasNext())
