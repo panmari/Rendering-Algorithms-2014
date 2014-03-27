@@ -36,6 +36,7 @@ public class Glossy implements Material {
 		float g_term_one = normal.dot(wOut)*g_term;
 		float g_term_two = normal.dot(wIn)*g_term;
 		float G = Math.min(1, Math.min(g_term_one, g_term_two));
+		// D is Microfacet distribution, determines BRDF.
 		float D = (float) ((e + 2)*Math.pow(w_h.dot(normal),e)/(2*Math.PI));
 		
 		//fresnel term
@@ -64,10 +65,12 @@ public class Glossy implements Material {
 		r2divisor.add(cosTheta_i2);
 		r2.div(r2divisor);
 		
-		Spectrum r = new Spectrum(r1); 
-		r.add(r2);
-		r.mult(1/(2f * 4 * cosTheta_i * cosTheta_o));
+		Spectrum F = new Spectrum(r1); 
+		F.add(r2);
+		F.mult(1/2f);
+		Spectrum r = new Spectrum(F);
 		r.mult(G*D);
+		r.mult(1/(4f * cosTheta_i * cosTheta_o));
 		return r;
 	}
 	
