@@ -26,14 +26,9 @@ public class StaticVecmath {
 	}
 	
 	public static float getDimension(Tuple3f tuple, Axis dimension) {
-		switch (dimension) {
-    	case x:
-    		return tuple.x;
-    	case y:
-    		return tuple.y;
-    	default:
-    		return tuple.z;
-    	}
+		return dimension.normal.x * tuple.x + 
+				dimension.normal.y * tuple.y + 
+				dimension.normal.z * tuple.z;
 	}
 	
 	public static enum Axis{
