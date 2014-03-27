@@ -21,14 +21,14 @@ public class AreaLightTestScene extends Scene {
 	public AreaLightTestScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/AreaLightTestScene");
+		outputFilename = new String("../output/testscenes/AreaLightTestScene-random");
 		
 		// Image width and height in pixels
 		width = 640;
 		height = 360;
 		
 		// Number of samples per pixel
-		SPP = 4;
+		SPP = 128;
 		
 		// Specify which camera, film, and tonemapper to use
 		Vector3f eye = new Vector3f(0.f, 0.f, 5.f);
@@ -42,7 +42,7 @@ public class AreaLightTestScene extends Scene {
 		
 		// Specify which integrator and sampler to use
 		integratorFactory = new AreaLightIntegratorFactory();
-		samplerFactory = new UniformSamplerFactory();				
+		samplerFactory = new RandomSamplerFactory();				
 		
 		CSGSolid sphere = new CSGSphere();
 		

@@ -23,7 +23,7 @@ public class GlossyScene extends Scene {
 	public GlossyScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/Glossy");
+		outputFilename = new String("../output/testscenes/Glossy-mine");
 		
 		// Image width and height in pixels
 		width = 512;

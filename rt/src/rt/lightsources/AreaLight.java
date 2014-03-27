@@ -20,6 +20,7 @@ public class AreaLight implements LightGeometry {
 	private final Vector3f edge2;
 	private final Point3f lightPos;
 	private final float area;
+	private Vector3f normal;
 	
 	/**
 	 * 
@@ -33,16 +34,15 @@ public class AreaLight implements LightGeometry {
 		this.lightPos = lightPos;
 		this.edge1 = edge1;
 		this.edge2 = edge2;
-		Vector3f crossProduct = new Vector3f();
-		crossProduct.cross(edge1, edge2);
-		this.area = crossProduct.length();
+		this.normal = new Vector3f();
+		normal.cross(edge1, edge2);
+		this.area = normal.length();
+		normal.normalize();
 		this.areaLightMaterial = new AreaLightMaterial(emission);
 	}
 	
-	/**
-	 * A ray never hit a point.
-	 */
 	public HitRecord intersect(Ray r) {
+		//TODO
 		return null;
 	}
 
@@ -50,7 +50,6 @@ public class AreaLight implements LightGeometry {
 	 * Sample a point on the light geometry.
 	 */
 	public HitRecord sample(float[] s) {
-		
 		HitRecord hitRecord = new HitRecord();
 		Vector3f edge1Sampled = new Vector3f(edge1);
 		edge1Sampled.scale(s[0]);
@@ -61,6 +60,7 @@ public class AreaLight implements LightGeometry {
 		position.add(edge2Sampled);
 		hitRecord.position = position;
 		hitRecord.material = areaLightMaterial;
+		hitRecord.normal = new Vector3f(this.normal);
 		hitRecord.p = 1.f/area;
 		return hitRecord;
 	}
