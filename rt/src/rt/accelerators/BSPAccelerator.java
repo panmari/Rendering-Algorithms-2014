@@ -54,7 +54,8 @@ public class BSPAccelerator implements Intersectable {
 		// split bounding box in middle along of some axis, make a new box each
 		Point3f leftBoxMax = new Point3f(b.max);
 		Point3f rightBoxMin = new Point3f(b.min);
-
+		//Idea: sort by split axis, iterate over all intersectables and keep adding up surface areas.
+		// cost = surface left * intersectables left + surface right * intersectables right
 		switch (node.splitAxis) {
 			case x:
 				leftBoxMax.x = (b.min.x + b.max.x)/2;
@@ -73,8 +74,8 @@ public class BSPAccelerator implements Intersectable {
 		BoundingBox leftBox = new BoundingBox(new Point3f(b.min), leftBoxMax);
 		BoundingBox rightBox = new BoundingBox(rightBoxMin, new Point3f(b.max));
 		
-		List<Intersectable> leftIntersectables = new ArrayList<>();
-		List<Intersectable> rightIntersectables = new ArrayList<>();
+		List<Intersectable> leftIntersectables = new ArrayList<>(iList.size()/2);
+		List<Intersectable> rightIntersectables = new ArrayList<>(iList.size()/2);
 		//add intersectable to bounding box that crosses it
 		for (Intersectable i: iList) {
 			if (i.getBoundingBox().isOverlapping(leftBox))
