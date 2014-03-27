@@ -6,21 +6,21 @@ import rt.HitRecord;
 import rt.Material;
 import rt.Spectrum;
 
-public class TorranceSparrow implements Material {
+public class Glossy implements Material {
 
 	private float e;
 	private Spectrum n, k;
 	private Spectrum nkterm;
 
-	public TorranceSparrow(Spectrum n, Spectrum k, float smoothness) {
+	public Glossy(float smoothness, Spectrum n, Spectrum k) {
 			this.n = n;
 			this.k = k;
+				
 			this.nkterm = new Spectrum(n);
 			this.nkterm.mult(n);
 			Spectrum kSquare = new Spectrum(k);
 			kSquare.mult(k);
 			nkterm.add(kSquare);
-			//this.diffuse.mult(1/(float)Math.PI);
 			this.e = smoothness;
 	}
 
@@ -31,8 +31,11 @@ public class TorranceSparrow implements Material {
 		Vector3f normal = hitRecord.normal;
 		Vector3f w_h = new Vector3f(wOut);
 		w_h.add(wIn);
-		w_h.normalize();
-		float G = Math.min(1, Math.min(normal.dot(w_h)*normal.dot(wOut)*2/(wOut.dot(w_h)), normal.dot(w_h)*normal.dot(wIn)*2/(wOut.dot(w_h))));
+		w_h.scale(1/2f);
+		float g_term = 2*normal.dot(w_h)/wOut.dot(w_h);
+		float g_term_one = normal.dot(wOut)*g_term;
+		float g_term_two = normal.dot(wIn)*g_term;
+		float G = Math.min(1, Math.min(g_term_one, g_term_two));
 		float D = (float) ((e + 2)*Math.pow(w_h.dot(normal),e)/(2*Math.PI));
 		
 		//fresnel term

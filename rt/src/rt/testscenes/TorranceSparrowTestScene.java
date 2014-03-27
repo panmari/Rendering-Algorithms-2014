@@ -45,7 +45,7 @@ public class TorranceSparrowTestScene extends Scene {
 		chessTexture = new Textured("../textures/chessboard.jpg");
 		
 		
-		Material gold = new TorranceSparrow(new Spectrum(0.25f,0.306f,1.426f), new Spectrum(3,2.88f,1.846f), 2);
+		Material gold = new Glossy(8f, new Spectrum(0.25f,0.306f,1.426f), new Spectrum(3,2.88f,1.846f));
 
 		CSGSolid sphere = new CSGSphere(gold);
 		

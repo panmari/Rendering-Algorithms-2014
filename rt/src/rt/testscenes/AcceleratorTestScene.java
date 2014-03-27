@@ -54,7 +54,7 @@ public class AcceleratorTestScene extends Scene {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Material gold = new TorranceSparrow(new Spectrum(0.25f,0.306f,1.426f), new Spectrum(3,2.88f,1.846f), 2);
+		Material gold = new Glossy(8f, new Spectrum(0.25f,0.306f,1.426f), new Spectrum(3,2.88f,1.846f));
 		Matrix4f t = new Matrix4f();
 		t.rotX((float) (-Math.PI/2));
 		Instance accMesh = new Instance(new BSPAccelerator(mesh),t);

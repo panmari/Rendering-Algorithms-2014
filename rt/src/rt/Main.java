@@ -2,7 +2,6 @@ package rt;
 
 import javax.imageio.ImageIO;
 
-import rt.basicscenes.*;
 import rt.testscenes.*;
 
 import java.util.*;
@@ -20,7 +19,7 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new AcceleratorTestScene();
+	public static Scene scene = new GlossyScene();
 	public static Point debugPixel;// = new Point(220, 185);
 	
 	static LinkedList<RenderTask> queue;
