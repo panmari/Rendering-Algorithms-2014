@@ -13,7 +13,6 @@ import rt.materials.Diffuse;
 public class CSGInstance extends CSGSolid {
 
 	private CSGSolid csgSolid;
-	public Material material;
 	private InstanceHelper instanceHelper;
 
 	public CSGInstance(CSGSolid i, Matrix4f t) {

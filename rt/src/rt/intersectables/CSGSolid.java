@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import rt.HitRecord;
 import rt.Intersectable;
+import rt.Material;
 import rt.Ray;
 
 /**
@@ -18,6 +19,7 @@ public abstract class CSGSolid implements Intersectable {
 
 	enum BoundaryType { START, END };
 	public enum BelongsTo { LEFT, RIGHT };
+	public Material material;
 	
 	/**
 	 * Boundary of an intersection interval, can be sorted by t easily.

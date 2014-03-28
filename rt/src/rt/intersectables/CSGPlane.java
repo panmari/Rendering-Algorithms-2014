@@ -23,7 +23,6 @@ public class CSGPlane extends CSGSolid {
 	
 	Vector3f normal;
 	float d;
-	public Material material;
 	private Matrix3f m;
 	
 	/**
