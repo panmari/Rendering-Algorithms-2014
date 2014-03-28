@@ -8,6 +8,7 @@ import rt.LightGeometry;
 import rt.Ray;
 import rt.Spectrum;
 import rt.accelerators.BoundingBox;
+import rt.intersectables.Rectangle;
 import rt.materials.AreaLightMaterial;
 
 /**
@@ -21,6 +22,7 @@ public class AreaLight implements LightGeometry {
 	private final Point3f lightPos;
 	private final float area;
 	private Vector3f normal;
+	private Rectangle rectangle;
 	
 	/**
 	 * 
@@ -39,11 +41,16 @@ public class AreaLight implements LightGeometry {
 		this.area = normal.length();
 		normal.normalize();
 		this.areaLightMaterial = new AreaLightMaterial(emission);
+		this.rectangle = new Rectangle(new Point3f(lightPos), new Vector3f(edge1), new Vector3f(edge2));
 	}
 	
 	public HitRecord intersect(Ray r) {
-		//TODO
-		return null;
+		HitRecord h = rectangle.intersect(r);
+		if (h == null)
+			return null;
+		h.intersectable = this;
+		h.material = this.areaLightMaterial;
+		return h;
 	}
 
 	/**

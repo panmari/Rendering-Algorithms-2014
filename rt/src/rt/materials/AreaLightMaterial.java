@@ -55,7 +55,7 @@ public class AreaLightMaterial implements Material {
 	 */
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut,
 			Vector3f wIn) {
-		return new Spectrum(0.f, 0.f, 0.f);
+		return new Spectrum(emission);
 	}
 	
 	/** 
