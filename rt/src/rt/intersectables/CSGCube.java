@@ -1,5 +1,7 @@
 package rt.intersectables;
 
+import java.util.ArrayList;
+
 import javax.vecmath.*;
 
 import rt.HitRecord;
@@ -12,7 +14,7 @@ import rt.materials.Diffuse;
 /**
  * A cube implemented using planes and CSG. The cube occupies the volume [-1,1] x [-1,1] x [-1,1]. 
  */
-public class CSGCube implements Intersectable {
+public class CSGCube extends CSGSolid {
 
 	CSGNode root;
 	
@@ -39,16 +41,17 @@ public class CSGCube implements Intersectable {
 		root = new CSGNode(n3, n4, CSGNode.OperationType.INTERSECT);
 	}
 
-	public HitRecord intersect(Ray r) {
-		return root.intersect(r);
-	}
-
 	/**
 	 * Very simple for a sphere with radius 1.
 	 */
 	@Override
 	public BoundingBox getBoundingBox() {
 		return new BoundingBox(new Point3f(-1,-1,-1), new Point3f(1,1,1));
+	}
+
+	@Override
+	ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
+		return root.getIntervalBoundaries(r);
 	}
 
 }

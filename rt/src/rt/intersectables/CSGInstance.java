@@ -28,8 +28,10 @@ public class CSGInstance extends CSGSolid {
 		ArrayList<IntervalBoundary> intervalBoundaries = csgSolid.getIntervalBoundaries(instanceRay);
 		
 		for (IntervalBoundary i: intervalBoundaries) {
-			if (i.hitRecord != null)
+			if (i.hitRecord != null) {
 				i.hitRecord = instanceHelper.transformBack(i.hitRecord);
+				i.hitRecord.material = this.material;
+			}
 		}
 		return intervalBoundaries;
 	}

@@ -84,7 +84,6 @@ public class HitRecord  {
 			t1 = new Vector3f(0,1,0);
 			t1.cross(t1, normal);
 		}
-		t1.normalize();
 		t2 = new Vector3f();
 		t2.cross(normal, t1);
 		Matrix3f m = new Matrix3f();
