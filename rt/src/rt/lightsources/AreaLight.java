@@ -61,7 +61,7 @@ public class AreaLight implements LightGeometry {
 		Vector3f edge1Sampled = new Vector3f(edge1);
 		edge1Sampled.scale(s[0]);
 		Vector3f edge2Sampled = new Vector3f(edge2);
-		edge1Sampled.scale(s[1]);
+		edge2Sampled.scale(s[1]);
 		Point3f position = new Point3f(this.lightPos);
 		position.add(edge1Sampled);
 		position.add(edge2Sampled);
