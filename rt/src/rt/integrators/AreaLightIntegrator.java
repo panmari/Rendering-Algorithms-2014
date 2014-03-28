@@ -66,7 +66,7 @@ public class AreaLightIntegrator implements Integrator {
 				Ray shadowRay = new Ray(hitRecord.position, lightDir, 0, true);
 				HitRecord shadowHit = root.intersect(shadowRay);
 				if (shadowHit != null &&
-						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
+						StaticVecmath.dist2(shadowHit.position, hitRecord.position) + 1e-5f < d2) //only if closer than light
 					continue;
 				
 				// Evaluate the BRDF
