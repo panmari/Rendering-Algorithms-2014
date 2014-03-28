@@ -44,18 +44,31 @@ public class TextureTestScene extends Scene {
 		samplerFactory = new OneSamplerFactory();		
 		
 		Material chessTexture = new Textured("../textures/chessboard.jpg", "../normalmaps/normal.gif");
+		Material forestfloor = new Textured("../textures/egg.jpg", "../normalmaps/forestfloor.jpg");
+
+		Material couch = new Textured("../textures/pink.jpg", "../normalmaps/couch.png");
+
 		CSGSolid sphere = new CSGSphere(chessTexture);
+		CSGSolid cube = new CSGCube();
+		
+		Matrix4f t = new Matrix4f();
+		t.setIdentity();
+		t.rotX((float) Math.toRadians(30));
+		t.setTranslation(new Vector3f(2.5f,0,0));
+		CSGInstance cubeInstance = new CSGInstance(cube, t);
+		cubeInstance.material = couch;
 		
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
-		groundPlane.material = chessTexture;
+		groundPlane.material = forestfloor;
 		CSGPlane backPlane = new CSGPlane(new Vector3f(0.f, 0.f, 1.f), 3.15f);
 		backPlane.material = grid;		
 		
 		// Collect objects in intersectable list
 		IntersectableList intersectableList = new IntersectableList();
 		intersectableList.add(sphere);	
+		intersectableList.add(cubeInstance);
 		intersectableList.add(groundPlane);
 		intersectableList.add(backPlane);
 		

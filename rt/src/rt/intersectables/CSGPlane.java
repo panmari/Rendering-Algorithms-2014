@@ -1,5 +1,6 @@
 package rt.intersectables;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
@@ -23,6 +24,7 @@ public class CSGPlane extends CSGSolid {
 	Vector3f normal;
 	float d;
 	public Material material;
+	private Matrix3f m;
 	
 	/**
 	 * Makes a CSG plane.
@@ -37,6 +39,22 @@ public class CSGPlane extends CSGSolid {
 	public CSGPlane(Vector3f normal, float d, Material material) {
 		this.normal = new Vector3f(normal);
 		this.normal.normalize();
+		// Make tangent frame: t1, t2, normal is a right handed frame
+		Vector3f t1 = new Vector3f(1,0,0);
+		t1.cross(t1, normal);
+		if(t1.length()==0)
+		{
+			t1 = new Vector3f(0,1,0);
+			t1.cross(t1, normal);
+		}
+		Vector3f t2 = new Vector3f();
+		t2.cross(normal, t1);
+		m = new Matrix3f();
+		m.setColumn(0, t1);
+		m.setColumn(1, t2);
+		m.setColumn(2, normal);
+		m.invert();
+		
 		this.d = d;
 		this.material = material;
 	}
@@ -118,11 +136,19 @@ public class CSGPlane extends CSGSolid {
 			Vector3f wIn = new Vector3f(r.direction);
 			wIn.negate();
 		
-			//use projection to x/z plane to decide on texture coordinate
-			//TODO: do this better
-			float u = Math.abs(position.x % 1);
-			float v = Math.abs(position.z % 1);			
-			return new HitRecord(t, position, retNormal, wIn, null, material, u, v); 
+			HitRecord h = new HitRecord(t, position, retNormal, wIn, null, material, 0, 0);
+			Point3f texPosition = new Point3f(position);
+			
+			m.transform(texPosition);
+
+			if (retNormal.x == 1) {
+				h.u = Math.abs(texPosition.x % 1);
+				h.v = Math.abs(texPosition.z % 1);
+			} else {
+				h.u = Math.abs(texPosition.x % 1);
+				h.v = Math.abs(texPosition.y % 1);
+			}
+			return h;
 		} else
 		{
 			return null;
@@ -131,7 +157,8 @@ public class CSGPlane extends CSGSolid {
 
 	@Override
 	public BoundingBox getBoundingBox() {
-		// TODO Auto-generated method stub
-		return null;
+		//TODO: think of something smarter
+		return new BoundingBox(new Point3f(Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY), 
+				new Point3f(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
 	}
 }
