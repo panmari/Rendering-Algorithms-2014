@@ -1,7 +1,5 @@
 package rt.materials;
 
-import java.util.Random;
-
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
@@ -13,18 +11,19 @@ import rt.Spectrum;
  */
 public class AreaLightMaterial implements Material {
 
-	Spectrum emission;
-	Random rand;
+	private final Spectrum emission;
+	private final float area;
 	
-	public AreaLightMaterial(Spectrum emission)
+	public AreaLightMaterial(Spectrum emission, float area)
 	{
 		this.emission = new Spectrum(emission);
-		this.rand = new Random();
+		this.area = area;
 	}
 	
 	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
 		Spectrum s = new Spectrum(emission);
 		s.mult(hitRecord.normal.dot(wOut));
+		s.mult((float) (1/(Math.PI*area))); // from L_i term
 		return s;
 	}
 
@@ -88,7 +87,7 @@ public class AreaLightMaterial implements Material {
 
 	@Override
 	public void evaluateBumpMap(HitRecord hitRecord) {
-		// TODO Auto-generated method stub
+		//does nothing
 	}
 
 

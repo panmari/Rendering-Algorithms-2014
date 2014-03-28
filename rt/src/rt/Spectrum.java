@@ -95,4 +95,16 @@ public class Spectrum {
 		this.g -= s.g;
 		this.b -= s.b;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		Spectrum other = (Spectrum) obj;
+		if (b != other.b)
+			return false;
+		if (g != other.g)
+			return false;
+		if (r != other.r)
+			return false;
+		return true;
+	}
 }

@@ -44,8 +44,12 @@ public class AreaLightIntegrator implements Integrator {
 		HitRecord hitRecord = root.intersect(r);
 		if(hitRecord != null)
 		{
+			Spectrum emission = hitRecord.material.evaluateEmission(hitRecord, hitRecord.w);
+			if (!emission.equals(new Spectrum(0,0,0)))
+				return emission;
 			Spectrum outgoing = new Spectrum(0.f, 0.f, 0.f);
 			Spectrum brdfValue;
+			
 			
 			// Iterate over all light sources
 			Iterator<LightGeometry> it = lightList.iterator();
@@ -81,7 +85,7 @@ public class AreaLightIntegrator implements Integrator {
 				
 				// Geometry term: multiply with 1/(squared distance), only correct like this 
 				// for point lights (not area lights)!
-				s.mult(1.f/d2);
+				s.mult(1.f/(d2*lightHit.p));
 				
 				// Accumulate
 				outgoing.add(s);

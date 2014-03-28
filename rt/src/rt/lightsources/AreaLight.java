@@ -40,7 +40,7 @@ public class AreaLight implements LightGeometry {
 		normal.cross(edge1, edge2);
 		this.area = normal.length();
 		normal.normalize();
-		this.areaLightMaterial = new AreaLightMaterial(emission);
+		this.areaLightMaterial = new AreaLightMaterial(emission, area);
 		this.rectangle = new Rectangle(new Point3f(lightPos), new Vector3f(edge1), new Vector3f(edge2));
 	}
 	
