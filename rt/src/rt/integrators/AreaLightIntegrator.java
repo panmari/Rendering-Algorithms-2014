@@ -14,9 +14,9 @@ import rt.Sampler;
 import rt.SamplerFactory;
 import rt.Scene;
 import rt.Spectrum;
-import rt.StaticVecmath;
 import rt.samplers.RandomSampler;
 import rt.samplers.UniformSampler;
+import util.StaticVecmath;
 
 /**
  * Integrator for Whitted style ray tracing. This is a basic version that needs to be extended!
@@ -45,7 +45,7 @@ public class AreaLightIntegrator implements Integrator {
 		if(hitRecord != null)
 		{
 			Spectrum emission = hitRecord.material.evaluateEmission(hitRecord, hitRecord.w);
-			if (!emission.equals(new Spectrum(0,0,0)))
+			if (emission != null) // hit light => return emission of light directly
 				return emission;
 			Spectrum outgoing = new Spectrum(0.f, 0.f, 0.f);
 			Spectrum brdfValue;
@@ -55,7 +55,7 @@ public class AreaLightIntegrator implements Integrator {
 			Iterator<LightGeometry> it = lightList.iterator();
 			while(it.hasNext())
 			{
-				LightGeometry lightSource = it.next();
+				LightGeometry lightSource = it.next();	
 				float[][] sample = this.sampler.makeSamples(1, 2);
 				// Make direction from hit point to light source position; this is only supposed to work with point lights
 				HitRecord lightHit = lightSource.sample(sample[0]);

@@ -13,7 +13,7 @@ import rt.Ray;
 import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
-import rt.StaticVecmath;
+import util.StaticVecmath;
 
 /**
  * Integrator for Whitted style ray tracing. This is a basic version that needs to be extended!

@@ -6,10 +6,10 @@ import javax.vecmath.Point3f;
 
 import rt.Intersectable;
 import rt.Material;
-import rt.MyMath;
 import rt.Spectrum;
 import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
+import util.StaticVecmath;
 
 /**
  * A triangle mesh. The mesh internally stores the triangles using vertex
@@ -67,8 +67,8 @@ public class Mesh extends Aggregate {
 		for(int i=0; i<indices.length/3; i++) {
 			MeshTriangle newTriangle = new MeshTriangle(this, i);
 			triangles[i] = newTriangle;
-			MyMath.elementwiseMin(min, newTriangle.getBoundingBox().min);
-			MyMath.elementwiseMax(max, newTriangle.getBoundingBox().max);
+			StaticVecmath.elementwiseMin(min, newTriangle.getBoundingBox().min);
+			StaticVecmath.elementwiseMax(max, newTriangle.getBoundingBox().max);
 		}
 		this.boundingBox = new BoundingBox(min, max);
 	}

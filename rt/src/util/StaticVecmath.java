@@ -1,4 +1,4 @@
-package rt;
+package util;
 
 import javax.vecmath.*;
 
@@ -50,5 +50,28 @@ public class StaticVecmath {
 			int ordinalNext = (this.ordinal() + 1) % Axis.values().length;
 			return Axis.values()[ordinalNext];
 		}
+	}
+
+	/**
+	 * sets min to the minimum of min and other (on a per element basis
+	 * @param min
+	 * @param other
+	 */
+	public static void elementwiseMin(Tuple3f min, Tuple3f other) {
+		min.x = Math.min(min.x, other.x);
+		min.y = Math.min(min.y, other.y);
+		min.z = Math.min(min.z, other.z);
+	}
+
+	/**
+	 * sets max to the maximum of max and other (on a per element basis
+	 * @param max
+	 * @param other
+	 */
+	public static void elementwiseMax(Tuple3f max, Tuple3f other) {
+		max.x = Math.max(max.x, other.x);
+		max.y = Math.max(max.y, other.y);
+		max.z = Math.max(max.z, other.z);
+	
 	}
 }

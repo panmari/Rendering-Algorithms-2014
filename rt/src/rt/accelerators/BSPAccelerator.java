@@ -14,10 +14,10 @@ import com.google.common.collect.Lists;
 import rt.HitRecord;
 import rt.Intersectable;
 import rt.Ray;
-import rt.StaticVecmath.Axis;
 import rt.intersectables.Aggregate;
 import sun.org.mozilla.javascript.internal.Node;
-import static rt.StaticVecmath.getDimension;
+import util.StaticVecmath.Axis;
+import static util.StaticVecmath.getDimension;
 
 public class BSPAccelerator implements Intersectable {
 

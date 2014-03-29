@@ -15,7 +15,7 @@ import rt.Ray;
 import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
-import rt.StaticVecmath;
+import util.StaticVecmath;
 
 public class WhittedIntegrator implements Integrator {
 

@@ -6,11 +6,11 @@ import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
 import rt.Material;
-import rt.MyMath;
 import rt.Ray;
 import rt.Spectrum;
 import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
+import util.MyMath;
 
 import java.util.ArrayList;
 

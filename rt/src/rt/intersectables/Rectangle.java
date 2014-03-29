@@ -6,7 +6,7 @@ import javax.vecmath.Vector3f;
 import rt.HitRecord;
 import rt.Intersectable;
 import rt.Ray;
-import rt.StaticVecmath;
+import util.StaticVecmath;
 
 public class Rectangle extends Plane implements Intersectable {
 

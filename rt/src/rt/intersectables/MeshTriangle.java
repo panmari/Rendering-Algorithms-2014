@@ -6,9 +6,9 @@ import com.google.common.collect.ImmutableList;
 
 import rt.HitRecord;
 import rt.Intersectable;
-import rt.MyMath;
 import rt.Ray;
 import rt.accelerators.BoundingBox;
+import util.StaticVecmath;
 
 /**
  * Defines a triangle by referring back to a {@link Mesh}
@@ -43,12 +43,12 @@ public class MeshTriangle implements Intersectable {
 		Point3f c = new Point3f(vertices[v2*3], vertices[v2*3 + 1], vertices[v2*3 + 2]);
 	
 		Point3f min = new Point3f(a);
-		MyMath.elementwiseMin(min, b);
-		MyMath.elementwiseMin(min, c);
+		StaticVecmath.elementwiseMin(min, b);
+		StaticVecmath.elementwiseMin(min, c);
 		
 		Point3f max = new Point3f(a);
-		MyMath.elementwiseMax(max, b);
-		MyMath.elementwiseMax(max, c);
+		StaticVecmath.elementwiseMax(max, b);
+		StaticVecmath.elementwiseMax(max, c);
 
 		this.boundingBox = new BoundingBox(min, max);
 	}

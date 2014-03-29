@@ -5,6 +5,7 @@ import javax.vecmath.Vector3f;
 import rt.HitRecord;
 import rt.Material;
 import rt.Spectrum;
+import util.MyMath;
 
 public class Glossy implements Material {
 
@@ -37,7 +38,7 @@ public class Glossy implements Material {
 		float g_term_two = normal.dot(wIn)*g_term;
 		float G = Math.min(1, Math.min(g_term_one, g_term_two));
 		// D is Microfacet distribution, determines BRDF.
-		float D = (float) ((e + 2)*Math.pow(w_h.dot(normal),e)/(2*Math.PI));
+		float D =  (e + 2)*MyMath.pow(w_h.dot(normal),e)/(2*MyMath.PI);
 		
 		//fresnel term
 		float cosTheta_i = normal.dot(wIn);
@@ -76,7 +77,7 @@ public class Glossy implements Material {
 	
 	@Override
 	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
-		// TODO Auto-generated method stub
+		//no emission
 		return null;
 	}
 

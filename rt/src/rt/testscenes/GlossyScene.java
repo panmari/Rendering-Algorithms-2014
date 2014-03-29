@@ -74,11 +74,11 @@ public class GlossyScene extends Scene {
 
 		//gold
 		Spectrum ext = new Spectrum(3.f, 2.88f, 1.846f);
-		instance.material = new rt.materials.Glossy( 8.f, new Spectrum(0.25f, 0.306f, 1.426f), ext);
+		//instance.material = new rt.materials.Glossy( 8.f, new Spectrum(0.25f, 0.306f, 1.426f), ext);
 		
 		//copper
 		ext = new Spectrum(3.23f, 2.6f, 2.5f);
-	//	instance.material = new rt.materials.Glossy( 8.f, new Spectrum(0.27f, 0.82f, 1.16f), ext);
+		instance.material = new rt.materials.Glossy( 8.f, new Spectrum(0.27f, 0.82f, 1.16f), ext);
 		//aluminium
 		ext = new Spectrum(7.48f, 6.55f, 5.28f);
 	//	instance.material = new rt.materials.Glossy( 8.f, new Spectrum(1.3f, 1.02f, 0.64f), ext);

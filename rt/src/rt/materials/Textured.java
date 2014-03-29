@@ -12,8 +12,8 @@ import javax.vecmath.Vector3f;
 import rt.HitRecord;
 import rt.Material;
 import rt.Spectrum;
-import static rt.MyMath.floor;
-import static rt.MyMath.ceil;
+import static util.MyMath.ceil;
+import static util.MyMath.floor;
 
 
 public class Textured implements Material {
@@ -105,7 +105,7 @@ public class Textured implements Material {
 
 	@Override
 	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
-		return new Spectrum(0.f, 0.f, 0.f);
+		return null;
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public class Refractive implements Material {
 
 	@Override
 	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
-		// TODO Auto-generated method stub
+		//no emission
 		return null;
 	}
 

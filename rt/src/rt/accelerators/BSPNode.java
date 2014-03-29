@@ -3,8 +3,8 @@ package rt.accelerators;
 import java.util.List;
 
 import rt.Intersectable;
-import rt.StaticVecmath.Axis;
-import static rt.StaticVecmath.getDimension;
+import util.StaticVecmath.Axis;
+import static util.StaticVecmath.getDimension;
 
 public class BSPNode {
 
