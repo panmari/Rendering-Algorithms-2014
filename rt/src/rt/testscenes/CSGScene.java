@@ -61,11 +61,12 @@ public class CSGScene extends Scene {
 		trans.setTranslation(new Vector3f(-1.5f, -1.5f, 0.f));
 		trans.mul(rot);
 		doubleCone = new CSGInstance(doubleCone, trans);
+		doubleCone.material = refractive;
 		
 		// Something like a"soap bar"
 		Material yellow = new Diffuse(new Spectrum(1.f, 0.8f, 0.2f));
-		CSGSolid soap = new CSGUnitCylinder(yellow);
-		CSGSolid cap = new CSGInfiniteDoubleCone(yellow);
+		CSGSolid soap = new CSGUnitCylinder();
+		CSGSolid cap = new CSGInfiniteDoubleCone();
 		// Smoothen the edges
 		trans.setIdentity();
 		trans.m23 = -0.8f;
@@ -95,6 +96,7 @@ public class CSGScene extends Scene {
 		trans.setTranslation(new Vector3f(1.5f, -1.5f, 1.f));
 		trans.mul(rot);
 		soap = new CSGInstance(soap, trans);
+		soap.material = yellow;
 		
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
@@ -135,7 +137,7 @@ public class CSGScene extends Scene {
 	private CSGSolid coneCrossSection(float a, Material material)
 	{
 		// Makes a two-sided infinite cone with apex angle 90 degrees
-		CSGInfiniteDoubleCone doubleCone = new CSGInfiniteDoubleCone(material);
+		CSGInfiniteDoubleCone doubleCone = new CSGInfiniteDoubleCone();
 		// Scaling factor along the cone axis corresponding to apex angle
 		float s = (float)Math.tan((90-a/2)/180.f*(float)Math.PI);
 		
@@ -152,7 +154,7 @@ public class CSGScene extends Scene {
 		// Cut off at z=0 and z=1
 		CSGNode out = new CSGNode(scaledCone, new CSGPlane(new Vector3f(0.f, 0.f, -1.f), 0.f, material), CSGNode.OperationType.INTERSECT);
 		out = new CSGNode(out, new CSGPlane(new Vector3f(0.f, 0.f, 1.f), -1.f, material), CSGNode.OperationType.INTERSECT);
-		
+		out.material = material;
 		return out;
 	}
 }
