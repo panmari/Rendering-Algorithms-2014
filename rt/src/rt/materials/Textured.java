@@ -50,7 +50,6 @@ public class Textured implements Material {
 	}
 
 	/**
-	 * this is ugly & slow, refactor pls!
 	 * @param x
 	 * @param y
 	 * @return

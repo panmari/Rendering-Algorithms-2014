@@ -7,6 +7,7 @@ import rt.Material;
 import rt.Ray;
 import rt.Spectrum;
 import rt.Material.ShadingSample;
+import util.StaticVecmath;
 
 public class Reflective implements Material {
 
@@ -41,14 +42,7 @@ public class Reflective implements Material {
 
 	@Override
 	public ShadingSample evaluateSpecularReflection(HitRecord hitRecord) {
-		Vector3f i = new Vector3f(hitRecord.w);
-		i.negate();
-		i.normalize();
-		float cosTheta_i = -i.dot(hitRecord.normal);
-		Vector3f r = new Vector3f(i);
-		Vector3f nScaled = new Vector3f(hitRecord.normal);
-		nScaled.scale(2*cosTheta_i);
-		r.add(nScaled);
+		Vector3f r = StaticVecmath.reflect(hitRecord.normal, hitRecord.w);
 		
 		Spectrum brdf = new Spectrum(ks);
 		return new ShadingSample(brdf, new Spectrum(0,0,0), r, false, 1);

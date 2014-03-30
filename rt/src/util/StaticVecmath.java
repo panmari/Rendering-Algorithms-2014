@@ -74,4 +74,21 @@ public class StaticVecmath {
 		max.z = Math.max(max.z, other.z);
 	
 	}
+	
+	/**
+	 * Reflects the vector incoming at the normal given. 
+	 * Assumes incoming vector is pointing away from surface.
+	 * @param normal
+	 * @param incoming
+	 * @return
+	 */
+	public static Vector3f reflect(Vector3f normal, Vector3f incoming) {
+		float cosTheta_i = incoming.dot(normal);
+		Vector3f reflected = new Vector3f();
+		reflected.negate(incoming);
+		Vector3f nScaled = new Vector3f(normal);
+		nScaled.scale(2*cosTheta_i);
+		reflected.add(nScaled);
+		return reflected;
+	}
 }
