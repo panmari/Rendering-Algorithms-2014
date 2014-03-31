@@ -1,11 +1,13 @@
 package rt.materials;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
 import rt.Material;
 import rt.Spectrum;
 import util.MyMath;
+import util.StaticVecmath;
 
 public class Glossy implements Material {
 
@@ -104,15 +106,39 @@ public class Glossy implements Material {
 		return null;
 	}
 
+	/**
+	 * Return a random direction over the full sphere of directions.
+	 */
 	@Override
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
-		// TODO Auto-generated method stub
-		return null;
+		Vector3f w_o = hitRecord.w;
+		// samples on hemisphere
+		float phi = sample[0]*2*MyMath.PI;
+		float cosTheta = MyMath.pow(sample[1], 1/(e + 1));
+		
+		// 1. construct w_h
+		// tangential vertices are in column one and two
+		Matrix3f m = hitRecord.getTangentialMatrix();
+		Vector3f w_h = new Vector3f(phi, cosTheta, 0);
+		m.transform(w_h);
+		w_h.normalize();
+		
+		// 2. Reflect w_o around w_h
+		Vector3f w_i = StaticVecmath.reflect(w_h, w_o);
+		
+		// 3. Compute probability
+		//TODO: do I really need to use cosTheta here?
+		float p = 1/(4*w_o.dot(w_h))*(e + 1)/(2*MyMath.PI)*MyMath.pow(cosTheta, e);
+		if (w_i.dot(hitRecord.normal) <= 0) { //below horizon
+			return new ShadingSample(new Spectrum(0), new Spectrum(0), w_i, false, p);
+		} else {
+			return new ShadingSample(evaluateBRDF(hitRecord, w_o, w_i), new Spectrum(0), w_i, false, p);
+		}
 	}
+
 
 	@Override
 	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

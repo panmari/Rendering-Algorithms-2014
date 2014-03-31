@@ -3,6 +3,7 @@ package rt.materials;
 import javax.vecmath.Vector3f;
 
 import rt.*;
+import util.MyMath;
 
 /**
  * A basic diffuse material.
@@ -67,7 +68,16 @@ public class Diffuse implements Material {
 	// To be implemented for path tracer!
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample)
 	{
-		return null;	
+		/**
+		Vector3f dir = new Vector3f();
+		dir.x = sample[0]*2*MyMath.PI;
+		dir.y = MyMath.sqrt(sample[1]);
+		
+		//map to directional vector
+		hitRecord.getTangentialMatrix().transform(dir);
+		*/
+		return null;
+
 	}
 		
 	public boolean castsShadows()
