@@ -68,15 +68,19 @@ public class Diffuse implements Material {
 	// To be implemented for path tracer!
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample)
 	{
-		/**
-		Vector3f dir = new Vector3f();
-		dir.x = sample[0]*2*MyMath.PI;
-		dir.y = MyMath.sqrt(sample[1]);
 		
+		Vector3f dir = new Vector3f();
+		float sqr_psi_1 = MyMath.sqrt(sample[0]);
+		float two_pi_psi_2 = sample[1]*2*MyMath.PI;
+				
+		dir.x = MyMath.cos(two_pi_psi_2)*sqr_psi_1;
+		dir.y = MyMath.sin(two_pi_psi_2)*sqr_psi_1;
+		dir.z = MyMath.sqrt(1 - sample[0]);
 		//map to directional vector
 		hitRecord.getTangentialMatrix().transform(dir);
-		*/
-		return null;
+		
+		float p = MyMath.cos(dir.dot(hitRecord.normal));
+		return new ShadingSample(new Spectrum(kd), new Spectrum(0), dir, false, p);
 
 	}
 		

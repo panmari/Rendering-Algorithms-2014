@@ -57,4 +57,12 @@ public class MyMath {
 	public static float sqrt(float f) {
 		return (float) Math.sqrt(f);
 	}
+
+	public static float cos(float a) {
+		return (float) Math.cos(a);
+	}
+	
+	public static float sin(float a) {
+		return (float) Math.sin(a);
+	}
 }
