@@ -53,9 +53,11 @@ public class Rectangle extends Plane implements Intersectable {
 		float projectionEdge1 = d.dot(edge1);
 		float projectionEdge2 = d.dot(edge2);
 		if (projectionEdge1 >= 0 && projectionEdge1 <= edge1LengthSquare &&
-				projectionEdge2 >= 0 && projectionEdge2 <= edge2LengthSquare)
+				projectionEdge2 >= 0 && projectionEdge2 <= edge2LengthSquare) {
+			h.u = projectionEdge1/edge1LengthSquare;
+			h.v = projectionEdge2/edge2LengthSquare;
 			return h;
-		else
+		} else
 			return null;
 	}
 
