@@ -53,4 +53,8 @@ public class MyMath {
 	public static float pow(float base, float exponent) {
 		return (float) Math.pow(base, exponent);
 	}
+
+	public static float sqrt(float f) {
+		return (float) Math.sqrt(f);
+	}
 }
