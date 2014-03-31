@@ -123,17 +123,18 @@ public class Glossy implements Material {
 		float cosTheta = MyMath.pow(sample[1], 1/(e + 1));
 		
 		// 1. construct w_h
-		// tangential vertices are in column one and two
+		Vector3f w_h = new Vector3f();
+		w_h.x = cosTheta*MyMath.cos(phi);
+		w_h.y = MyMath.sqrt(1 - cosTheta*cosTheta)*MyMath.sin(phi);
+		w_h.z = cosTheta;
 		Matrix3f m = hitRecord.getTangentialMatrix();
-		Vector3f w_h = new Vector3f(phi, cosTheta, 0);
 		m.transform(w_h);
-		w_h.normalize();
 		
 		// 2. Reflect w_o around w_h
 		Vector3f w_i = StaticVecmath.reflect(w_h, w_o);
 		
 		// 3. Compute probability
-		//TODO: do I really need to use cosTheta here?
+		//TODO: do I really need to use cosTheta here (angle between normal and w_h) or cosTheta_i?
 		float p = 1/(4*w_o.dot(w_h))*(e + 1)/(2*MyMath.PI)*MyMath.pow(cosTheta, e);
 		if (w_i.dot(hitRecord.normal) <= 0) { //below horizon
 			return new ShadingSample(new Spectrum(0), new Spectrum(0), w_i, false, p);

@@ -78,7 +78,7 @@ public class Diffuse implements Material {
 		//map to directional vector
 		hitRecord.getTangentialMatrix().transform(dir);
 		
-		float p = MyMath.cos(dir.dot(hitRecord.normal));
+		float p = MyMath.cos(dir.dot(hitRecord.normal))/MyMath.PI;
 		return new ShadingSample(new Spectrum(kd), new Spectrum(0), dir, false, p);
 
 	}
