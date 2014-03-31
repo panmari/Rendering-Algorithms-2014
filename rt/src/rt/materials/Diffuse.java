@@ -65,7 +65,6 @@ public class Diffuse implements Material {
 		return null;
 	}
 	
-	// To be implemented for path tracer!
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample)
 	{
 		

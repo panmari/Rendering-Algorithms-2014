@@ -27,7 +27,6 @@ public class Glossy implements Material {
 			this.e = smoothness;
 	}
 
-
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut, Vector3f wIn) {
 		assert(Math.abs(wIn.lengthSquared() - 1) < 1e-6f);
@@ -47,9 +46,9 @@ public class Glossy implements Material {
 		float g_term_two = normal.dot(wIn)*g_term;
 		float G = Math.min(1, Math.min(g_term_one, g_term_two));
 		// D is Microfacet distribution, determines BRDF.
-		float D =  (e + 2)*MyMath.pow(w_h.dot(normal),e)/(2*MyMath.PI);
+		float D = (e + 2)*MyMath.pow(w_h.dot(normal),e)/(2*MyMath.PI);
 		
-		//fresnel term
+		//fresnel term, channel wise
 		float cosTheta_i = normal.dot(wIn);
 		float cosTheta_o = normal.dot(wOut);
 		float cosTheta_i2 = cosTheta_i*cosTheta_i;

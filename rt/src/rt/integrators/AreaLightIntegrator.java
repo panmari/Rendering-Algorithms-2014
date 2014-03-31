@@ -9,6 +9,7 @@ import rt.Integrator;
 import rt.Intersectable;
 import rt.LightList;
 import rt.LightGeometry;
+import rt.Material.ShadingSample;
 import rt.Ray;
 import rt.Sampler;
 import rt.SamplerFactory;
@@ -50,7 +51,28 @@ public class AreaLightIntegrator implements Integrator {
 			Spectrum outgoing = new Spectrum(0.f, 0.f, 0.f);
 			Spectrum brdfValue;
 			
+			ShadingSample shadingSample = hitRecord.material.getShadingSample(hitRecord, this.sampler.makeSamples(1, 2)[0]);
+			//TODO: every material should return a shading sample
+			if (shadingSample != null) { 
+				Ray shadingSampleRay = new Ray(hitRecord.position, shadingSample.w, 0, true);
+				HitRecord shadingSampleHit = root.intersect(shadingSampleRay);
+				if (shadingSampleHit != null) {
+					Spectrum lightHit = shadingSampleHit.material.evaluateEmission(shadingSampleHit, StaticVecmath.negate(shadingSample.w));
+					if (lightHit != null) {
+						lightHit.mult(shadingSample.brdf);
+						float ndotl = hitRecord.normal.dot(shadingSample.w);
+						ndotl = Math.max(ndotl, 0.f);
+						lightHit.mult(ndotl/shadingSample.p);
+						return lightHit;
+					}
+				} else 
+					return new Spectrum(0);
+			} else 
+				return new Spectrum(1,0,0);
 			
+		} 
+		return new Spectrum(0);
+			/*
 			// Iterate over all light sources
 			Iterator<LightGeometry> it = lightList.iterator();
 			while(it.hasNext())
@@ -93,6 +115,7 @@ public class AreaLightIntegrator implements Integrator {
 			return outgoing;
 		} else 
 			return new Spectrum(0.f,0.f,0.f);
+			*/
 		
 	}
 
