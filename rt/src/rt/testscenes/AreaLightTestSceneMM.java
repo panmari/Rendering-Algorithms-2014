@@ -22,7 +22,7 @@ public class AreaLightTestSceneMM extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 8;
+		SPP = 32;
 		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
@@ -58,7 +58,8 @@ public class AreaLightTestSceneMM extends Scene {
 	
 		// Bottom
 		rectangle = new Rectangle(new Point3f(-2.f, -.75f, 2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
-		rectangle.material = new Textured("../textures/grass-texture.jpg");
+		rectangle.material = new Diffuse(new Spectrum(.8f));
+		//rectangle.material = new Textured("../textures/grass-texture.jpg");
 		objects.add(rectangle);
 
 		// Top
