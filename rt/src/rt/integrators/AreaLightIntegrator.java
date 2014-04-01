@@ -56,7 +56,7 @@ public class AreaLightIntegrator implements Integrator {
 				
 			WeightedSpectrum lightSampledSpectrum = sampleLight(hitRecord, randomLightSource);
 			lightSampledSpectrum.p *= 1f/lightList.size(); // adapt probability to hit exactly that light
-			lightSampledSpectrum.mult(1/lightSampledSpectrum.p);
+			lightSampledSpectrum.mult(lightList.size()); // also adapt spectrum bc of changed probability
 			
 			WeightedSpectrum brdfSampledSpectrum = sampleBRDF(hitRecord);
 						
@@ -141,7 +141,7 @@ public class AreaLightIntegrator implements Integrator {
 		
 		// Geometry term: multiply with 1/(squared distance), only correct like this 
 		// for point lights (not area lights)!
-		s.mult(1.f/(d2));
+		s.mult(1.f/(d2*lightHit.p));
 		
 		return new WeightedSpectrum(s, lightHit.p);
 	}
