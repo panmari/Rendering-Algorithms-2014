@@ -98,19 +98,19 @@ public class Glossy implements Material {
 
 	@Override
 	public ShadingSample evaluateSpecularReflection(HitRecord hitRecord) {
-		// TODO Auto-generated method stub
+		// does not happen
 		return null;
 	}
 
 	@Override
 	public boolean hasSpecularRefraction() {
-		// TODO Auto-generated method stub
+		// does not happen
 		return false;
 	}
 
 	@Override
 	public ShadingSample evaluateSpecularRefraction(HitRecord hitRecord) {
-		// TODO Auto-generated method stub
+		// does not happen
 		return null;
 	}
 
@@ -123,15 +123,16 @@ public class Glossy implements Material {
 		assert Math.abs(w_o.length() - 1) < 1e-5f : "Not normalized, length: " + w_o.length();
 
 		// samples on hemisphere
-		float phi = sample[0]*2*MyMath.PI;
-		//angle between n and w_h
+		float phi = 2*MyMath.PI*sample[0];
+		// angle between n and w_h
 		float cosTheta = MyMath.pow(sample[1], 1/(e + 1));
 		
 		// 1. construct w_h
 		Vector3f w_h = new Vector3f();
-		//construct eucledian vector from spherical coordinates
-		w_h.x = cosTheta*MyMath.cos(phi);
-		w_h.y = MyMath.sqrt(1 - cosTheta*cosTheta)*MyMath.sin(phi);
+		//construct euclidean vector from spherical coordinates
+		float sinTheta = MyMath.sqrt(1 - cosTheta*cosTheta);
+		w_h.x = sinTheta*MyMath.cos(phi);
+		w_h.y = sinTheta*MyMath.sin(phi);
 		w_h.z = cosTheta;
 		// TODO: why does this need to be normalized?
 		w_h.normalize();
@@ -141,10 +142,11 @@ public class Glossy implements Material {
 		
 		// 2. Reflect w_o around w_h
 		Vector3f w_i = StaticVecmath.reflect(w_h, w_o);
+		assert Math.abs(w_i.length() - 1) < 1e-5f : "Not normalized, length: " + w_i.length();
 		
 		// 3. Compute probability
-		//TODO: do I really need to use cosTheta here (angle between normal and w_h) or cosTheta_i?
 		float p = 1/(4*w_o.dot(w_h))*(e + 1)/(2*MyMath.PI)*MyMath.pow(cosTheta, e);
+		
 		if (w_i.dot(hitRecord.normal) <= 0) { //below horizon
 			return new ShadingSample(new Spectrum(0), new Spectrum(0), w_i, false, p);
 		} else {
