@@ -1,5 +1,6 @@
 package rt.materials;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
 import rt.*;
@@ -75,11 +76,15 @@ public class Diffuse implements Material {
 		dir.x = MyMath.cos(two_pi_psi_2)*sqr_psi_1;
 		dir.y = MyMath.sin(two_pi_psi_2)*sqr_psi_1;
 		dir.z = MyMath.sqrt(1 - sample[0]);
+		assert(Math.abs(dir.lengthSquared() - 1) < 1e-5f);
 		//map to directional vector
-		hitRecord.getTangentialMatrix().transform(dir);
-		
-		float p = MyMath.cos(dir.dot(hitRecord.normal))/MyMath.PI;
-		return new ShadingSample(new Spectrum(kd), new Spectrum(0), dir, false, p);
+		Matrix3f m = hitRecord.getTangentialMatrix();
+		m.transform(dir);
+		//TODO: why do I need to normalize here?
+		dir.normalize();
+
+		float p = dir.dot(hitRecord.normal)/MyMath.PI;
+		return new ShadingSample(new Spectrum(kd), new Spectrum(), dir, false, p);
 
 	}
 		
