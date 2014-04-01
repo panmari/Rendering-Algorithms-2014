@@ -54,11 +54,15 @@ public class AreaLightIntegrator implements Integrator {
 			Spectrum outgoing = new Spectrum();
 			List<WeightedSpectrum> specs = new ArrayList<>(2);
 			// Iterate over all light sources
-			WeightedSpectrum lightSampledSpectrum = sampleLight(hitRecord, randomLightSource);
-			lightSampledSpectrum.p *= 1f/lightList.size(); // adapt probability to hit exactly that light
-			lightSampledSpectrum.mult(1/lightSampledSpectrum.p);
-			specs.add(lightSampledSpectrum);
-			specs.add(sampleBRDF(hitRecord));
+			//WeightedSpectrum lightSampledSpectrum = sampleLight(hitRecord, randomLightSource);
+			//lightSampledSpectrum.p *= 1f/lightList.size(); // adapt probability to hit exactly that light
+			//lightSampledSpectrum.mult(1/lightSampledSpectrum.p);
+			
+			WeightedSpectrum brdfSampledSpectrum = sampleBRDF(hitRecord);
+			
+			specs.add(brdfSampledSpectrum);
+			
+			//return brdfSampledSpectrum;
 			
 			float p_sum = 0;
 			for (WeightedSpectrum s: specs) {
@@ -70,12 +74,15 @@ public class AreaLightIntegrator implements Integrator {
 			outgoing = new Spectrum();
 			for (WeightedSpectrum s: specs) {
 				// balance heuristic -> p/p_sum
-				s.mult(s.p/p_sum);
-				// balance heuristic -> p*p/p_sum_squares //TODO
-				//s.mult(s.p*s.p/p_sum);
+				float weight = s.p/p_sum;
+				// power heuristic -> p*p/p_sum_squares
+				// s.mult(s.p*s.p/p_sum);
+				weight = Float.isNaN(weight) ? 0 : weight;
+				s.mult(weight);
 				outgoing.add(s);
 			}
 			return outgoing;
+			
 		} else return new Spectrum();	
 			
 	
@@ -91,15 +98,16 @@ public class AreaLightIntegrator implements Integrator {
 				float cosTheta_i_prime = hitRecord.normal.dot(shadingSample.w);
 				float areaProbablity = shadingSample.p*Math.abs(cosTheta_i_prime);
 				areaProbablity /= StaticVecmath.dist2(hitRecord.position, shadingSampleHit.position);
-				Spectrum lightHit = shadingSampleHit.material.evaluateEmission(shadingSampleHit, StaticVecmath.negate(shadingSample.w));
-				if (lightHit != null) {
-					lightHit.mult(shadingSample.brdf);
-					float ndotl = hitRecord.normal.dot(shadingSample.w);
-					ndotl = Math.max(ndotl, 0.f);
-					lightHit.mult(ndotl/shadingSample.p);
-					return new WeightedSpectrum(lightHit, areaProbablity);
+				Spectrum emission = shadingSampleHit.material.evaluateEmission(shadingSampleHit, shadingSampleHit.w);
+				if (emission != null) {
+					//System.out.println("p_a " + areaProbablity);
+					emission.mult(shadingSample.brdf);
+					float cos_theta_i = hitRecord.normal.dot(shadingSample.w);
+					cos_theta_i = Math.max(cos_theta_i, 0.f);
+					emission.mult(cos_theta_i/shadingSample.p);
+					return new WeightedSpectrum(emission, areaProbablity);
 				} else //didn't hit light -> stay dark
-					return new WeightedSpectrum(new Spectrum(0,0,0), areaProbablity);
+					return new WeightedSpectrum(new Spectrum(0,0,0), 0);
 			} else // return black with probablity 0, since infinitely far away hit
 				return new WeightedSpectrum(new Spectrum(0,0,0), 0);
 		} else //this should not happen and is only here for lazyness
