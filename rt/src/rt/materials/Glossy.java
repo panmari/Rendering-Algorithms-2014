@@ -120,17 +120,24 @@ public class Glossy implements Material {
 	@Override
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
 		Vector3f w_o = hitRecord.w;
+		assert Math.abs(w_o.length() - 1) < 1e-5f : "Not normalized, length: " + w_o.length();
+
 		// samples on hemisphere
 		float phi = sample[0]*2*MyMath.PI;
+		//angle between n and w_h
 		float cosTheta = MyMath.pow(sample[1], 1/(e + 1));
 		
 		// 1. construct w_h
 		Vector3f w_h = new Vector3f();
+		//construct eucledian vector from spherical coordinates
 		w_h.x = cosTheta*MyMath.cos(phi);
 		w_h.y = MyMath.sqrt(1 - cosTheta*cosTheta)*MyMath.sin(phi);
 		w_h.z = cosTheta;
+		// TODO: why does this need to be normalized?
+		w_h.normalize();
 		Matrix3f m = hitRecord.getTangentialMatrix();
 		m.transform(w_h);
+		w_h.normalize();
 		
 		// 2. Reflect w_o around w_h
 		Vector3f w_i = StaticVecmath.reflect(w_h, w_o);

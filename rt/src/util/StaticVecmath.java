@@ -83,6 +83,8 @@ public class StaticVecmath {
 	 * @return
 	 */
 	public static Vector3f reflect(Vector3f normal, Vector3f incoming) {
+		assert Math.abs(normal.length() - 1) < 1e-5f: "Normal not normalized: " + normal.length();
+		
 		float cosTheta_i = incoming.dot(normal);
 		Vector3f reflected = new Vector3f();
 		reflected.negate(incoming);

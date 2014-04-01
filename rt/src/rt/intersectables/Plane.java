@@ -50,6 +50,8 @@ public class Plane implements Intersectable {
 			// wIn is incident direction; convention is that it points away from surface
 			Vector3f wIn = new Vector3f(r.direction);
 			wIn.negate();
+			wIn.normalize();
+			
 			return new HitRecord(t, position, retNormal, wIn, this, material, 0.f, 0.f); 
 		} else
 		{

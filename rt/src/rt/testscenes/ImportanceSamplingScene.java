@@ -22,7 +22,7 @@ public class ImportanceSamplingScene extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 8;
+		SPP = 512;
 		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
@@ -75,6 +75,7 @@ public class ImportanceSamplingScene extends Scene {
 		lightList = new LightList();
 		
 		// Add area lights
+		//Red
 		Point3f bottomLeft = new Point3f(1.95f, 2.f, -2.2f);
 		Vector3f right = new Vector3f(0.f, .1f, 0.f);
 		Vector3f top = new Vector3f(0.f, 0.f, -.1f);
@@ -83,6 +84,7 @@ public class ImportanceSamplingScene extends Scene {
 		objects.add(AreaLight);
 		lightList.add(AreaLight);
 		
+		// blue
 		bottomLeft = new Point3f(1.95f, 2.f, -0.6f);
 		right = new Vector3f(0.f, .2f, 0.f);
 		top = new Vector3f(0.f, 0.f, -.2f);
@@ -91,6 +93,7 @@ public class ImportanceSamplingScene extends Scene {
 		objects.add(AreaLight);
 		lightList.add(AreaLight);
 		
+		// green
 		bottomLeft = new Point3f(1.95f, 2.f, 1.1f);
 		right = new Vector3f(0.f, .4f, 0.f);
 		top = new Vector3f(0.f, 0.f, -.4f);
@@ -99,6 +102,7 @@ public class ImportanceSamplingScene extends Scene {
 		objects.add(AreaLight);
 		lightList.add(AreaLight);
 		
+		// yellow
 		bottomLeft = new Point3f(1.95f, 2.f, 3.f);
 		right = new Vector3f(0.f, 0.8f, 0.f);
 		top = new Vector3f(0.f, 0.f, -0.8f);
@@ -106,6 +110,7 @@ public class ImportanceSamplingScene extends Scene {
 		objects.add(AreaLight);
 		lightList.add(AreaLight);
 		
+		// above & bright
 		bottomLeft = new Point3f(-0.5f, 3.f, 0.75f);
 		right = new Vector3f(0.f, 0.f, -0.5f);
 		top = new Vector3f(0.5f, 0.f, 0.f);
