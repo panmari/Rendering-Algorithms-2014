@@ -50,14 +50,15 @@ public class AreaLightIntegrator implements Integrator {
 			Spectrum emission = hitRecord.material.evaluateEmission(hitRecord, hitRecord.w);
 			if (emission != null) // hit light => return emission of light directly
 				return emission;
-			Iterator<LightGeometry> it = lightList.iterator();
+			LightGeometry randomLightSource = lightList.getRandomLight();
 			Spectrum outgoing = new Spectrum();
-			List<WeightedSpectrum> specs = new ArrayList<>();
+			List<WeightedSpectrum> specs = new ArrayList<>(2);
 			// Iterate over all light sources
-			while(it.hasNext()) {
-				specs.add(sampleLight(hitRecord, it.next()));
-			}
-			//specs.add(sampleBRDF(hitRecord));
+			WeightedSpectrum lightSampledSpectrum = sampleLight(hitRecord, randomLightSource);
+			lightSampledSpectrum.p *= 1f/lightList.size(); // adapt probability to hit exactly that light
+			lightSampledSpectrum.mult(1/lightSampledSpectrum.p);
+			specs.add(lightSampledSpectrum);
+			specs.add(sampleBRDF(hitRecord));
 			
 			float p_sum = 0;
 			for (WeightedSpectrum s: specs) {
@@ -84,7 +85,8 @@ public class AreaLightIntegrator implements Integrator {
 			Ray shadingSampleRay = new Ray(hitRecord.position, shadingSample.w, 0, true);
 			HitRecord shadingSampleHit = root.intersect(shadingSampleRay);
 			if (shadingSampleHit != null) {
-				float areaProbablity = shadingSample.p*Math.abs(hitRecord.normal.dot(shadingSample.w));
+				float cosTheta_i_prime = hitRecord.normal.dot(shadingSample.w);
+				float areaProbablity = shadingSample.p*Math.abs(cosTheta_i_prime);
 				areaProbablity /= StaticVecmath.dist2(hitRecord.position, shadingSampleHit.position);
 				Spectrum lightHit = shadingSampleHit.material.evaluateEmission(shadingSampleHit, StaticVecmath.negate(shadingSample.w));
 				if (lightHit != null) {
@@ -96,7 +98,7 @@ public class AreaLightIntegrator implements Integrator {
 				} else //didn't hit light -> stay dark
 					return new WeightedSpectrum(new Spectrum(0,0,0), areaProbablity);
 			} else // return black with probablity 0, since infinitely far away hit
-				return new WeightedSpectrum(new Spectrum(1,0,0), 0);
+				return new WeightedSpectrum(new Spectrum(0,0,0), 0);
 		} else //this should not happen and is only here for lazyness
 			return new WeightedSpectrum(new Spectrum(1,0,0), 1);
 	}
@@ -131,7 +133,7 @@ public class AreaLightIntegrator implements Integrator {
 		
 		// Geometry term: multiply with 1/(squared distance), only correct like this 
 		// for point lights (not area lights)!
-		s.mult(1.f/(d2*lightHit.p));
+		s.mult(1.f/(d2));
 		
 		return new WeightedSpectrum(s, lightHit.p);
 	}

@@ -12,8 +12,8 @@ import util.StaticVecmath;
 public class Glossy implements Material {
 
 	private float e;
-	private Spectrum n, k;
-	private Spectrum nkterm;
+	private final Spectrum n, k;
+	private final Spectrum nkterm;
 
 	public Glossy(float smoothness, Spectrum n, Spectrum k) {
 			this.n = n;
@@ -41,10 +41,12 @@ public class Glossy implements Material {
 		w_h.add(wIn);
 		w_h.normalize();
 		assert(Math.abs(w_h.lengthSquared() - 1) < 1e-6f);
+		// G is the geometric term
 		float g_term = 2*normal.dot(w_h)/wOut.dot(w_h);
 		float g_term_one = normal.dot(wOut)*g_term;
 		float g_term_two = normal.dot(wIn)*g_term;
 		float G = Math.min(1, Math.min(g_term_one, g_term_two));
+		
 		// D is Microfacet distribution, determines BRDF.
 		float D = (e + 2)*MyMath.pow(w_h.dot(normal),e)/(2*MyMath.PI);
 		

@@ -22,7 +22,7 @@ public class AreaLightTestSceneMM extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 32;
+		SPP = 64;
 		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
