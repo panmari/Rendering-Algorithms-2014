@@ -144,13 +144,14 @@ public class Glossy implements Material {
 		Vector3f w_i = StaticVecmath.reflect(w_h, w_o);
 		assert Math.abs(w_i.length() - 1) < 1e-5f : "Not normalized, length: " + w_i.length();
 		
-		// 3. Compute probability
-		float p = 1/(4*w_o.dot(w_h))*(e + 1)/(2*MyMath.PI)*MyMath.pow(cosTheta, e);
+		// 3. Compute probability of outgoing direction p_w_i (aka direction light comes from)
+		float p_w_h = (e + 1)/(2*MyMath.PI)*MyMath.pow(cosTheta, e);
+		float p_w_i = p_w_h/(4*w_o.dot(w_h));
 		
 		if (w_i.dot(hitRecord.normal) <= 0) { //below horizon
-			return new ShadingSample(new Spectrum(0), new Spectrum(0), w_i, false, p);
+			return new ShadingSample(new Spectrum(0), new Spectrum(0), w_i, false, p_w_i);
 		} else {
-			return new ShadingSample(evaluateBRDF(hitRecord, w_o, w_i), new Spectrum(0), w_i, false, p);
+			return new ShadingSample(evaluateBRDF(hitRecord, w_o, w_i), new Spectrum(0), w_i, false, p_w_i);
 		}
 	}
 
@@ -168,8 +169,7 @@ public class Glossy implements Material {
 
 	@Override
 	public void evaluateBumpMap(HitRecord hitRecord) {
-		// TODO Auto-generated method stub
-		
+		// meh
 	}
 
 }
