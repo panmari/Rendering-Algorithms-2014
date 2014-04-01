@@ -50,20 +50,17 @@ public class AreaLightIntegrator implements Integrator {
 			Spectrum emission = hitRecord.material.evaluateEmission(hitRecord, hitRecord.w);
 			if (emission != null) // hit light => return emission of light directly
 				return emission;
+			
 			LightGeometry randomLightSource = lightList.getRandomLight();
 			Spectrum outgoing = new Spectrum();
-			List<WeightedSpectrum> specs = new ArrayList<>(2);
-			// Iterate over all light sources
-			//WeightedSpectrum lightSampledSpectrum = sampleLight(hitRecord, randomLightSource);
-			//lightSampledSpectrum.p *= 1f/lightList.size(); // adapt probability to hit exactly that light
-			//lightSampledSpectrum.mult(1/lightSampledSpectrum.p);
+				
+			WeightedSpectrum lightSampledSpectrum = sampleLight(hitRecord, randomLightSource);
+			lightSampledSpectrum.p *= 1f/lightList.size(); // adapt probability to hit exactly that light
+			lightSampledSpectrum.mult(1/lightSampledSpectrum.p);
 			
 			WeightedSpectrum brdfSampledSpectrum = sampleBRDF(hitRecord);
-			
-			specs.add(brdfSampledSpectrum);
-			
-			//return brdfSampledSpectrum;
-			
+						
+			WeightedSpectrum[] specs = new WeightedSpectrum[]{lightSampledSpectrum, brdfSampledSpectrum};
 			float p_sum = 0;
 			for (WeightedSpectrum s: specs) {
 				// balance heuristic
