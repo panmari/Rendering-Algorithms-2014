@@ -62,14 +62,17 @@ public class AreaLightIntegrator implements Integrator {
 			
 			float p_sum = 0;
 			for (WeightedSpectrum s: specs) {
+				// balance heuristic
 				p_sum += s.p;
+				// power heuristic:
+				//p_sum += s.p*s.p;
 			}
 			outgoing = new Spectrum();
 			for (WeightedSpectrum s: specs) {
 				// balance heuristic -> p/p_sum
 				s.mult(s.p/p_sum);
 				// balance heuristic -> p*p/p_sum_squares //TODO
-				//s.mult(s.p/p_sum);
+				//s.mult(s.p*s.p/p_sum);
 				outgoing.add(s);
 			}
 			return outgoing;
