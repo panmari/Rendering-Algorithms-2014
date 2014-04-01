@@ -24,7 +24,7 @@ public interface Material {
 		public Spectrum emission;
 		
 		/**
-		 * The sampled direction.
+		 * The sampled direction, pointing away from the surface.
 		 */
 		public Vector3f w;
 		

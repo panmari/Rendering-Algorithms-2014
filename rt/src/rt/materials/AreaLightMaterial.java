@@ -50,9 +50,6 @@ public class AreaLightMaterial implements Material {
 		return false;
 	}
 
-	/** 
-	 * Shouldn't be called on a point light
-	 */
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut,
 			Vector3f wIn) {
 		return new Spectrum(emission);

@@ -72,7 +72,6 @@ public class StaticVecmath {
 		max.x = Math.max(max.x, other.x);
 		max.y = Math.max(max.y, other.y);
 		max.z = Math.max(max.z, other.z);
-	
 	}
 	
 	/**

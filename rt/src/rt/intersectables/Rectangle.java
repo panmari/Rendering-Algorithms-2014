@@ -38,8 +38,7 @@ public class Rectangle extends Plane implements Intersectable {
 	private static float makeDistance(Point3f position, Vector3f edge1, Vector3f edge2) {
 		Vector3f normal = makeNormal(edge1, edge2);
 		Vector3f a = new Vector3f(position);
-		a.negate();
-		float t = (normal.dot(a));
+		float t = -normal.dot(a);
 		return t;
 	}
 	

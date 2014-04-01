@@ -129,13 +129,14 @@ public class Glossy implements Material {
 		
 		// 1. construct w_h
 		Vector3f w_h = new Vector3f();
-		//construct euclidean vector from spherical coordinates
+		// construct euclidean vector from spherical coordinates
 		float sinTheta = MyMath.sqrt(1 - cosTheta*cosTheta);
-		w_h.x = sinTheta*MyMath.cos(phi);
-		w_h.y = sinTheta*MyMath.sin(phi);
+		w_h.x = sinTheta * MyMath.cos(phi);
+		w_h.y = sinTheta * MyMath.sin(phi);
 		w_h.z = cosTheta;
-		// TODO: why does this need to be normalized?
-		w_h.normalize();
+
+		assert Math.abs(w_h.length() - 1) < 1e-5f : "Not normalized, length: " + w_h.length();
+
 		Matrix3f m = hitRecord.getTangentialMatrix();
 		m.transform(w_h);
 		w_h.normalize();
