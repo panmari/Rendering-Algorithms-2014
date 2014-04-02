@@ -121,11 +121,13 @@ public class Glossy implements Material {
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
 		Vector3f w_o = hitRecord.w;
 		assert Math.abs(w_o.length() - 1) < 1e-5f : "Not normalized, length: " + w_o.length();
-
+		
+		float psi1 = sample[0];
+		float psi2 = sample[1];
 		// samples on hemisphere
-		float phi = 2*MyMath.PI*sample[0];
+		float phi = 2*MyMath.PI*psi2;
 		// angle between n and w_h
-		float cosTheta = MyMath.pow(sample[1], 1/(e + 1));
+		float cosTheta = MyMath.pow(psi1, 1/(e + 1));
 		
 		// 1. construct w_h
 		Vector3f w_h = new Vector3f();
@@ -139,7 +141,8 @@ public class Glossy implements Material {
 
 		Matrix3f m = hitRecord.getTangentialMatrix();
 		m.transform(w_h);
-		w_h.normalize();
+
+		assert Math.abs(w_h.length() - 1) < 1e-5f : "Not normalized, length: " + w_h.length();
 		
 		// 2. Reflect w_o around w_h
 		Vector3f w_i = StaticVecmath.reflect(w_h, w_o);
