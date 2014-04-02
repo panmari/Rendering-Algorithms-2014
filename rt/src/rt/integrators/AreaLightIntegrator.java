@@ -1,29 +1,20 @@
 package rt.integrators;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.vecmath.*;
+import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
 import rt.Integrator;
 import rt.Intersectable;
-import rt.LightList;
 import rt.LightGeometry;
+import rt.LightList;
 import rt.Material.ShadingSample;
 import rt.Ray;
 import rt.Sampler;
-import rt.SamplerFactory;
 import rt.Scene;
 import rt.Spectrum;
 import rt.samplers.RandomSampler;
-import rt.samplers.UniformSampler;
 import util.StaticVecmath;
 
-/**
- * Integrator for Whitted style ray tracing. This is a basic version that needs to be extended!
- */
 public class AreaLightIntegrator implements Integrator {
 
 	LightList lightList;
@@ -91,17 +82,23 @@ public class AreaLightIntegrator implements Integrator {
 		if (shadingSample != null) { 
 			Ray shadingSampleRay = new Ray(hitRecord.position, shadingSample.w, 0, true);
 			HitRecord shadingSampleHit = root.intersect(shadingSampleRay);
+			
 			if (shadingSampleHit != null) {
-				float cosTheta_i_prime = hitRecord.normal.dot(shadingSample.w);
-				float areaProbablity = shadingSample.p*Math.abs(cosTheta_i_prime);
-				areaProbablity /= StaticVecmath.dist2(hitRecord.position, shadingSampleHit.position);
+				assert StaticVecmath.dist2(shadingSample.w, StaticVecmath.negate(shadingSampleHit.w)) < 1e-5f;
+				
 				Spectrum emission = shadingSampleHit.material.evaluateEmission(shadingSampleHit, shadingSampleHit.w);
-				if (emission != null) {
-					//System.out.println("p_a " + areaProbablity);
+			
+				if (emission != null && shadingSampleHit.normal.dot(shadingSampleHit.w) > 0) { // hit light from ahead
+					float cosTheta_i = hitRecord.normal.dot(shadingSample.w);
+					cosTheta_i = Math.max(cosTheta_i, 0.f); // lights can not be hit from above -> set to zero
+
+					// compute area probability for this ray
+					float areaProbablity = shadingSample.p * Math.abs(cosTheta_i); // abs in case we decide hitting from above possible
+					areaProbablity /= StaticVecmath.dist2(hitRecord.position, shadingSampleHit.position);
+
 					emission.mult(shadingSample.brdf);
-					float cos_theta_i = hitRecord.normal.dot(shadingSample.w);
-					cos_theta_i = Math.max(cos_theta_i, 0.f);
-					emission.mult(cos_theta_i/shadingSample.p);
+					emission.mult(cosTheta_i/shadingSample.p);
+					
 					return new WeightedSpectrum(emission, areaProbablity);
 				} else //didn't hit light -> stay dark
 					return new WeightedSpectrum(new Spectrum(0,0,0), 0);
@@ -142,7 +139,8 @@ public class AreaLightIntegrator implements Integrator {
 		// Geometry term: multiply with 1/(squared distance), only correct like this 
 		// for point lights (not area lights)!
 		s.mult(1.f/(d2*lightHit.p));
-		
+		float cos = Math.max(lightHit.normal.dot(StaticVecmath.negate(lightDir)), 0);
+		s.mult(cos);
 		return new WeightedSpectrum(s, lightHit.p);
 	}
 
