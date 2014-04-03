@@ -12,20 +12,26 @@ import rt.Ray;
 import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
+import rt.integrators.heuristics.BalanceHeuristic;
+import rt.integrators.heuristics.MoarPowerHeuristic;
+import rt.integrators.heuristics.PowerHeuristic;
 import rt.samplers.RandomSampler;
+import rt.util.FloatFunction;
 import util.StaticVecmath;
 
 public class AreaLightIntegrator implements Integrator {
 
 	LightList lightList;
 	Intersectable root;
-	private Sampler sampler;
+	private final Sampler sampler;
+	private final FloatFunction heuristic;
 	
 	public AreaLightIntegrator(Scene scene)
 	{
 		this.lightList = scene.getLightList();
 		this.root = scene.getIntersectable();
 		this.sampler = new RandomSampler();
+		this.heuristic = new MoarPowerHeuristic(10f);
 	}
 
 	/**
@@ -43,7 +49,6 @@ public class AreaLightIntegrator implements Integrator {
 				return emission;
 			
 			LightGeometry randomLightSource = lightList.getRandomLight();
-			Spectrum outgoing = new Spectrum();
 				
 			WeightedSpectrum lightSampledSpectrum = sampleLight(hitRecord, randomLightSource);
 			lightSampledSpectrum.p *= 1f/lightList.size(); // adapt probability to hit exactly that light
@@ -54,17 +59,11 @@ public class AreaLightIntegrator implements Integrator {
 			WeightedSpectrum[] specs = new WeightedSpectrum[]{lightSampledSpectrum, brdfSampledSpectrum};
 			float p_sum = 0;
 			for (WeightedSpectrum s: specs) {
-				// balance heuristic
-				p_sum += s.p;
-				// power heuristic:
-				//p_sum += s.p*s.p;
+				p_sum += heuristic.evaluate(s.p);
 			}
-			outgoing = new Spectrum();
+			Spectrum outgoing = new Spectrum();
 			for (WeightedSpectrum s: specs) {
-				// balance heuristic -> p/p_sum
-				float weight = s.p/p_sum;
-				// power heuristic -> p*p/p_sum_squares
-				// s.mult(s.p*s.p/p_sum);
+				float weight = heuristic.evaluate(s.p)/p_sum;
 				weight = Float.isNaN(weight) ? 0 : weight;
 				s.mult(weight);
 				outgoing.add(s);
