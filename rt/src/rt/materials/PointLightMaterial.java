@@ -23,7 +23,6 @@ public class PointLightMaterial implements Material {
 	}
 	
 	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
-		
 		return new Spectrum(emission);
 	}
 

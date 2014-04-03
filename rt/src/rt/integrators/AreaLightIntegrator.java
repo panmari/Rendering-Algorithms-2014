@@ -88,20 +88,21 @@ public class AreaLightIntegrator implements Integrator {
 				
 				Spectrum emission = shadingSampleHit.material.evaluateEmission(shadingSampleHit, shadingSampleHit.w);
 			
-				if (emission != null && shadingSampleHit.normal.dot(shadingSampleHit.w) > 0) { // hit light from ahead
-					float cosTheta_i = hitRecord.normal.dot(hitRecord.w);
-					assert cosTheta_i >= 0: "went into strange direction: " + cosTheta_i;
+				float cosTheta_i = hitRecord.normal.dot(hitRecord.w);
+				assert cosTheta_i >= 0: "went into strange direction: " + cosTheta_i;
 
-					// compute area probability for this ray
-					float areaProbablity = shadingSample.p * Math.abs(cosTheta_i); // abs should not matter
-					areaProbablity /= StaticVecmath.dist2(hitRecord.position, shadingSampleHit.position);
+				// compute area probability for this ray
+				float areaProbablity = shadingSample.p * Math.abs(cosTheta_i); // abs should not matter
+				areaProbablity /= StaticVecmath.dist2(hitRecord.position, shadingSampleHit.position);
+
+				if (emission != null && shadingSampleHit.normal.dot(shadingSampleHit.w) > 0) { // hit light from ahead
 
 					emission.mult(shadingSample.brdf);
 					emission.mult(cosTheta_i/shadingSample.p);
 					
 					return new WeightedSpectrum(emission, areaProbablity);
 				} else //didn't hit light -> stay dark
-					return new WeightedSpectrum(new Spectrum(0,0,0), 0);
+					return new WeightedSpectrum(new Spectrum(0,0,0), areaProbablity);
 			} else // return black with probablity 0, since infinitely far away hit
 				return new WeightedSpectrum(new Spectrum(0,0,0), 0);
 		} else //this should not happen and is only here for lazyness
