@@ -19,8 +19,8 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new AreaLightTestSceneMM();
-	public static Point debugPixel;// = new Point(220, 185);
+	public static Scene scene = new ImportanceSamplingScene();
+	public static Point debugPixel;// = new Point(135, 260);
 	
 	static LinkedList<RenderTask> queue;
 	static Counter tasksLeft;

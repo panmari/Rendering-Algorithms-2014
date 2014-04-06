@@ -12,11 +12,10 @@ import rt.Ray;
 import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
-import rt.integrators.heuristics.BalanceHeuristic;
-import rt.integrators.heuristics.MoarPowerHeuristic;
-import rt.integrators.heuristics.PowerHeuristic;
+import rt.integrators.heuristics.*;
 import rt.samplers.RandomSampler;
 import rt.util.FloatFunction;
+import util.MyMath;
 import util.StaticVecmath;
 
 public class AreaLightIntegrator implements Integrator {
@@ -31,7 +30,7 @@ public class AreaLightIntegrator implements Integrator {
 		this.lightList = scene.getLightList();
 		this.root = scene.getIntersectable();
 		this.sampler = new RandomSampler();
-		this.heuristic = new MoarPowerHeuristic(10f);
+		this.heuristic = new PowerHeuristic();
 	}
 
 	/**
@@ -47,25 +46,13 @@ public class AreaLightIntegrator implements Integrator {
 			Spectrum emission = hitRecord.material.evaluateEmission(hitRecord, hitRecord.w);
 			if (emission != null) // hit light => return emission of light directly
 				return emission;
-			
-			LightGeometry randomLightSource = lightList.getRandomLight();
-				
-			WeightedSpectrum lightSampledSpectrum = sampleLight(hitRecord, randomLightSource);
-			lightSampledSpectrum.p *= 1f/lightList.size(); // adapt probability to hit exactly that light
-			lightSampledSpectrum.mult(lightList.size()); // also adapt spectrum bc of changed probability
-			
-			WeightedSpectrum brdfSampledSpectrum = sampleBRDF(hitRecord);
+							
+			Spectrum lightSampledSpectrum = sampleLight(hitRecord, lightList.getRandomLight());
+			Spectrum brdfSampledSpectrum = sampleBRDF(hitRecord);
 						
-			WeightedSpectrum[] specs = new WeightedSpectrum[]{lightSampledSpectrum, brdfSampledSpectrum};
-			float p_sum = 0;
-			for (WeightedSpectrum s: specs) {
-				p_sum += heuristic.evaluate(s.p);
-			}
+			Spectrum[] specs = new Spectrum[]{lightSampledSpectrum, brdfSampledSpectrum}; //, brdfSampledSpectrum};
 			Spectrum outgoing = new Spectrum();
-			for (WeightedSpectrum s: specs) {
-				float weight = heuristic.evaluate(s.p)/p_sum;
-				weight = Float.isNaN(weight) ? 0 : weight;
-				s.mult(weight);
+			for (Spectrum s: specs) {
 				outgoing.add(s);
 			}
 			return outgoing;
@@ -75,7 +62,7 @@ public class AreaLightIntegrator implements Integrator {
 	
 	}
 	
-	private WeightedSpectrum sampleBRDF(HitRecord hitRecord) {
+	private Spectrum sampleBRDF(HitRecord hitRecord) {
 		ShadingSample shadingSample = hitRecord.material.getShadingSample(hitRecord, this.sampler.makeSamples(1, 2)[0]);
 		//TODO: every material should return a shading sample
 		if (shadingSample != null) { 
@@ -90,28 +77,35 @@ public class AreaLightIntegrator implements Integrator {
 				float cosTheta_i = hitRecord.normal.dot(hitRecord.w);
 				assert cosTheta_i >= 0: "went into strange direction: " + cosTheta_i;
 
-				// compute area probability for this ray
-				float areaProbablity = shadingSample.p * Math.abs(cosTheta_i); // abs should not matter
-				areaProbablity /= StaticVecmath.dist2(hitRecord.position, shadingSampleHit.position);
 
 				if (emission != null && shadingSampleHit.normal.dot(shadingSampleHit.w) > 0) { // hit light from ahead
-
+					// compute area probability for this ray
+					float areaProbablity = shadingSampleHit.p/lightList.size();
+					// make directional probability
+					areaProbablity *= Math.abs(cosTheta_i); // abs should not matter
+					areaProbablity /= StaticVecmath.dist2(hitRecord.position, shadingSampleHit.position);
+					 
 					emission.mult(shadingSample.brdf);
 					emission.mult(cosTheta_i/shadingSample.p);
+					float weight = heuristic.evaluate(shadingSample.p)/(heuristic.evaluate(shadingSample.p) + heuristic.evaluate(areaProbablity));
+					emission.mult(weight);
 					
-					return new WeightedSpectrum(emission, areaProbablity);
+					return emission;
 				} else //didn't hit light -> stay dark
-					return new WeightedSpectrum(new Spectrum(0,0,0), areaProbablity);
+					return new Spectrum();
 			} else // return black with probablity 0, since infinitely far away hit
-				return new WeightedSpectrum(new Spectrum(0,0,0), 0);
+				return new Spectrum();
 		} else //this should not happen and is only here for lazyness
-			return new WeightedSpectrum(new Spectrum(1,0,0), 1);
+			return new Spectrum(1,0,0);
 	}
 	
-	private WeightedSpectrum sampleLight(HitRecord hitRecord, LightGeometry lightSource) {
+	private Spectrum sampleLight(HitRecord hitRecord, LightGeometry lightSource) {
 		float[][] sample = this.sampler.makeSamples(1, 2);
 		// Make direction from hit point to light source position; this is only supposed to work with point lights
 		HitRecord lightHit = lightSource.sample(sample[0]);
+		// adapt probability to hit exactly that light
+		lightHit.p *= 1f/lightList.size(); 
+		
 		Vector3f lightDir = StaticVecmath.sub(lightHit.position, hitRecord.position);
 		float d2 = lightDir.lengthSquared();
 		lightDir.normalize();
@@ -120,10 +114,10 @@ public class AreaLightIntegrator implements Integrator {
 		HitRecord shadowHit = root.intersect(shadowRay);
 		if (shadowHit != null &&
 				StaticVecmath.dist2(shadowHit.position, hitRecord.position) + 1e-5f < d2) //only if closer than light
-			return new WeightedSpectrum(new Spectrum(), lightHit.p);
+			return new Spectrum();
 		
-		// Evaluate the BRDF
-		Spectrum brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);
+		// Evaluate the BRDF, probability is saved in p of hitRecord
+		Spectrum brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);		 
 		
 		// Multiply together factors relevant for shading, that is, brdf * emission * ndotl * geometry term
 		Spectrum s = new Spectrum(brdfValue);
@@ -136,29 +130,23 @@ public class AreaLightIntegrator implements Integrator {
 		ndotl = Math.max(ndotl, 0.f);
 		s.mult(ndotl);
 		
-		// Geometry term: multiply with 1/(squared distance), only correct like this 
-		// for point lights (not area lights)!
+		float brdfProbability = hitRecord.p;
+		//make area probability
+		brdfProbability /= Math.abs(ndotl); // abs should not matter
+		brdfProbability *= StaticVecmath.dist2(hitRecord.position, lightHit.position);
+
+
+		// Geometry term
 		s.mult(1.f/(d2*lightHit.p));
 		float cos = Math.max(lightHit.normal.dot(StaticVecmath.negate(lightDir)), 0);
 		s.mult(cos);
-		return new WeightedSpectrum(s, lightHit.p);
+		
+		float weight = heuristic.evaluate(lightHit.p)/(heuristic.evaluate(lightHit.p) + heuristic.evaluate(brdfProbability));
+		s.mult(weight);
+		return s;
 	}
 
 	public float[][] makePixelSamples(Sampler sampler, int n) {
 		return sampler.makeSamples(n, 2);
-	}
-
-	private class WeightedSpectrum extends Spectrum {
-		
-		private float p;
-
-		public WeightedSpectrum(Spectrum s, float p) {
-			super(s);
-			this.p = p;
-		}
-		
-		public String toString() {
-			return super.toString() + " p: " + this.p;
-		}
 	}
 }

@@ -32,15 +32,19 @@ public class Glossy implements Material {
 		assert(Math.abs(wIn.lengthSquared() - 1) < 1e-6f);
 		assert(Math.abs(wOut.lengthSquared() - 1) < 1e-6f);
 		assert(Math.abs(hitRecord.normal.lengthSquared() - 1) < 1e-6f);
-		//can shorten computation in these cases
-		if (hitRecord.normal.dot(wIn) < 0 || hitRecord.normal.dot(wOut) < 0)
-			return new Spectrum(0);
 		
 		Vector3f normal = hitRecord.normal;
 		Vector3f w_h = new Vector3f(wOut);
 		w_h.add(wIn);
 		w_h.normalize();
 		assert(Math.abs(w_h.lengthSquared() - 1) < 1e-6f);
+		
+		hitRecord.p = makeProbability(normal.dot(wOut), wOut, w_h);
+		//can shorten computation in these cases
+		if (hitRecord.normal.dot(wIn) < 0 || hitRecord.normal.dot(wOut) < 0)
+			return new Spectrum(0);
+		
+		
 		// G is the geometric term
 		float g_term = 2*normal.dot(w_h)/wOut.dot(w_h);
 		float g_term_one = normal.dot(wOut)*g_term;
@@ -149,8 +153,7 @@ public class Glossy implements Material {
 		assert Math.abs(w_i.length() - 1) < 1e-5f : "Not normalized, length: " + w_i.length();
 		
 		// 3. Compute probability of outgoing direction p_w_i (aka direction light comes from)
-		float p_w_h = (e + 1)/(2*MyMath.PI)*MyMath.pow(cosTheta, e);
-		float p_w_i = p_w_h/(4*w_o.dot(w_h));
+		float p_w_i = makeProbability(cosTheta, w_o, w_h);
 		
 		if (w_i.dot(hitRecord.normal) <= 0) { //below horizon
 			return new ShadingSample(new Spectrum(0), new Spectrum(0), w_i, false, p_w_i);
@@ -159,7 +162,18 @@ public class Glossy implements Material {
 		}
 	}
 
-
+	/**
+	 * 
+	 * @param cosTheta angle between n and w_o
+	 * @param w_o
+	 * @param w_h
+	 * @return
+	 */
+	private float makeProbability(float cosTheta, Vector3f w_o, Vector3f w_h) {
+		float p_w_h = (e + 1)/(2*MyMath.PI)*MyMath.pow(cosTheta, e);
+		float p_w_i = p_w_h/(4*w_o.dot(w_h));
+		return p_w_i;
+	}
 	@Override
 	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
 		return null;

@@ -44,6 +44,7 @@ public class Diffuse implements Material {
 	 *  @param hitRecord hit record to be used
 	 */
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut, Vector3f wIn) {
+		hitRecord.p = wIn.dot(hitRecord.normal)/MyMath.PI;
 		return new Spectrum(kd);
 	}
 
