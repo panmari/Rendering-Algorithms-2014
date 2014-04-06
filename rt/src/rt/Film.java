@@ -16,7 +16,7 @@ public interface Film {
 	 * @param y y-coordinate in image space
 	 * @param s sample to be added
 	 */
-	public void addSample(double x, double y, Spectrum s);
+	public void addSample(float x, float y, Spectrum s);
 	
 	/**
 	 * Returns the image stored in the film.

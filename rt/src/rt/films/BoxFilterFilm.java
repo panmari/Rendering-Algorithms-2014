@@ -34,7 +34,7 @@ public class BoxFilterFilm implements Film {
 		}
 	}
 	
-	public void addSample(double x, double y, Spectrum s)
+	public void addSample(float x, float y, Spectrum s)
 	{
 		if((int)x>=0 && (int)x<width && (int)y>=0 && (int)y<height)
 		{

@@ -94,7 +94,7 @@ public class Main {
 							Spectrum s = task.integrator.integrate(r);							
 							
 							// Write to film
-							task.scene.getFilm().addSample((double)i+(double)samples[k][0], (double)j+(double)samples[k][1], s);
+							task.scene.getFilm().addSample(i + samples[k][0], j + samples[k][1], s);
 						}
 					}
 				}
