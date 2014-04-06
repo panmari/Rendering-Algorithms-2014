@@ -59,6 +59,7 @@ public class Main {
 			// can be reduced. 
 			integrator = scene.getIntegratorFactory().make(scene);
 			sampler = scene.getSamplerFactory().make();
+			sampler.init(left*scene.height + bottom);
 		}
 	}
 	

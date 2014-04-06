@@ -18,4 +18,9 @@ public interface Sampler {
 	 * @return the array of d-dimensional samples samples
 	 */
 	public float[][] makeSamples(int n, int d);
+
+	/**
+	 * Initializes a random sampler with the given number, so results are deterministic
+	 */
+	public void init(long i);
 }

@@ -1,7 +1,6 @@
 package rt.cameras;
 
 import javax.vecmath.Matrix4f;
-import javax.vecmath.Point4f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 

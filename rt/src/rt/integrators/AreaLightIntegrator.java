@@ -14,15 +14,15 @@ import rt.Scene;
 import rt.Spectrum;
 import rt.integrators.heuristics.*;
 import rt.samplers.RandomSampler;
+import rt.samplers.UniformSampler;
 import rt.util.FloatFunction;
-import util.MyMath;
 import util.StaticVecmath;
 
 public class AreaLightIntegrator implements Integrator {
 
 	LightList lightList;
 	Intersectable root;
-	private final Sampler sampler;
+	public final Sampler sampler;
 	private final FloatFunction heuristic;
 	
 	public AreaLightIntegrator(Scene scene)
@@ -30,6 +30,7 @@ public class AreaLightIntegrator implements Integrator {
 		this.lightList = scene.getLightList();
 		this.root = scene.getIntersectable();
 		this.sampler = new RandomSampler();
+		sampler.init(2);
 		this.heuristic = new PowerHeuristic();
 	}
 
@@ -47,10 +48,10 @@ public class AreaLightIntegrator implements Integrator {
 			if (emission != null) // hit light => return emission of light directly
 				return emission;
 							
-			Spectrum lightSampledSpectrum = sampleLight(hitRecord, lightList.getRandomLight());
+			Spectrum lightSampledSpectrum = sampleLight(hitRecord, lightList.getRandomLight(sampler.makeSamples(1, 1)));
 			Spectrum brdfSampledSpectrum = sampleBRDF(hitRecord);
 						
-			Spectrum[] specs = new Spectrum[]{lightSampledSpectrum, brdfSampledSpectrum}; //, brdfSampledSpectrum};
+			Spectrum[] specs = new Spectrum[]{lightSampledSpectrum, brdfSampledSpectrum};
 			Spectrum outgoing = new Spectrum();
 			for (Spectrum s: specs) {
 				outgoing.add(s);

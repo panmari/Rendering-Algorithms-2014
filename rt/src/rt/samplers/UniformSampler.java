@@ -22,4 +22,9 @@ public class UniformSampler implements Sampler {
 		return samples;
 	}
 
+	@Override
+	public void init(long i) {
+		// does nothing here
+	}
+
 }

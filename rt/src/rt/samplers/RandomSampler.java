@@ -34,5 +34,10 @@ public class RandomSampler implements Sampler {
 		}
 		return samples;
 	}
+
+	@Override
+	public void init(long i) {
+		random.setSeed(i);
+	}
 	
 }
