@@ -22,11 +22,10 @@ import util.StaticVecmath;
 public class PathTracingIntegrator implements Integrator {
 
 	final int nrBounces = 1;
-	//final float[] russianRouletteProbabilities = new float[]{0,0,.5f,.5f,.5f,.5f,.5f,.5f,.5f,1};
-	// two bounces
 	private LightList lightList;
 	private Intersectable root;
 	private RandomSampler sampler;
+	private Random bulletGenerator = new Random();
 	
 	public PathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
@@ -38,9 +37,8 @@ public class PathTracingIntegrator implements Integrator {
 	public Spectrum integrate(Ray primaryRay) {
 		Ray currentRay = primaryRay;
 		Spectrum outgoing = new Spectrum();
-		Random a = new Random();
 		Spectrum alpha = new Spectrum(1);
-		RussianRouletteIterator rr = new RussianRouletteIterator(0f,0f,0f,1f);
+		RussianRouletteIterator rr = new RussianRouletteIterator(0,0,0.5f);
 		for(int bounce = 0;; bounce++) {
 			HitRecord hit = root.intersect(currentRay);
 			if (hit == null)
@@ -48,21 +46,19 @@ public class PathTracingIntegrator implements Integrator {
 			Spectrum emission = hit.material.evaluateEmission(hit, hit.w);
 			if (bounce == 0 && emission != null) {
 				outgoing.add(emission);
-				//break;
+				break;
 			}
 			Spectrum x = sampleLight(hit);
 			Spectrum currentBounceContribution = new Spectrum(alpha);
 			currentBounceContribution.mult(x);
 			outgoing.add(currentBounceContribution);
 			Float rrProbability = rr.next();
-			if (a.nextFloat() < rrProbability)
+			if (bulletGenerator.nextFloat() < rrProbability)
 				break;
 			ShadingSample s = hit.material.getShadingSample(hit, this.sampler.makeSamples(1, 2)[0]);
-			if (s == null) // hit light -> break
-				break;
 			currentRay = new Ray(hit.position, s.w, bounce + 1, true);
 			alpha.mult(s.brdf);
-			alpha.mult(hit.normal.dot(s.w)/(s.p*(1-rrProbability)));
+			alpha.mult(hit.normal.dot(s.w)/(s.p*(1 - rrProbability)));
 		}
 		return outgoing;
 	}
@@ -102,10 +98,6 @@ public class PathTracingIntegrator implements Integrator {
 	
 		// adapt probability to hit exactly that light
 		float probability = lightHit.p/lightList.size();
-		
-		// some geometric terms
-		//s.mult(1.f/(d2*probability));
-		s.mult(cosLight);
 
 		// turn into directional probability
 		float dirProbablity = probability * d2 /cosLight;

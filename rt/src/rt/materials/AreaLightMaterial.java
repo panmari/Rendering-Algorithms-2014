@@ -1,10 +1,13 @@
 package rt.materials;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
 import rt.Material;
 import rt.Spectrum;
+import rt.Material.ShadingSample;
+import util.MyMath;
 
 /**
  * This material should be used with {@link rt.lightsources.PointLight}.
@@ -30,15 +33,27 @@ public class AreaLightMaterial implements Material {
 	 * Return a random direction over the full sphere of directions.
 	 */
 	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
-		// To be implemented
+		// To be implemented for bidirectional path tracer
 		return null;
 	}
 
-	/** 
-	 * Shouldn't be called on a point light
-	 */
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
-		return null;
+		Vector3f dir = new Vector3f();
+		float sqr_psi_1 = MyMath.sqrt(sample[0]);
+		float two_pi_psi_2 = sample[1]*2*MyMath.PI;
+				
+		dir.x = MyMath.cos(two_pi_psi_2)*sqr_psi_1;
+		dir.y = MyMath.sin(two_pi_psi_2)*sqr_psi_1;
+		dir.z = MyMath.sqrt(1 - sample[0]);
+		assert(Math.abs(dir.lengthSquared() - 1) < 1e-5f);
+		//map to directional vector
+		Matrix3f m = hitRecord.getTangentialMatrix();
+		m.transform(dir);
+		//TODO: why do I need to normalize here?
+		dir.normalize();
+
+		float p = dir.dot(hitRecord.normal)/MyMath.PI;
+		return new ShadingSample(new Spectrum(), new Spectrum(), dir, false, p);
 	}
 
 	/** 
