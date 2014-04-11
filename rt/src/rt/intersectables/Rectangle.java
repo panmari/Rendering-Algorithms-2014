@@ -18,6 +18,12 @@ public class Rectangle extends Plane implements Intersectable {
 	private float edge1LengthSquare;
 	private float edge2LengthSquare;
 
+	/**
+	 * Constructs a rectangle given one point and two edge vectors.
+	 * @param position
+	 * @param edge1
+	 * @param edge2
+	 */
 	public Rectangle(Point3f position, Vector3f edge1, Vector3f edge2) {
 		super(makeNormal(edge1, edge2), makeDistance(position, edge1, edge2));
 		this.position = position;
@@ -25,6 +31,16 @@ public class Rectangle extends Plane implements Intersectable {
 		this.edge2 = edge2;
 		this.edge1LengthSquare = edge1.lengthSquared();
 		this.edge2LengthSquare = edge2.lengthSquared();
+	}
+	
+	/**
+	 * Constructs a rectangle given three points 
+	 * @param first
+	 * @param second
+	 * @param third
+	 */
+	public Rectangle(Point3f first, Point3f second, Point3f third) {
+		this(first, StaticVecmath.sub(third, first), StaticVecmath.sub(second, first));
 	}
 
 	private static Vector3f makeNormal(Vector3f edge1, Vector3f edge2) {

@@ -19,7 +19,7 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new PathtracingBoxSphere();
+	public static Scene scene = new CornellBoxScene();
 	public static Point debugPixel;// = new Point(135, 260);
 	
 	static LinkedList<RenderTask> queue;
