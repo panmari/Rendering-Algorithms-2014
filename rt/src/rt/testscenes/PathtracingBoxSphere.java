@@ -1,6 +1,7 @@
 package rt.testscenes;
 
 import javax.vecmath.*;
+
 import rt.*;
 import rt.intersectables.*;
 import rt.tonemappers.*;
@@ -22,7 +23,7 @@ public class PathtracingBoxSphere extends Scene {
 		
 		// Samples per pixel
 		SPP = 1024;
-		outputFilename = outputFilename + " " + String.format("%d", SPP) + "SPP";
+		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
 		Vector3f eye = new Vector3f(-3.f,1.f,4.f);
@@ -42,7 +43,12 @@ public class PathtracingBoxSphere extends Scene {
 		// List of objects
 		IntersectableList objects = new IntersectableList();	
 		
-		Sphere sphere = new Sphere(new Vector3f(-.5f,-.2f,1.f), .5f);
+		CSGSolid sphere = new CSGSphere();
+		Matrix4f t = new Matrix4f();
+		t.setIdentity();
+		t.setScale(.5f);
+		t.setTranslation(new Vector3f(-.5f,-.2f,1.f));
+		sphere = new CSGInstance(sphere, t);
 		sphere.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
 		objects.add(sphere);
 
