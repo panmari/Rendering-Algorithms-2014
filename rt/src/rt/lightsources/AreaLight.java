@@ -67,7 +67,8 @@ public class AreaLight implements LightGeometry {
 		position.add(edge1Sampled);
 		position.add(edge2Sampled);
 		hitRecord.position = position;
-		hitRecord.material = areaLightMaterial;
+		hitRecord.intersectable = this;
+		hitRecord.material = this.areaLightMaterial;
 		hitRecord.normal = new Vector3f(this.normal);
 		hitRecord.p = 1.f/area;
 		return hitRecord;

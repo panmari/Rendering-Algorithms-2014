@@ -94,4 +94,8 @@ public class HitRecord  {
 		return m;
 	}
 	
+	public String toString() {
+		return "Pos: " + position + " on " + intersectable;
+	}
+	
 }

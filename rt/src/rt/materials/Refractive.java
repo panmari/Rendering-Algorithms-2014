@@ -74,6 +74,7 @@ public class Refractive implements Material {
 	
 	@Override
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
+		// TODO: either return refractive or reflective shading sample. 
 		// TODO Auto-generated method stub
 		return null;
 	}
