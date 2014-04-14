@@ -11,6 +11,7 @@ import rt.integrators.*;
 import rt.lightsources.*;
 import rt.materials.*;
 import rt.samplers.*;
+import rt.accelerators.BSPAccelerator;
 import rt.cameras.*;
 import rt.films.*;
 
@@ -46,21 +47,21 @@ public class PathtracingBoxPeople extends Scene {
 		// List of objects
 		IntersectableList objects = new IntersectableList();	
 						
-		Rectangle rectangle = new Rectangle(new Vector3f(2.f, -.75f, 2.f), new Vector3f(0.f, 4.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
+		Rectangle rectangle = new Rectangle(new Point3f(2.f, -.75f, 2.f), new Vector3f(0.f, 4.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
 		rectangle.material = new Diffuse(new Spectrum(0.8f, 0.f, 0.f));
 		objects.add(rectangle);
 	
 		// Bottom
-		rectangle = new Rectangle(new Vector3f(-2.f, -.75f, 2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
+		rectangle = new Rectangle(new Point3f(-2.f, -.75f, 2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
 		rectangle.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
 		objects.add(rectangle);
 
 		// Top
-		rectangle = new Rectangle(new Vector3f(-2.f, 3.25f, 2.f), new Vector3f(0.f, 0.f, -4.f), new Vector3f(4.f, 0.f, 0.f));
+		rectangle = new Rectangle(new Point3f(-2.f, 3.25f, 2.f), new Vector3f(0.f, 0.f, -4.f), new Vector3f(4.f, 0.f, 0.f));
 		rectangle.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
 		objects.add(rectangle);
 		
-		rectangle = new Rectangle(new Vector3f(-2.f, -.75f, -2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 4.f, 0.f));
+		rectangle = new Rectangle(new Point3f(-2.f, -.75f, -2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 4.f, 0.f));
 		rectangle.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
 //			rectangle.material = new MirrorMaterial(new Spectrum(0.8f, 0.8f, 0.8f));
 		objects.add(rectangle);
@@ -107,10 +108,10 @@ public class PathtracingBoxPeople extends Scene {
 			System.out.printf("Could not read .obj file\n");
 		}
 
-		Vector3f bottomLeft = new Vector3f(-0.75f, 3.f, 1.5f);
+		Point3f bottomLeft = new Point3f(-0.75f, 3.f, 1.5f);
 		Vector3f right = new Vector3f(0.f, 0.f, -0.5f);
 		Vector3f top = new Vector3f(0.5f, 0.f, 0.f);
-		RectangleLight rectangleLight = new RectangleLight(bottomLeft, right, top, new Spectrum(100.f, 100.f, 100.f));
+		AreaLight rectangleLight = new AreaLight(bottomLeft, right, top, new Spectrum(100.f, 100.f, 100.f));
 		objects.add(rectangleLight);
 		
 		// Connect objects to root
@@ -121,13 +122,5 @@ public class PathtracingBoxPeople extends Scene {
 		lightList.add(rectangleLight);
 	}
 	
-	public void finish()
-	{
-		if(integratorFactory instanceof BDPathTracingIntegratorFactory)
-		{
-			((BDPathTracingIntegratorFactory)integratorFactory).writeLightImage("../output/testscenes/lightimage");
-			((BDPathTracingIntegratorFactory)integratorFactory).addLightImage(film);
-		}
-	}
 	
 }
