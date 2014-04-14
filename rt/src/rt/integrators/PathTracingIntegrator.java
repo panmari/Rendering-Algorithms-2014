@@ -38,14 +38,15 @@ public class PathTracingIntegrator implements Integrator {
 		Ray currentRay = primaryRay;
 		Spectrum outgoing = new Spectrum();
 		Spectrum alpha = new Spectrum(1);
-		RussianRouletteIterator rr = new RussianRouletteIterator(0,0,0,0,0.5f);
+		RussianRouletteIterator rr = new RussianRouletteIterator(0,0,0,0,0,0.5f);
 		for(int bounce = 0;; bounce++) {
 			HitRecord hit = root.intersect(currentRay);
 			if (hit == null)
 				break;
 			Spectrum emission = hit.material.evaluateEmission(hit, hit.w);
-			if (bounce == 0 && emission != null) {
-				outgoing.add(emission);
+			if (emission != null) {
+				if (bounce == 0)
+					outgoing.add(emission);
 				break;
 			}
 			// shadow ray russian roulette -> assume no shadow, shade. If shade < threshold, do russian roulette.
