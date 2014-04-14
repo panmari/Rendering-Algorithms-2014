@@ -94,8 +94,10 @@ public class PathTracingIntegrator implements Integrator {
 		
 		s.mult(emission);
 		
-		float cosLight = Math.max(lightHit.normal.dot(StaticVecmath.negate(lightDir)), 0);
-		
+		float cosLight;
+		if (lightHit.normal != null)
+			cosLight = Math.max(lightHit.normal.dot(StaticVecmath.negate(lightDir)), 0);
+		else cosLight = 1; //for point lights
 	
 		// adapt probability to hit exactly that light
 		float probability = lightHit.p/lightList.size();
