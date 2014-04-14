@@ -92,7 +92,7 @@ public class BSPAccelerator implements Intersectable {
 	
 	@Override
 	public HitRecord intersect(Ray r) {
-		Point2f ts = root.boundingBox.intersect(r);
+		Point2f ts = root.boundingBox.intersectBB(r);
 		if (ts == null)
 			return null;
 		
@@ -118,11 +118,11 @@ public class BSPAccelerator implements Intersectable {
 				}
 				// process children
 				if( tSplitAxis > tmax || tSplitAxis < 0 || 
-						(Math.abs(tSplitAxis) < 1e-5 && first.boundingBox.intersect(r) != null)) {
+						(Math.abs(tSplitAxis) < 1e-5 && first.boundingBox.intersectBB(r) != null)) {
 					node = first;
 				}
 				else if(tSplitAxis < tmin || 
-						(Math.abs(tSplitAxis) < 1e-5 && second.boundingBox.intersect(r) != null)) {
+						(Math.abs(tSplitAxis) < 1e-5 && second.boundingBox.intersectBB(r) != null)) {
 					node = second;
 				} else {
 					node = first;
@@ -170,9 +170,9 @@ public class BSPAccelerator implements Intersectable {
 				}
 			}
 			else {
-			if (currentNode.left.boundingBox.intersect(r) != null)
+			if (currentNode.left.boundingBox.intersectBB(r) != null)
 				nodeStack.push(currentNode.left);
-			if (currentNode.right.boundingBox.intersect(r) != null) 
+			if (currentNode.right.boundingBox.intersectBB(r) != null) 
 				nodeStack.push(currentNode.right);
 			}
 		}

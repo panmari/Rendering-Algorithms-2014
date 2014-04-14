@@ -10,8 +10,9 @@ import rt.Ray;
 import rt.intersectables.CSGNode;
 import rt.intersectables.CSGPlane;
 import rt.materials.Diffuse;
+import util.StaticVecmath;
 
-public class BoundingBox {
+public class BoundingBox implements Intersectable {
 
 	final public Point3f min;
 	final public Point3f max;
@@ -28,7 +29,7 @@ public class BoundingBox {
 	 * http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 	 * @return a point2f with the two t values of the intersections, the smaller one on x. Null if there is no intersection.
 	 */
-	public Point2f intersect(Ray r) {
+	public Point2f intersectBB(Ray r) {
 		Vector3f invdir = new Vector3f(1/r.direction.x,
 				1/r.direction.y,
 				1/r.direction.z);
@@ -78,6 +79,20 @@ public class BoundingBox {
 	
 	public String toString() {
 		return "min: " + this.min + ", max: " + this.max;
+	}
+
+	/**
+	 * Careful, this has no useful normal and/or texture coordinates.
+	 */
+	@Override
+	public HitRecord intersect(Ray r) {
+		float t = intersectBB(r).x;
+		return new HitRecord(t, r.pointAt(t), new Vector3f(1,0,0), StaticVecmath.negate(r.direction), this, null, 0, 0);
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		return this;
 	}
 
 }

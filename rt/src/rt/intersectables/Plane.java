@@ -66,4 +66,8 @@ public class Plane implements Intersectable {
 				new Point3f(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
 	}
 
+	@Override
+	public String toString() {
+		return normal.toString();
+	}
 }

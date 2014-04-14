@@ -40,7 +40,7 @@ public class Rectangle extends Plane implements Intersectable {
 	 * @param third
 	 */
 	public Rectangle(Point3f first, Point3f second, Point3f third) {
-		this(first, StaticVecmath.sub(third, first), StaticVecmath.sub(second, first));
+		this(first, StaticVecmath.sub(second, first), StaticVecmath.sub(third, first));
 	}
 
 	private static Vector3f makeNormal(Vector3f edge1, Vector3f edge2) {
@@ -76,4 +76,8 @@ public class Rectangle extends Plane implements Intersectable {
 			return null;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 }
