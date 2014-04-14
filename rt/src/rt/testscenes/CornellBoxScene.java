@@ -22,7 +22,7 @@ public class CornellBoxScene extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 1024;
+		SPP = 8;
 		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
@@ -44,7 +44,7 @@ public class CornellBoxScene extends Scene {
 		IntersectableList objects = new IntersectableList();	
 		
 		Material gray = new Diffuse(new Spectrum(.5f));
-		Rectangle floor = new Rectangle(new Point3f(0,0,0), new Point3f(552.8f,0,0), new Point3f(0,0,559.2f));
+		Rectangle floor = new Rectangle(new Point3f(552.8f,0,0), new Point3f(0,0,0), new Point3f(0,0,559.2f));
 		floor.material = gray;
 		Rectangle roof = new Rectangle(new Point3f(556, 548.8f, 0), new Point3f(556, 548.8f, 559.2f), new Point3f(0, 548.8f, 559.2f));
 		roof.material = gray;
@@ -61,6 +61,27 @@ public class CornellBoxScene extends Scene {
 		objects.add(back);
 		objects.add(left);
 		objects.add(right);
+		
+		//instance(translate([185 83.5 169]) * rotate(-16.616, [0 1 0]), box([-82.5 -82.5 -82.5], [82.5 82.5 82.5], diffuse([.3 .5 .3])))
+		//instance(translate([368 166 351]) * rotate(-72.766, [0 1 0]), box([-82.5 -168 -82.5], [82.5 165 82.5], diffuse([.5 .2 .2])))
+		Intersectable unitBox = new UnitCube();
+		
+		Matrix4f t = new Matrix4f();
+		t.setIdentity();
+		t.setScale(82.5f);
+		
+		Matrix4f rot = new Matrix4f();
+		rot.rotY((float) Math.toRadians(-16.616f));
+		t.mul(rot);
+		
+		Matrix4f trans = new Matrix4f();
+		trans.setIdentity();
+		trans.setTranslation(new Vector3f(185, 83.5f, 169));
+		t.mul(trans, t);
+		Instance greenBox = new Instance(unitBox, t);
+		greenBox.material = new Diffuse(new Spectrum(.3f, .5f, .3f));
+		objects.add(greenBox);
+		
 		// Connect objects to root
 		root = objects;
 				
@@ -68,9 +89,11 @@ public class CornellBoxScene extends Scene {
 		lightList = new LightList();
 		//point light
 		LightGeometry pl = new PointLight(new Vector3f(185, 538, 169), new Spectrum(412300, 341100, 298600));
-		//are light
+		//area light
+		Spectrum emission = new Spectrum(41.23f, 34.11f, 29.86f);
+		emission.mult(50000);
 		LightGeometry al = new AreaLight(new Point3f(185, 538, 169), new Vector3f(80, 0, 0), 
-				new Vector3f(0, 0, 80), new Spectrum(41.23f, 34.11f, 29.86f));
+				new Vector3f(0, 0, 80), emission);
 		lightList.add(al);
 	}
 	
