@@ -1,5 +1,7 @@
 package rt.accelerators;
 
+import static util.StaticVecmath.getDimension;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -8,20 +10,14 @@ import java.util.Stack;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point3f;
-import javax.vecmath.Tuple3f;
-import javax.vecmath.Vector3f;
-
-import com.google.common.collect.Lists;
 
 import rt.HitRecord;
 import rt.Intersectable;
 import rt.Ray;
 import rt.intersectables.Aggregate;
-import sun.org.mozilla.javascript.internal.Node;
 import util.IntersectableComparator;
 import util.StaticVecmath;
 import util.StaticVecmath.Axis;
-import static util.StaticVecmath.getDimension;
 
 public class BSPAccelerator implements Intersectable {
 
@@ -41,13 +37,11 @@ public class BSPAccelerator implements Intersectable {
 		this.root = new BSPNode(a.getBoundingBox(), Axis.x);
 		Iterator<Intersectable> iter = a.iterator();
 		List<Intersectable> list = new ArrayList<>(a.size());
-		float area = 0;
 		while(iter.hasNext()) {
 			Intersectable i = iter.next();
 			list.add(i);
-			area += i.getBoundingBox().area;
 		}
-		buildTree(root, list, area, 0);
+		buildTree(root, list, 0);
 	}
 	
 	/**
@@ -56,66 +50,62 @@ public class BSPAccelerator implements Intersectable {
 	 * @param b
 	 * @return
 	 */
-	private BSPNode buildTree(BSPNode node, List<Intersectable> iList, float area, int depth) {
+	private BSPNode buildTree(BSPNode node, List<Intersectable> iList, int depth) {
 		if (depth > MAX_DEPTH || iList.size() < MIN_NR_PRIMITIVES) {
 			node.intersectables = iList;
 			return node;
 		}
-		assert area > 0;
 
 		BoundingBox b = node.boundingBox;
 		// split bounding box in middle along of some axis, make a new box each
-		Point3f leftBoxMax = new Point3f(b.max);
-		Point3f rightBoxMin = new Point3f(b.min);
 		Collections.sort(iList, new IntersectableComparator(node.splitAxis));
 		
-		float leftArea = 0;
-		for (Intersectable i: iList) {
-			leftArea += i.getBoundingBox().area;
-			if (leftArea >= area/2) {
-				float split = StaticVecmath.getDimension(i.getBoundingBox().min, node.splitAxis);
-				switch (node.splitAxis) {
-				case x:
-					leftBoxMax.x = split;
-					rightBoxMin.x = split;
-					break;
-				case y:
-					leftBoxMax.y = split;
-					rightBoxMin.y = split;
-					break;
-				case z:
-					leftBoxMax.z = split;
-					rightBoxMin.z = split;
-					break;
-				}
-				break;
-			}
-		}
 		//Idea: sort by split axis, iterate over all intersectables and keep adding up surface areas.
 		// cost = surface left * intersectables left + surface right * intersectables right
 		
-		
-		BoundingBox leftBox = new BoundingBox(new Point3f(b.min), leftBoxMax);
-		BoundingBox rightBox = new BoundingBox(rightBoxMin, new Point3f(b.max));
-		
-		List<Intersectable> leftIntersectables = new ArrayList<>(iList.size()/2);
-		List<Intersectable> rightIntersectables = new ArrayList<>(iList.size()/2);
-		//add intersectable to bounding box that crosses it
-		float leftFinalArea = 0, rightFinalArea = 0;
-		for (Intersectable i: iList) {
-			if (i.getBoundingBox().isOverlapping(leftBox)) {
-				leftIntersectables.add(i);
-				leftFinalArea += i.getBoundingBox().area;
-			}
-			if (i.getBoundingBox().isOverlapping(rightBox)) {
-				rightIntersectables.add(i);
-				rightFinalArea += i.getBoundingBox().area;
+				
+		float minCosts = Float.POSITIVE_INFINITY;
+		float minCut = 0;
+		List<Intersectable> minLeftIntersectables = null, minRightIntersectables = null;
+		BoundingBox minLeftBox = null, minRightBox = null;
+		for (Intersectable ib: iList) {
+			for (Point3f bound: ib.getBoundingBox().bounds) {
+				float split = StaticVecmath.getDimension(bound, node.splitAxis);
+				Point3f leftBoxMax = new Point3f(b.max);
+				Point3f rightBoxMin = new Point3f(b.min);
+				StaticVecmath.setDimension(leftBoxMax, split, node.splitAxis);
+				StaticVecmath.setDimension(rightBoxMin, split, node.splitAxis);
+				BoundingBox leftBox = new BoundingBox(new Point3f(b.min), leftBoxMax);
+				BoundingBox rightBox = new BoundingBox(rightBoxMin, new Point3f(b.max));
+
+				List<Intersectable> leftIntersectables = new ArrayList<>(iList.size()/2);
+				List<Intersectable> rightIntersectables = new ArrayList<>(iList.size()/2);
+				//add intersectable to bounding box that crosses it
+				float leftFinalArea = 0, rightFinalArea = 0;
+				for (Intersectable i: iList) {
+					if (i.getBoundingBox().isOverlapping(leftBox)) {
+						leftIntersectables.add(i);
+						leftFinalArea += i.getBoundingBox().area;
+					}
+					if (i.getBoundingBox().isOverlapping(rightBox)) {
+						rightIntersectables.add(i);
+						rightFinalArea += i.getBoundingBox().area;
+					}
+				}
+				float costs = leftFinalArea*leftIntersectables.size() + rightFinalArea * rightIntersectables.size();
+				if (costs < minCosts) {
+					minCut = split;
+					minCosts = costs;
+					minLeftIntersectables = leftIntersectables;
+					minRightIntersectables = rightIntersectables;
+					minLeftBox = leftBox;
+					minRightBox = rightBox;
+				}
 			}
 		}
-		
 		Axis nextSplitAxis = node.splitAxis.getNext();
-		node.left = buildTree(new BSPNode(leftBox, nextSplitAxis), leftIntersectables, leftFinalArea, depth + 1);
-		node.right = buildTree(new BSPNode(rightBox, nextSplitAxis), rightIntersectables, rightFinalArea, depth + 1);
+		node.left = buildTree(new BSPNode(minLeftBox, nextSplitAxis), minLeftIntersectables, depth + 1);
+		node.right = buildTree(new BSPNode(minRightBox, nextSplitAxis), minRightIntersectables, depth + 1);
 		return node;
 	}
 	
