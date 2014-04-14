@@ -1,6 +1,8 @@
 package rt.accelerators;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -16,6 +18,8 @@ import rt.Intersectable;
 import rt.Ray;
 import rt.intersectables.Aggregate;
 import sun.org.mozilla.javascript.internal.Node;
+import util.IntersectableComparator;
+import util.StaticVecmath;
 import util.StaticVecmath.Axis;
 import static util.StaticVecmath.getDimension;
 
@@ -35,7 +39,15 @@ public class BSPAccelerator implements Intersectable {
 		this.MAX_DEPTH = (int) Math.round(8 + 1.3f*Math.log(n));
 
 		this.root = new BSPNode(a.getBoundingBox(), Axis.x);
-		buildTree(root, Lists.newArrayList(a.iterator()), 0);
+		Iterator<Intersectable> iter = a.iterator();
+		List<Intersectable> list = new ArrayList<>(a.size());
+		float area = 0;
+		while(iter.hasNext()) {
+			Intersectable i = iter.next();
+			list.add(i);
+			area += i.getBoundingBox().area;
+		}
+		buildTree(root, list, area, 0);
 	}
 	
 	/**
@@ -44,32 +56,44 @@ public class BSPAccelerator implements Intersectable {
 	 * @param b
 	 * @return
 	 */
-	private BSPNode buildTree(BSPNode node, List<Intersectable> iList, int depth) {
+	private BSPNode buildTree(BSPNode node, List<Intersectable> iList, float area, int depth) {
 		if (depth > MAX_DEPTH || iList.size() < MIN_NR_PRIMITIVES) {
 			node.intersectables = iList;
 			return node;
 		}
+		assert area > 0;
 
 		BoundingBox b = node.boundingBox;
 		// split bounding box in middle along of some axis, make a new box each
 		Point3f leftBoxMax = new Point3f(b.max);
 		Point3f rightBoxMin = new Point3f(b.min);
+		Collections.sort(iList, new IntersectableComparator(node.splitAxis));
+		
+		float leftArea = 0;
+		for (Intersectable i: iList) {
+			leftArea += i.getBoundingBox().area;
+			if (leftArea >= area/2) {
+				float split = StaticVecmath.getDimension(i.getBoundingBox().min, node.splitAxis);
+				switch (node.splitAxis) {
+				case x:
+					leftBoxMax.x = split;
+					rightBoxMin.x = split;
+					break;
+				case y:
+					leftBoxMax.y = split;
+					rightBoxMin.y = split;
+					break;
+				case z:
+					leftBoxMax.z = split;
+					rightBoxMin.z = split;
+					break;
+				}
+				break;
+			}
+		}
 		//Idea: sort by split axis, iterate over all intersectables and keep adding up surface areas.
 		// cost = surface left * intersectables left + surface right * intersectables right
-		switch (node.splitAxis) {
-			case x:
-				leftBoxMax.x = (b.min.x + b.max.x)/2;
-				rightBoxMin.x = (b.min.x + b.max.x)/2;
-				break;
-			case y:
-				leftBoxMax.y = (b.min.y + b.max.y)/2;
-				rightBoxMin.y = (b.min.y + b.max.y)/2;
-				break;
-			case z:
-				leftBoxMax.z = (b.min.z + b.max.z)/2;
-				rightBoxMin.z = (b.min.z + b.max.z)/2;
-				break;
-		}
+		
 		
 		BoundingBox leftBox = new BoundingBox(new Point3f(b.min), leftBoxMax);
 		BoundingBox rightBox = new BoundingBox(rightBoxMin, new Point3f(b.max));
@@ -77,16 +101,21 @@ public class BSPAccelerator implements Intersectable {
 		List<Intersectable> leftIntersectables = new ArrayList<>(iList.size()/2);
 		List<Intersectable> rightIntersectables = new ArrayList<>(iList.size()/2);
 		//add intersectable to bounding box that crosses it
+		float leftFinalArea = 0, rightFinalArea = 0;
 		for (Intersectable i: iList) {
-			if (i.getBoundingBox().isOverlapping(leftBox))
+			if (i.getBoundingBox().isOverlapping(leftBox)) {
 				leftIntersectables.add(i);
-			if (i.getBoundingBox().isOverlapping(rightBox))
+				leftFinalArea += i.getBoundingBox().area;
+			}
+			if (i.getBoundingBox().isOverlapping(rightBox)) {
 				rightIntersectables.add(i);
+				rightFinalArea += i.getBoundingBox().area;
+			}
 		}
 		
 		Axis nextSplitAxis = node.splitAxis.getNext();
-		node.left = buildTree(new BSPNode(leftBox, nextSplitAxis), leftIntersectables, depth + 1);
-		node.right = buildTree(new BSPNode(rightBox, nextSplitAxis), rightIntersectables, depth + 1);
+		node.left = buildTree(new BSPNode(leftBox, nextSplitAxis), leftIntersectables, leftFinalArea, depth + 1);
+		node.right = buildTree(new BSPNode(rightBox, nextSplitAxis), rightIntersectables, rightFinalArea, depth + 1);
 		return node;
 	}
 	
