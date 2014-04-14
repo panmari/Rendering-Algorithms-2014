@@ -1,4 +1,4 @@
-package rt.util;
+package util;
 
 public interface FloatFunction {
 

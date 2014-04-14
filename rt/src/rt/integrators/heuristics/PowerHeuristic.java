@@ -1,6 +1,6 @@
 package rt.integrators.heuristics;
 
-import rt.util.FloatFunction;
+import util.FloatFunction;
 
 public class PowerHeuristic implements FloatFunction {
 

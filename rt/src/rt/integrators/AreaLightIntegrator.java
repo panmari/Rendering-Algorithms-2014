@@ -15,7 +15,7 @@ import rt.Spectrum;
 import rt.integrators.heuristics.*;
 import rt.samplers.RandomSampler;
 import rt.samplers.UniformSampler;
-import rt.util.FloatFunction;
+import util.FloatFunction;
 import util.StaticVecmath;
 
 public class AreaLightIntegrator implements Integrator {
