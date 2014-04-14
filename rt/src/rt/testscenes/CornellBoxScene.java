@@ -22,7 +22,7 @@ public class CornellBoxScene extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 8;
+		SPP = 16;
 		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
@@ -82,19 +82,36 @@ public class CornellBoxScene extends Scene {
 		greenBox.material = new Diffuse(new Spectrum(.3f, .5f, .3f));
 		objects.add(greenBox);
 		
+		t = new Matrix4f();
+		t.setIdentity();
+		t.setScale(82.5f);
+		t.m11 = 166.5f;
+		rot.rotY((float) Math.toRadians(-72.766f));
+		t.mul(rot);
+		
+		trans = new Matrix4f();
+		trans.setIdentity();
+		trans.setTranslation(new Vector3f(368, 167.5f, 351));
+		t.mul(trans, t);
+		Instance redBox = new Instance(unitBox, t);
+		redBox.material = new Diffuse(new Spectrum(.5f, .2f, .2f));
+		objects.add(redBox);
 		// Connect objects to root
 		root = objects;
 				
 		// List of lights
 		lightList = new LightList();
 		//point light
-		LightGeometry pl = new PointLight(new Vector3f(185, 538, 169), new Spectrum(412300, 341100, 298600));
+		LightGeometry l;
+		// l = new PointLight(new Vector3f(278, 478, 279.5f), new Spectrum(412300, 341100, 298600));
+		
 		//area light
 		Spectrum emission = new Spectrum(41.23f, 34.11f, 29.86f);
 		emission.mult(50000);
-		LightGeometry al = new AreaLight(new Point3f(185, 538, 169), new Vector3f(80, 0, 0), 
-				new Vector3f(0, 0, 80), emission);
-		lightList.add(al);
+		l = new AreaLight(new Point3f(343, 548.7f, 227), new Vector3f(0, 0, 105), 
+				new Vector3f(-130, 0, 0), emission);
+		lightList.add(l);
+		objects.add(l);
 	}
 	
 }
