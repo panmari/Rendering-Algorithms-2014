@@ -75,6 +75,19 @@ public class PathTracingIntegrator implements Integrator {
 		float d2 = lightDir.lengthSquared();
 		lightDir.normalize();
 		
+		float cosLight;
+		if (lightHit.normal != null)
+			cosLight = Math.max(lightHit.normal.dot(StaticVecmath.negate(lightDir)), 0);
+		else cosLight = 1; //for point lights
+		
+		// russian roulette for shadow ray
+		float rrProbability = 1;
+		if (cosLight < 0.1f) {
+			rrProbability = 0.5f;
+			if (bulletGenerator.nextFloat() < rrProbability)
+				return new Spectrum();
+		}
+		
 		Ray shadowRay = new Ray(hitRecord.position, lightDir, 0, true);
 		HitRecord shadowHit = root.intersect(shadowRay);
 		if (shadowHit != null &&
@@ -94,18 +107,13 @@ public class PathTracingIntegrator implements Integrator {
 		emission.mult(ndotl);
 		
 		s.mult(emission);
-		
-		float cosLight;
-		if (lightHit.normal != null)
-			cosLight = Math.max(lightHit.normal.dot(StaticVecmath.negate(lightDir)), 0);
-		else cosLight = 1; //for point lights
 	
 		// adapt probability to hit exactly that light
 		float probability = lightHit.p/lightList.size();
 
 		// turn into directional probability
 		float dirProbablity = probability * d2 /cosLight;
-		s.mult(1f/dirProbablity);
+		s.mult(1f/(dirProbablity*(1 - rrProbability)));
 		return s;
 	}
 
