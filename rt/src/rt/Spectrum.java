@@ -107,4 +107,11 @@ public class Spectrum {
 			return false;
 		return true;
 	}
+
+	/**
+	 * Returns the perceived luminance of this sample
+	 */
+	public float getLuminance() {
+		return 0.299f*r + 0.587f*g + 0.114f*b;
+	}
 }

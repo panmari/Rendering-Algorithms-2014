@@ -80,9 +80,15 @@ public class PathTracingIntegrator implements Integrator {
 			cosLight = Math.max(lightHit.normal.dot(StaticVecmath.negate(lightDir)), 0);
 		else cosLight = 1; //for point lights
 		
+		float cosHit = hitRecord.normal.dot(lightDir);
+		cosHit = Math.max(cosHit, 0.f);
+		
+		// Evaluate the BRDF, probability is saved in p of hitRecord
+		Spectrum brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);		 
+
 		// russian roulette for shadow ray
-		float rrProbability = 1;
-		if (cosLight < 0.1f) {
+		float rrProbability = 0;
+		if (cosLight < 0.1f || cosHit < 0.1f || brdfValue.getLuminance() < 0.001f ) {
 			rrProbability = 0.5f;
 			if (bulletGenerator.nextFloat() < rrProbability)
 				return new Spectrum();
@@ -93,18 +99,13 @@ public class PathTracingIntegrator implements Integrator {
 		if (shadowHit != null &&
 				StaticVecmath.dist2(shadowHit.position, hitRecord.position) + 1e-5f < d2) //only if closer than light
 			return new Spectrum();
-		
-		// Evaluate the BRDF, probability is saved in p of hitRecord
-		Spectrum brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);		 
-		
+			
 		Spectrum s = new Spectrum(brdfValue);
 		// Multiply with emission
 		Spectrum emission = lightHit.material.evaluateEmission(lightHit, StaticVecmath.negate(lightDir));
 		
 		// Multiply with cosine of surface normal and incident direction
-		float ndotl = hitRecord.normal.dot(lightDir);
-		ndotl = Math.max(ndotl, 0.f);
-		emission.mult(ndotl);
+		emission.mult(cosHit);
 		
 		s.mult(emission);
 	
