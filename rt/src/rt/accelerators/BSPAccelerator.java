@@ -68,7 +68,10 @@ public class BSPAccelerator implements Intersectable {
 		float minCut = 0;
 		List<Intersectable> minLeftIntersectables = null, minRightIntersectables = null;
 		BoundingBox minLeftBox = null, minRightBox = null;
-		for (Intersectable ib: iList) {
+		int medianIdx = iList.size()/2;
+		int nrCandidates = 5;
+		for (int idx = Math.min(0, medianIdx-nrCandidates); idx < Math.max(iList.size(), medianIdx + nrCandidates); idx++) {
+			Intersectable ib = iList.get(idx);
 			for (Point3f bound: ib.getBoundingBox().bounds) {
 				float split = StaticVecmath.getDimension(bound, node.splitAxis);
 				Point3f leftBoxMax = new Point3f(b.max);
