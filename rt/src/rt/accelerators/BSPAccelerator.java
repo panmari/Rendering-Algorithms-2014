@@ -90,19 +90,16 @@ public class BSPAccelerator implements Intersectable {
 			List<Intersectable> rightIntersectables = new ArrayList<>(
 					iList.size() / 2);
 			// add intersectable to bounding box that crosses it
-			float leftFinalArea = 0, rightFinalArea = 0;
 			for (Intersectable i : iList) {
 				if (i.getBoundingBox().isOverlapping(leftBox)) {
 					leftIntersectables.add(i);
-					leftFinalArea += i.getBoundingBox().area;
 				}
 				if (i.getBoundingBox().isOverlapping(rightBox)) {
 					rightIntersectables.add(i);
-					rightFinalArea += i.getBoundingBox().area;
 				}
 			}
-			float costs = leftFinalArea * leftIntersectables.size()
-						+ rightFinalArea * rightIntersectables.size();
+			float costs = leftBox.area * leftIntersectables.size()
+						+ rightBox.area * rightIntersectables.size();
 			
 			if (costs < minCosts) {
 				minCosts = costs;
