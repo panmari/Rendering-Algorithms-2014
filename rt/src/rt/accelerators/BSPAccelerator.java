@@ -6,8 +6,6 @@ import java.util.Stack;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point3f;
-import javax.vecmath.Tuple3f;
-import javax.vecmath.Vector3f;
 
 import com.google.common.collect.Lists;
 
@@ -15,31 +13,34 @@ import rt.HitRecord;
 import rt.Intersectable;
 import rt.Ray;
 import rt.intersectables.Aggregate;
-import sun.org.mozilla.javascript.internal.Node;
+import util.StaticVecmath;
 import util.StaticVecmath.Axis;
 import static util.StaticVecmath.getDimension;
 
 public class BSPAccelerator implements Intersectable {
 
 	private final int MAX_DEPTH;
-	private final int MIN_NR_PRIMITIVES = 5; 
+	private final int MIN_NR_PRIMITIVES = 5;
 	private final int n;
 	private final BSPNode root;
-	
+
 	/**
-	 * The aggregate given is usually a mesh, but may be anything else as defined by the aggregate contract.
+	 * The aggregate given is usually a mesh, but may be anything else as
+	 * defined by the aggregate contract.
+	 * 
 	 * @param a
 	 */
 	public BSPAccelerator(Aggregate a) {
 		this.n = a.size();
-		this.MAX_DEPTH = (int) Math.round(8 + 1.3f*Math.log(n));
+		this.MAX_DEPTH = (int) Math.round(8 + 1.3f * Math.log(n));
 
 		this.root = new BSPNode(a.getBoundingBox(), Axis.x);
 		buildTree(root, Lists.newArrayList(a.iterator()), 0);
 	}
-	
+
 	/**
-	 * Axis may be 
+	 * Axis may be
+	 * 
 	 * @param i
 	 * @param b
 	 * @return
@@ -50,66 +51,97 @@ public class BSPAccelerator implements Intersectable {
 			return node;
 		}
 
+		float minCosts = Float.POSITIVE_INFINITY;
+		List<Intersectable> minLeftIntersectables = null, minRightIntersectables = null;
+		BoundingBox minLeftBox = null, minRightBox = null;
+		Axis minAxis = null;
 		BoundingBox b = node.boundingBox;
-		// split bounding box in middle along of some axis, make a new box each
-		Point3f leftBoxMax = new Point3f(b.max);
-		Point3f rightBoxMin = new Point3f(b.min);
-		//Idea: sort by split axis, iterate over all intersectables and keep adding up surface areas.
-		// cost = surface left * intersectables left + surface right * intersectables right
-		switch (node.splitAxis) {
+		for (Axis axis : StaticVecmath.Axis.values()) {
+			// split bounding box in middle along of some axis, make a new box
+			// each
+			Point3f leftBoxMax = new Point3f(b.max);
+			Point3f rightBoxMin = new Point3f(b.min);
+			// Idea: sort by split axis, iterate over all intersectables and
+			// keep adding up surface areas.
+			// cost = surface left * intersectables left + surface right *
+			// intersectables right
+			switch (axis) {
 			case x:
-				leftBoxMax.x = (b.min.x + b.max.x)/2;
-				rightBoxMin.x = (b.min.x + b.max.x)/2;
+				leftBoxMax.x = (b.min.x + b.max.x) / 2;
+				rightBoxMin.x = (b.min.x + b.max.x) / 2;
 				break;
 			case y:
-				leftBoxMax.y = (b.min.y + b.max.y)/2;
-				rightBoxMin.y = (b.min.y + b.max.y)/2;
+				leftBoxMax.y = (b.min.y + b.max.y) / 2;
+				rightBoxMin.y = (b.min.y + b.max.y) / 2;
 				break;
 			case z:
-				leftBoxMax.z = (b.min.z + b.max.z)/2;
-				rightBoxMin.z = (b.min.z + b.max.z)/2;
+				leftBoxMax.z = (b.min.z + b.max.z) / 2;
+				rightBoxMin.z = (b.min.z + b.max.z) / 2;
 				break;
+			}
+
+			BoundingBox leftBox = new BoundingBox(new Point3f(b.min),
+					leftBoxMax);
+			BoundingBox rightBox = new BoundingBox(rightBoxMin, new Point3f(
+					b.max));
+
+			List<Intersectable> leftIntersectables = new ArrayList<>(
+					iList.size() / 2);
+			List<Intersectable> rightIntersectables = new ArrayList<>(
+					iList.size() / 2);
+			// add intersectable to bounding box that crosses it
+			float leftFinalArea = 0, rightFinalArea = 0;
+			for (Intersectable i : iList) {
+				if (i.getBoundingBox().isOverlapping(leftBox)) {
+					leftIntersectables.add(i);
+					leftFinalArea += i.getBoundingBox().area;
+				}
+				if (i.getBoundingBox().isOverlapping(rightBox)) {
+					rightIntersectables.add(i);
+					rightFinalArea += i.getBoundingBox().area;
+				}
+			}
+			float costs = leftFinalArea * leftIntersectables.size()
+						+ rightFinalArea * rightIntersectables.size();
+			
+			if (costs < minCosts) {
+				minCosts = costs;
+				minLeftIntersectables = leftIntersectables;
+				minRightIntersectables = rightIntersectables;
+				minLeftBox = leftBox;
+				minRightBox = rightBox;
+				minAxis = axis;
+			}
 		}
-		
-		BoundingBox leftBox = new BoundingBox(new Point3f(b.min), leftBoxMax);
-		BoundingBox rightBox = new BoundingBox(rightBoxMin, new Point3f(b.max));
-		
-		List<Intersectable> leftIntersectables = new ArrayList<>(iList.size()/2);
-		List<Intersectable> rightIntersectables = new ArrayList<>(iList.size()/2);
-		//add intersectable to bounding box that crosses it
-		for (Intersectable i: iList) {
-			if (i.getBoundingBox().isOverlapping(leftBox))
-				leftIntersectables.add(i);
-			if (i.getBoundingBox().isOverlapping(rightBox))
-				rightIntersectables.add(i);
-		}
-		
-		Axis nextSplitAxis = node.splitAxis.getNext();
-		node.left = buildTree(new BSPNode(leftBox, nextSplitAxis), leftIntersectables, depth + 1);
-		node.right = buildTree(new BSPNode(rightBox, nextSplitAxis), rightIntersectables, depth + 1);
+		node.setAxis(minAxis);
+		node.left = buildTree(new BSPNode(minLeftBox), minLeftIntersectables,
+				depth + 1);
+		node.right = buildTree(new BSPNode(minRightBox),
+				minRightIntersectables, depth + 1);
 		return node;
 	}
-	
+
 	@Override
 	public HitRecord intersect(Ray r) {
 		Point2f ts = root.boundingBox.intersectBB(r);
 		if (ts == null)
 			return null;
-		
+
 		Stack<StackNode> nodeStack = new Stack<>();
 		BSPNode node = root;
 		HitRecord nearestHit = null;
-		float tNearestHit = Float.POSITIVE_INFINITY;	
+		float tNearestHit = Float.POSITIVE_INFINITY;
 		float tmin = ts.x, tmax = ts.y;
 		while (node != null) {
 			if (tNearestHit < tmin)
 				break;
 			if (!node.isLeaf()) {
-				float tSplitAxis = (node.splitAxisDistance - getDimension(r.origin, node.splitAxis))/
-										getDimension(r.direction, node.splitAxis);
+				float tSplitAxis = (node.splitAxisDistance - getDimension(
+						r.origin, node.splitAxis))
+						/ getDimension(r.direction, node.splitAxis);
 				BSPNode first, second;
 
-				if (getDimension(r.origin, node.splitAxis) < node.splitAxisDistance ) {
+				if (getDimension(r.origin, node.splitAxis) < node.splitAxisDistance) {
 					first = node.left;
 					second = node.right;
 				} else {
@@ -117,12 +149,14 @@ public class BSPAccelerator implements Intersectable {
 					second = node.left;
 				}
 				// process children
-				if( tSplitAxis > tmax || tSplitAxis < 0 || 
-						(Math.abs(tSplitAxis) < 1e-5 && first.boundingBox.intersectBB(r) != null)) {
+				if (tSplitAxis > tmax
+						|| tSplitAxis < 0
+						|| (Math.abs(tSplitAxis) < 1e-5 && first.boundingBox
+								.intersectBB(r) != null)) {
 					node = first;
-				}
-				else if(tSplitAxis < tmin || 
-						(Math.abs(tSplitAxis) < 1e-5 && second.boundingBox.intersectBB(r) != null)) {
+				} else if (tSplitAxis < tmin
+						|| (Math.abs(tSplitAxis) < 1e-5 && second.boundingBox
+								.intersectBB(r) != null)) {
 					node = second;
 				} else {
 					node = first;
@@ -130,14 +164,14 @@ public class BSPAccelerator implements Intersectable {
 					tmax = tSplitAxis;
 				}
 			} else {
-				for (Intersectable i: node.intersectables) {
+				for (Intersectable i : node.intersectables) {
 					HitRecord tmp = i.intersect(r);
-					if(tmp != null && tmp.t < tNearestHit && tmp.t > 0) {
+					if (tmp != null && tmp.t < tNearestHit && tmp.t > 0) {
 						tNearestHit = tmp.t;
 						nearestHit = tmp;
 					}
 				}
-				if(!nodeStack.empty()) {
+				if (!nodeStack.empty()) {
 					StackNode s = nodeStack.pop();
 					node = s.node;
 					tmin = s.tmin;
@@ -148,9 +182,10 @@ public class BSPAccelerator implements Intersectable {
 		}
 		return nearestHit;
 	}
-	
+
 	/**
 	 * Not in use, slower than code above...
+	 * 
 	 * @return
 	 */
 	public HitRecord primitiveIntersect(Ray r) {
@@ -161,27 +196,28 @@ public class BSPAccelerator implements Intersectable {
 		while (!nodeStack.empty()) {
 			BSPNode currentNode = nodeStack.pop();
 			if (currentNode.intersectables != null) {
-				for (Intersectable i: currentNode.intersectables) {
+				for (Intersectable i : currentNode.intersectables) {
 					HitRecord currentHit = i.intersect(r);
-					if (currentHit != null && nearestT > currentHit.t && currentHit.t > 0) {
+					if (currentHit != null && nearestT > currentHit.t
+							&& currentHit.t > 0) {
 						nearestT = currentHit.t;
 						nearestHit = currentHit;
 					}
 				}
-			}
-			else {
-			if (currentNode.left.boundingBox.intersectBB(r) != null)
-				nodeStack.push(currentNode.left);
-			if (currentNode.right.boundingBox.intersectBB(r) != null) 
-				nodeStack.push(currentNode.right);
+			} else {
+				if (currentNode.left.boundingBox.intersectBB(r) != null)
+					nodeStack.push(currentNode.left);
+				if (currentNode.right.boundingBox.intersectBB(r) != null)
+					nodeStack.push(currentNode.right);
 			}
 		}
 		return nearestHit;
 	}
-	
+
 	class StackNode {
 		final float tmin, tmax;
 		final BSPNode node;
+
 		StackNode(BSPNode node, float tmin, float tmax) {
 			this.node = node;
 			this.tmin = tmin;
@@ -189,10 +225,8 @@ public class BSPAccelerator implements Intersectable {
 		}
 	}
 
-
 	@Override
 	public BoundingBox getBoundingBox() {
 		return root.boundingBox;
 	}
 }
-	

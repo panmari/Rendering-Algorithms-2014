@@ -11,15 +11,27 @@ public class BSPNode {
 	List<Intersectable> intersectables;
 	final BoundingBox boundingBox;
 	BSPNode left, right;
-	final Axis splitAxis;
+	Axis splitAxis;
 	/**
 	 * Distance from origin to split axis plane
 	 */
-	final float splitAxisDistance;
+	float splitAxisDistance;
 	
 	public BSPNode(BoundingBox boundingBox, Axis splitAxis) {
 		this.boundingBox = boundingBox;
-		this.splitAxis = splitAxis;
+		setAxis(splitAxis);
+	}
+	
+	/**
+	 * Initialized without split axis, needs to be set afterwards!
+	 * @param boundingBox
+	 */
+	public BSPNode(BoundingBox boundingBox) {
+		this.boundingBox = boundingBox;
+	}
+	
+	public void setAxis(Axis newAxis) {
+		this.splitAxis = newAxis;
 		this.splitAxisDistance = (getDimension(boundingBox.min, splitAxis) +
 				getDimension(boundingBox.max, splitAxis))/2;
 	}

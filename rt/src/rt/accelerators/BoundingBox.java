@@ -17,11 +17,15 @@ public class BoundingBox implements Intersectable {
 	final public Point3f min;
 	final public Point3f max;
 	final public Point3f[] bounds;
+	float area;
 	
 	public BoundingBox(Point3f bottomLeft, Point3f topRight) {
 		this.min = bottomLeft;
 		this.max = topRight;
 		this.bounds = new Point3f[]{bottomLeft, topRight};
+		Vector3f diagonal = new Vector3f();
+		diagonal.sub(topRight, bottomLeft);
+		this.area = 2*(diagonal.x*diagonal.y + diagonal.x * diagonal.z + diagonal.y * diagonal.z);
 	}
 	
 	/**
