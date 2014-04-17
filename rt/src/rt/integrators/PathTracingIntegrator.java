@@ -88,13 +88,13 @@ public class PathTracingIntegrator implements Integrator {
 
 		// russian roulette for shadow ray
 		float rrProbability = 0;
-		/*
+		
 		if (cosLight < 0.1f || cosHit < 0.1f || brdfValue.getLuminance() < 0.001f ) {
 			rrProbability = 0.5f;
 			if (bulletGenerator.nextFloat() < rrProbability)
 				return new Spectrum();
 		}
-		*/
+		
 		Ray shadowRay = new Ray(hitRecord.position, lightDir, 0, true);
 		HitRecord shadowHit = root.intersect(shadowRay);
 		if (shadowHit != null &&

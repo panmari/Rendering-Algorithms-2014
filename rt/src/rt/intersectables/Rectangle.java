@@ -78,6 +78,6 @@ public class Rectangle extends Plane implements Intersectable {
 
 	@Override
 	public String toString() {
-		return super.toString();
+		return "Rectangle: " + normal;
 	}
 }

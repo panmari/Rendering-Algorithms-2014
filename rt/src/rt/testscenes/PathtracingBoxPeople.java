@@ -26,7 +26,7 @@ public class PathtracingBoxPeople extends Scene {
 		
 		// Samples per pixel
 		SPP = 512;
-		outputFilename = outputFilename + " " + String.format("%d", SPP) + "SPP";
+		outputFilename += String.format("-mine_%d_SPP", SPP);
 		
 		// Make camera and film
 		Vector3f eye = new Vector3f(-3.f,1.f,4.f);

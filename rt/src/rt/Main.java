@@ -19,8 +19,9 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new CornellBoxScene();
-	public static Point debugPixel;// = new Point(135, 260);
+	public static Scene scene = new PathtracingBoxPeople();
+	public static Point debugPixel;// = new Point(210, 270);
+	public static final int windowSize = 10;
 	
 	static LinkedList<RenderTask> queue;
 	static Counter tasksLeft;
@@ -128,7 +129,8 @@ public class Main {
 		// Make render tasks, split image into blocks to be rendered by the tasks
 		if (debugPixel != null) {
 			nTasks = 1;
-			RenderTask debugTask = new RenderTask(scene, debugPixel.x, debugPixel.x + 1, debugPixel.y, debugPixel.y + 1);
+			RenderTask debugTask = new RenderTask(scene, debugPixel.x - windowSize, debugPixel.x + 1 + windowSize, 
+														 debugPixel.y - windowSize, debugPixel.y + 1 + windowSize);
 			queue.add(debugTask);
 		} else {
 			nTasks = (int)Math.ceil((double)width/(double)taskSize) * (int)Math.ceil((double)height/(double)taskSize);
