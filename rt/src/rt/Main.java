@@ -85,18 +85,21 @@ public class Main {
 					for(int i=task.left; i<task.right; i++)
 					{											
 						float samples[][] = task.integrator.makePixelSamples(task.sampler, task.scene.getSPP());
-
+						//for going in a s through pixels, adapt i here
+						int iAdapted = i;
+						if (j % 2 == 1)
+							iAdapted = task.scene.getFilm().getWidth() - i;
 						// For all samples of the pixel
 						for(int k=0; k<samples.length; k++)
 						{	
 							// Make ray
-							Ray r = task.scene.getCamera().makeWorldSpaceRay(i, j, samples[k]);
+							Ray r = task.scene.getCamera().makeWorldSpaceRay(iAdapted, j, samples[k]);
 
 							// Evaluate ray
 							Spectrum s = task.integrator.integrate(r);							
 							
 							// Write to film
-							task.scene.getFilm().addSample(i + samples[k][0], j + samples[k][1], s);
+							task.scene.getFilm().addSample(iAdapted + samples[k][0], j + samples[k][1], s);
 						}
 					}
 				}
@@ -174,7 +177,10 @@ public class Main {
 		}
 		
 		System.out.printf("\n");
-		System.out.printf("Image computed in %d ms.\n", timer.timeElapsed());
+		long time_ms = timer.timeElapsed();
+		long time_s = time_ms / 1000;
+		long time_min =  time_s / 60;
+		System.out.printf("Image computed in %d ms = %d min, %d sec.\n", time_ms, time_min, time_s - time_min*60);
 		
 		// Tone map output image and writ to file
 		BufferedImage image = scene.getTonemapper().process(scene.getFilm());
