@@ -61,10 +61,7 @@ public class BSPAccelerator implements Intersectable {
 			// each
 			Point3f leftBoxMax = new Point3f(b.max);
 			Point3f rightBoxMin = new Point3f(b.min);
-			// Idea: sort by split axis, iterate over all intersectables and
-			// keep adding up surface areas.
-			// cost = surface left * intersectables left + surface right *
-			// intersectables right
+
 			switch (axis) {
 			case x:
 				leftBoxMax.x = (b.min.x + b.max.x) / 2;
