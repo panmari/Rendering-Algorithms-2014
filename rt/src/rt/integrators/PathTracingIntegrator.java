@@ -15,9 +15,9 @@ import rt.Ray;
 import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
-import rt.integrators.heuristics.PowerHeuristic;
 import rt.samplers.RandomSampler;
 import util.StaticVecmath;
+import util.StdHelper;
 
 public class PathTracingIntegrator implements Integrator {
 
@@ -26,11 +26,13 @@ public class PathTracingIntegrator implements Integrator {
 	private Intersectable root;
 	private RandomSampler sampler;
 	private Random bulletGenerator = new Random();
+	private StdHelper stdHelper;
 	
 	public PathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
 		this.root = scene.getIntersectable();
 		this.sampler = new RandomSampler();
+		this.stdHelper = new StdHelper(10);
 	}
 	
 	@Override
@@ -62,6 +64,7 @@ public class PathTracingIntegrator implements Integrator {
 			alpha.mult(s.brdf);
 			alpha.mult(hit.normal.dot(s.w)/(s.p*(1 - rrProbability)));
 		}
+		stdHelper.update(outgoing.getLuminance());
 		return outgoing;
 	}
 	
