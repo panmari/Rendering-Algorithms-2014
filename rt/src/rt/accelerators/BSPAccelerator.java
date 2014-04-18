@@ -21,7 +21,7 @@ public class BSPAccelerator implements Intersectable {
 
 	private final int MAX_DEPTH;
 	private final int MIN_NR_PRIMITIVES = 5;
-	private final int NR_SPLIT_TRIES = 8; // should be < 10
+	private final int NR_SPLIT_TRIES = 15; // should be < 10
 	private final int n;
 	private final BSPNode root;
 
@@ -62,7 +62,7 @@ public class BSPAccelerator implements Intersectable {
 		for (Axis axis : StaticVecmath.Axis.values()) {
 			// split bounding box in middle along of some axis, make a new box each
 			float centerSplit = StaticVecmath.getDimension(center, axis);
-			float stepSize = StaticVecmath.getDimension(b.getDiagonal(), axis)/10;
+			float stepSize = StaticVecmath.getDimension(b.getDiagonal(), axis)/(NR_SPLIT_TRIES + 1);
 			for (int step = -NR_SPLIT_TRIES; step <= NR_SPLIT_TRIES; step++) {
 				Point3f leftBoxMax = new Point3f(b.max);
 				Point3f rightBoxMin = new Point3f(b.min);
