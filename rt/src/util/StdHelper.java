@@ -22,8 +22,9 @@ public class StdHelper {
 	}
 		
 	public float getStd() {
-		if (values.size() > 1) //fixes division by zero
-			return MyMath.sqrt(M2/(values.size() - 1)); 
+		//fixes division by zero
+		if (values.size() > 1) 
+			return MyMath.sqrt(Math.max(M2/(values.size() - 1), 0)); //prevent nan if M2 is below zero
 		else
 			return 0;
 	}
@@ -34,7 +35,6 @@ public class StdHelper {
 		if (values.size() > maxSize) {
 			float oldValue = values.pop();
 			swapValues(oldValue, newValue);
-
 		} else {
 			addNewValue(newValue);
 		}

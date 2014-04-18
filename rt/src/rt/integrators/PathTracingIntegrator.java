@@ -99,7 +99,8 @@ public class PathTracingIntegrator implements Integrator {
 		s.mult(emission);
 		
 		// russian roulette for shadow ray, probability for continuing ray
-		float rrProbability = Math.min(1, s.getLuminance()/stdHelper.getStd());
+		float div = Math.max(stdHelper.getStd(), 0.001f);
+		float rrProbability = Math.min(1, s.getLuminance()/div);
 		if (bulletGenerator.nextFloat() > rrProbability)
 			return new Spectrum();
 		
@@ -114,7 +115,7 @@ public class PathTracingIntegrator implements Integrator {
 
 		// turn into directional probability
 		float dirProbablity = probability * d2 /cosLight;
-		s.mult(1f/(dirProbablity*(rrProbability)));
+		s.mult(1f/(dirProbablity*rrProbability));
 		return s;
 	}
 
