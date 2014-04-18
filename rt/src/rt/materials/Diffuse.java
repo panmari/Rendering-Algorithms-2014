@@ -67,6 +67,7 @@ public class Diffuse implements Material {
 		return null;
 	}
 	
+	
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample)
 	{
 		
@@ -78,6 +79,11 @@ public class Diffuse implements Material {
 		dir.y = MyMath.sin(two_pi_psi_2)*sqr_psi_1;
 		dir.z = MyMath.sqrt(1 - sample[0]);
 		assert(Math.abs(dir.lengthSquared() - 1) < 1e-5f);
+		
+		// TODO: highly experimental two directional diffuse thingy
+		if(hitRecord.normal.dot(hitRecord.w) < 0)
+			hitRecord.normal.negate();
+		
 		//map to directional vector
 		Matrix3f m = hitRecord.getTangentialMatrix();
 		m.transform(dir);
@@ -85,6 +91,7 @@ public class Diffuse implements Material {
 		dir.normalize();
 
 		float p = dir.dot(hitRecord.normal)/MyMath.PI;
+		assert p > 0;
 		return new ShadingSample(new Spectrum(kd), new Spectrum(), dir, false, p);
 
 	}

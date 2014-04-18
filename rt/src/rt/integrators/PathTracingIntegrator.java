@@ -15,9 +15,9 @@ import rt.Ray;
 import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
-import rt.integrators.heuristics.PowerHeuristic;
 import rt.samplers.RandomSampler;
 import util.StaticVecmath;
+import util.StdHelper;
 
 public class PathTracingIntegrator implements Integrator {
 
@@ -26,11 +26,13 @@ public class PathTracingIntegrator implements Integrator {
 	private Intersectable root;
 	private RandomSampler sampler;
 	private Random bulletGenerator = new Random();
+	private StdHelper stdHelper;
 	
 	public PathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
 		this.root = scene.getIntersectable();
 		this.sampler = new RandomSampler();
+		this.stdHelper = new StdHelper(10);
 	}
 	
 	@Override
@@ -49,7 +51,7 @@ public class PathTracingIntegrator implements Integrator {
 					outgoing.add(emission);
 				break;
 			}
-			// shadow ray russian roulette -> assume no shadow, shade. If shade < threshold, do russian roulette.
+
 			Spectrum x = sampleLight(hit);
 			Spectrum currentBounceContribution = new Spectrum(alpha);
 			currentBounceContribution.mult(x);
@@ -62,6 +64,7 @@ public class PathTracingIntegrator implements Integrator {
 			alpha.mult(s.brdf);
 			alpha.mult(hit.normal.dot(s.w)/(s.p*(1 - rrProbability)));
 		}
+		stdHelper.update(outgoing.getLuminance());
 		return outgoing;
 	}
 	
@@ -85,22 +88,7 @@ public class PathTracingIntegrator implements Integrator {
 		
 		// Evaluate the BRDF, probability is saved in p of hitRecord
 		Spectrum brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);		 
-
-		// russian roulette for shadow ray
-		float rrProbability = 0;
-		/*
-		if (cosLight < 0.1f || cosHit < 0.1f || brdfValue.getLuminance() < 0.001f ) {
-			rrProbability = 0.5f;
-			if (bulletGenerator.nextFloat() < rrProbability)
-				return new Spectrum();
-		}
-		*/
-		Ray shadowRay = new Ray(hitRecord.position, lightDir, 0, true);
-		HitRecord shadowHit = root.intersect(shadowRay);
-		if (shadowHit != null &&
-				StaticVecmath.dist2(shadowHit.position, hitRecord.position) + 1e-5f < d2) //only if closer than light
-			return new Spectrum();
-			
+		
 		Spectrum s = new Spectrum(brdfValue);
 		// Multiply with emission
 		Spectrum emission = lightHit.material.evaluateEmission(lightHit, StaticVecmath.negate(lightDir));
@@ -109,13 +97,25 @@ public class PathTracingIntegrator implements Integrator {
 		emission.mult(cosHit);
 		
 		s.mult(emission);
+		
+		// russian roulette for shadow ray, probability for continuing ray
+		float div = Math.max(stdHelper.getStd(), 0.001f);
+		float rrProbability = Math.min(1, s.getLuminance()/div);
+		if (bulletGenerator.nextFloat() > rrProbability)
+			return new Spectrum();
+		
+		Ray shadowRay = new Ray(hitRecord.position, lightDir, 0, true);
+		HitRecord shadowHit = root.intersect(shadowRay);
+		if (shadowHit != null &&
+				StaticVecmath.dist2(shadowHit.position, hitRecord.position) + 1e-5f < d2) //only if closer than light
+			return new Spectrum();
 	
 		// adapt probability to hit exactly that light
 		float probability = lightHit.p/lightList.size();
 
 		// turn into directional probability
 		float dirProbablity = probability * d2 /cosLight;
-		s.mult(1f/(dirProbablity*(1 - rrProbability)));
+		s.mult(1f/(dirProbablity*rrProbability));
 		return s;
 	}
 

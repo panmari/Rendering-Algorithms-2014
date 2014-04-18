@@ -19,14 +19,14 @@ public class PathtracingBoxPeople extends Scene {
 	
 	public PathtracingBoxPeople()
 	{	
-		outputFilename = new String("../output/testscenes/PathtracingBoxPeople");
+		outputFilename = new String("../output/testscenes/PathtracingBoxPeople-mine");
 				
 		// Specify pixel sampler to be used
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 512;
-		outputFilename = outputFilename + " " + String.format("%d", SPP) + "SPP";
+		SPP = 16;
+		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
 		Vector3f eye = new Vector3f(-3.f,1.f,4.f);

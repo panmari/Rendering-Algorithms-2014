@@ -68,6 +68,6 @@ public class Plane implements Intersectable {
 
 	@Override
 	public String toString() {
-		return normal.toString();
+		return "Plane: " + normal.toString();
 	}
 }

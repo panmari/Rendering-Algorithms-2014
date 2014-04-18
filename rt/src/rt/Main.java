@@ -19,8 +19,9 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new AcceleratorTestScene();
-	public static Point debugPixel;// = new Point(135, 260);
+	public static Scene scene = new PathtracingBoxPeople();
+	public static Point debugPixel;// = new Point(210, 270);
+	public static final int windowSize = 10;
 	
 	static LinkedList<RenderTask> queue;
 	static Counter tasksLeft;
@@ -84,18 +85,21 @@ public class Main {
 					for(int i=task.left; i<task.right; i++)
 					{											
 						float samples[][] = task.integrator.makePixelSamples(task.sampler, task.scene.getSPP());
-
+						//for going in a s through pixels, adapt i here
+						int iAdapted = i;
+						if (j % 2 == 1)
+							iAdapted = task.scene.getFilm().getWidth() - i;
 						// For all samples of the pixel
 						for(int k=0; k<samples.length; k++)
 						{	
 							// Make ray
-							Ray r = task.scene.getCamera().makeWorldSpaceRay(i, j, samples[k]);
+							Ray r = task.scene.getCamera().makeWorldSpaceRay(iAdapted, j, samples[k]);
 
 							// Evaluate ray
 							Spectrum s = task.integrator.integrate(r);							
 							
 							// Write to film
-							task.scene.getFilm().addSample(i + samples[k][0], j + samples[k][1], s);
+							task.scene.getFilm().addSample(iAdapted + samples[k][0], j + samples[k][1], s);
 						}
 					}
 				}
@@ -128,13 +132,15 @@ public class Main {
 		// Make render tasks, split image into blocks to be rendered by the tasks
 		if (debugPixel != null) {
 			nTasks = 1;
-			RenderTask debugTask = new RenderTask(scene, debugPixel.x, debugPixel.x + 1, debugPixel.y, debugPixel.y + 1);
+			RenderTask debugTask = new RenderTask(scene, debugPixel.x - windowSize, debugPixel.x + 1 + windowSize, 
+														 debugPixel.y - windowSize, debugPixel.y + 1 + windowSize);
 			queue.add(debugTask);
 		} else {
 			nTasks = (int)Math.ceil((double)width/(double)taskSize) * (int)Math.ceil((double)height/(double)taskSize);
 			for(int j=0; j<(int)Math.ceil((double)height/(double)taskSize); j++) {
 				for(int i=0; i<(int)Math.ceil((double)width/(double)taskSize); i++) {
-					RenderTask task = new RenderTask(scene, i*taskSize, Math.min((i+1)*taskSize,width), j*taskSize, Math.min((j+1)*taskSize,height));
+					RenderTask task = new RenderTask(scene, i*taskSize, Math.min((i+1)*taskSize, width), j*taskSize, 
+																		Math.min((j+1)*taskSize, height));
 					queue.add(task);
 				}
 			}
@@ -172,13 +178,21 @@ public class Main {
 		}
 		
 		System.out.printf("\n");
-		System.out.printf("Image computed in %d ms.\n", timer.timeElapsed());
+		long time_ms = timer.timeElapsed();
+		long time_s = time_ms / 1000;
+		long time_min =  time_s / 60;
+		String timing_output = String.format("Image computed in %d ms = %d min, %d sec.\n", time_ms, time_min, time_s - time_min*60);
+		System.out.print(timing_output);
 		
 		// Tone map output image and writ to file
 		BufferedImage image = scene.getTonemapper().process(scene.getFilm());
 		try
 		{
 			ImageIO.write(image, "png", new File(scene.getOutputFilename()+".png"));
+			PrintWriter writer = new PrintWriter(scene.getOutputFilename()+".txt", "UTF-8");
+			writer.print(timing_output);
+			writer.close();
+			
 		} catch (IOException e) {}
 	}
 	

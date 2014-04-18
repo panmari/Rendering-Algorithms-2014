@@ -168,8 +168,8 @@ public class MeshTriangle implements Intersectable {
 		Vector3f normal = new Vector3f(n_a);
 		normal.add(n_b);
 		normal.add(n_c);
-		// this should not be needed
-		// normal.normalize();
+		// this should not be needed, but most meshes suck...
+		normal.normalize();
 		return normal;
 	}
 
