@@ -180,13 +180,18 @@ public class Main {
 		long time_ms = timer.timeElapsed();
 		long time_s = time_ms / 1000;
 		long time_min =  time_s / 60;
-		System.out.printf("Image computed in %d ms = %d min, %d sec.\n", time_ms, time_min, time_s - time_min*60);
+		String timing_output = String.format("Image computed in %d ms = %d min, %d sec.\n", time_ms, time_min, time_s - time_min*60);
+		System.out.print(timing_output);
 		
 		// Tone map output image and writ to file
 		BufferedImage image = scene.getTonemapper().process(scene.getFilm());
 		try
 		{
 			ImageIO.write(image, "png", new File(scene.getOutputFilename()+".png"));
+			PrintWriter writer = new PrintWriter(scene.getOutputFilename()+".txt", "UTF-8");
+			writer.print(timing_output);
+			writer.close();
+			
 		} catch (IOException e) {}
 	}
 	
