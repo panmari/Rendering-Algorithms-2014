@@ -7,9 +7,6 @@ import javax.vecmath.Vector3f;
 import rt.HitRecord;
 import rt.Intersectable;
 import rt.Ray;
-import rt.intersectables.CSGNode;
-import rt.intersectables.CSGPlane;
-import rt.materials.Diffuse;
 import util.StaticVecmath;
 
 public class BoundingBox implements Intersectable {
@@ -23,8 +20,7 @@ public class BoundingBox implements Intersectable {
 		this.min = bottomLeft;
 		this.max = topRight;
 		this.bounds = new Point3f[]{bottomLeft, topRight};
-		Vector3f diagonal = new Vector3f();
-		diagonal.sub(topRight, bottomLeft);
+		Vector3f diagonal = getDiagonal();
 		this.area = 2*(diagonal.x*diagonal.y + diagonal.x * diagonal.z + diagonal.y * diagonal.z);
 	}
 	
@@ -71,14 +67,13 @@ public class BoundingBox implements Intersectable {
 	 * @return
 	 */
 	public boolean isOverlapping(BoundingBox other) {
-		float sizex2 = Math.abs(min.x + max.x - (other.min.x + other.max.x));
-		float sizey2 = Math.abs(min.y + max.y - (other.min.y + other.max.y));
-		float sizez2 = Math.abs(min.z + max.z - (other.min.z + other.max.z));
-
-		float distCentersx = max.x - min.x + other.max.x - other.min.x;
-		float distCentersy = max.y - min.y + other.max.y - other.min.y;
-		float distCentersz = max.z - min.z + other.max.z - other.min.z;
-		return sizex2 <= distCentersx && sizey2 <= distCentersy && sizez2 <= distCentersz;
+		Vector3f sizes = new Vector3f();
+		sizes.add(this.getDiagonal(), other.getDiagonal());
+		Vector3f distCenters2 = new Vector3f();
+		distCenters2.sub(this.getCenter(), other.getCenter());
+		distCenters2.scale(2);
+		distCenters2.absolute();	
+		return distCenters2.x <= sizes.x && distCenters2.y <= sizes.y && distCenters2.z <= sizes.z;
 	}
 	
 	public String toString() {
@@ -98,5 +93,21 @@ public class BoundingBox implements Intersectable {
 	public BoundingBox getBoundingBox() {
 		return this;
 	}
-
+	
+	public Point3f getCenter(){
+		Point3f center = new Point3f();
+		center.add(min, max);
+		center.scale(0.5f);
+		return center;
+	}
+	
+	/**
+	 * Can be used to get component wise size of bounding box
+	 * @return
+	 */
+	public Vector3f getDiagonal() {
+		Vector3f diagonal = new Vector3f();
+		diagonal.sub(max, min);
+		return diagonal;
+	}
 }

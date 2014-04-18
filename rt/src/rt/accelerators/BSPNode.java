@@ -32,8 +32,7 @@ public class BSPNode {
 	
 	public void setAxis(Axis newAxis) {
 		this.splitAxis = newAxis;
-		this.splitAxisDistance = (getDimension(boundingBox.min, splitAxis) +
-				getDimension(boundingBox.max, splitAxis))/2;
+		this.splitAxisDistance = getDimension(boundingBox.getCenter(), splitAxis);
 	}
 
 	public String toString() {
