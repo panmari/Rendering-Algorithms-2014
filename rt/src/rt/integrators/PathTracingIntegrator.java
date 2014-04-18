@@ -99,8 +99,7 @@ public class PathTracingIntegrator implements Integrator {
 		s.mult(emission);
 		
 		// russian roulette for shadow ray, probability for continuing ray
-		//TODO: scale s.getLuminance() by the variance of the last 10 samples.
-		float rrProbability = Math.min(1, s.getLuminance()*0.1f);
+		float rrProbability = Math.min(1, s.getLuminance()/stdHelper.getStd());
 		if (bulletGenerator.nextFloat() > rrProbability)
 			return new Spectrum();
 		
