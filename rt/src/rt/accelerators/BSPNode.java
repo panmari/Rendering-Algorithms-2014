@@ -3,6 +3,7 @@ package rt.accelerators;
 import java.util.List;
 
 import rt.Intersectable;
+import util.StaticVecmath;
 import util.StaticVecmath.Axis;
 import static util.StaticVecmath.getDimension;
 
@@ -19,7 +20,7 @@ public class BSPNode {
 	
 	public BSPNode(BoundingBox boundingBox, Axis splitAxis) {
 		this.boundingBox = boundingBox;
-		setAxis(splitAxis);
+		setSplit(splitAxis, StaticVecmath.getDimension(boundingBox.getCenter(), splitAxis));
 	}
 	
 	/**
@@ -30,9 +31,9 @@ public class BSPNode {
 		this.boundingBox = boundingBox;
 	}
 	
-	public void setAxis(Axis newAxis) {
+	public void setSplit(Axis newAxis, float splitAxisDist) {
 		this.splitAxis = newAxis;
-		this.splitAxisDistance = getDimension(boundingBox.getCenter(), splitAxis);
+		this.splitAxisDistance = splitAxisDist;
 	}
 
 	public String toString() {

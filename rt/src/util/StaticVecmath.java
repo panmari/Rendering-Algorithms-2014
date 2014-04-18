@@ -31,6 +31,26 @@ public class StaticVecmath {
 				dimension.normal.z * tuple.z;
 	}
 	
+	/**
+	 * How very ugly orz
+	 * @param tuple
+	 * @param dimension
+	 * @param f
+	 */
+	public static void setDimension(Tuple3f tuple, Axis dimension, float f) {
+		switch (dimension) {
+		case x:
+			tuple.x = f;
+			break;
+		case y:
+			tuple.y = f;
+			break;
+		case z:
+			tuple.z = f;
+			break;
+		}
+	}
+	
 	public static enum Axis{
 		x(new Vector3f(1, 0, 0)), 
 		y(new Vector3f(0, 1, 0)), 
