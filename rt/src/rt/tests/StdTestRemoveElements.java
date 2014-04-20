@@ -1,15 +1,23 @@
 package rt.tests;
 
 import static org.junit.Assert.*;
+
+import org.junit.Before;
 import org.junit.Test;
 
+import util.MyMath;
 import util.StdHelper;
 
 public class StdTestRemoveElements {
 
-	private StdHelper h = new StdHelper(5);
-	
+	private StdHelper h;	
 	private final static float EPSILON = 1e-4f;
+	
+	@Before
+	public void setUp() {
+		h = new StdHelper(5);
+	}
+	
 	@Test
 	public void testAppendingStuff() {
 		addToStdHelper(1);
@@ -29,8 +37,24 @@ public class StdTestRemoveElements {
 		assertEquals(1.0840, h.getStd(), EPSILON);
 	
 	}
+	
+	@Test
+	public void testInvertMethod() {
+		assertEquals(0f, MyMath.inv(0), EPSILON);
+		assertEquals(1f, MyMath.inv(1), EPSILON);
+		assertEquals(.5f, MyMath.inv(2), EPSILON);
+		assertEquals(-.5f, MyMath.inv(-2), EPSILON);
+	}
+	
+	@Test
+	public void shouldNotReturnStupidNaN() {
+		h.update(0, 0);
+		assertFalse(Float.isNaN(h.getVar()));
+		assertEquals(0f, h.getVar(), EPSILON);
+		assertFalse(Float.isNaN(h.getDelta()));
+	}
 
 	private void addToStdHelper(float newValue) {
-		h.update(newValue);
+		h.update(newValue, 0);
 	}
 }

@@ -6,10 +6,12 @@ public class StdHelper {
 
 	
 	private LinkedList<Float> values = new LinkedList<Float>();
+	private LinkedList<Integer> costs = new LinkedList<Integer>();
 	private float mean = 0;
 	private float M2 = 0;
 	
 	private final int maxSize;
+	private float meanCosts;
 	
 	/**
 	 * A small standard deviation helper that accepts values through the update() method and computes the standard
@@ -21,36 +23,53 @@ public class StdHelper {
 		this.maxSize = maxSize;
 	}
 		
-	public float getStd() {
+	public float getVar() {
 		//fixes division by zero
 		if (values.size() > 1) 
-			return MyMath.sqrt(Math.max(M2/(values.size() - 1), 0)); //prevent nan if M2 is below zero
+			return Math.max(M2/(values.size() - 1), 0); //prevent nan if M2 is below zero
 		else
 			return 0;
 	}
 	
+	/**
+	 * The delta for shadow ray russian roulette
+	 * @return
+	 */
+	public float getDelta() {
+		//plus epsilon to prevent NaN
+		float sqrDelta = getVar()/(meanCosts + 1e-7f);
+		return MyMath.sqrt(sqrDelta);
+	}
 	
-	public void update(float newValue) {
+	public float getStd() {
+		return MyMath.sqrt(getVar());
+	}
+	
+	public void update(float newValue, int bounce) {
 		values.addLast(newValue);
+		costs.addLast(bounce);
 		if (values.size() > maxSize) {
-			float oldValue = values.pop();
-			swapValues(oldValue, newValue);
+			swapValues(values.pop(), newValue, costs.pop(), bounce);
 		} else {
-			addNewValue(newValue);
+			addNewValue(newValue, bounce);
 		}
 	}
 	
-	private void swapValues(float oldValue, float newValue) {
+	private void swapValues(float oldValue, float newValue, int oldCost, int newCost) {
 		float delta = newValue - oldValue;
 		float dold = oldValue - mean;
 		mean += delta/values.size();
 		float dnew = newValue - mean;
 		M2 += delta*(dold + dnew);
+		float deltaCosts = newCost - oldCost;
+		meanCosts += deltaCosts/costs.size();
 	}
 	
-	private void addNewValue(float newValue) {
+	private void addNewValue(float newValue, int newCost) {
 		float delta = newValue - mean;
 		mean += delta/values.size();
 		M2 += delta*(newValue - mean);
+		float costDelta = newCost - meanCosts;
+		this.meanCosts += costDelta/costs.size();
 	}
 }

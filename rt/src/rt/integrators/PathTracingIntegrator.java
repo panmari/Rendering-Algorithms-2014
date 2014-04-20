@@ -16,6 +16,7 @@ import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
 import rt.samplers.RandomSampler;
+import util.MyMath;
 import util.StaticVecmath;
 import util.StdHelper;
 
@@ -25,13 +26,16 @@ public class PathTracingIntegrator implements Integrator {
 	private LightList lightList;
 	private Intersectable root;
 	private RandomSampler sampler;
-	private Random bulletGenerator = new Random();
+	private Random bulletGenerator;
 	private StdHelper stdHelper;
+	private static int count = 0;
 	
 	public PathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
 		this.root = scene.getIntersectable();
 		this.sampler = new RandomSampler();
+		this.bulletGenerator = new Random(count);
+		this.sampler.init(count++);
 		this.stdHelper = new StdHelper(10);
 	}
 	
@@ -41,7 +45,8 @@ public class PathTracingIntegrator implements Integrator {
 		Spectrum outgoing = new Spectrum();
 		Spectrum alpha = new Spectrum(1);
 		RussianRouletteIterator rr = new RussianRouletteIterator(0,0,0,0,0,0.5f);
-		for(int bounce = 0;; bounce++) {
+		int bounce = 0;
+		for(;;bounce++) {
 			HitRecord hit = root.intersect(currentRay);
 			if (hit == null)
 				break;
@@ -64,7 +69,7 @@ public class PathTracingIntegrator implements Integrator {
 			alpha.mult(s.brdf);
 			alpha.mult(hit.normal.dot(s.w)/(s.p*(1 - rrProbability)));
 		}
-		stdHelper.update(outgoing.getLuminance());
+		stdHelper.update(outgoing.getLuminance(), bounce);
 		return outgoing;
 	}
 	
@@ -83,11 +88,11 @@ public class PathTracingIntegrator implements Integrator {
 			cosLight = Math.max(lightHit.normal.dot(StaticVecmath.negate(lightDir)), 0);
 		else cosLight = 1; //for point lights
 		
+		// Evaluate the BRDF, probability is saved in p of hitRecord, must be done first bc may change hitRecord.normal
+		Spectrum brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);		 
+
 		float cosHit = hitRecord.normal.dot(lightDir);
 		cosHit = Math.max(cosHit, 0.f);
-		
-		// Evaluate the BRDF, probability is saved in p of hitRecord
-		Spectrum brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);		 
 		
 		Spectrum s = new Spectrum(brdfValue);
 		// Multiply with emission
@@ -96,11 +101,11 @@ public class PathTracingIntegrator implements Integrator {
 		// Multiply with cosine of surface normal and incident direction
 		emission.mult(cosHit);
 		
-		s.mult(emission);
+		s.mult(emission);	
 		
 		// russian roulette for shadow ray, probability for continuing ray
-		float div = Math.max(stdHelper.getStd(), 0.001f);
-		float rrProbability = Math.min(1, s.getLuminance()/div);
+		float delta = stdHelper.getDelta();
+		float rrProbability = Math.min(1, s.getLuminance()/delta);
 		if (bulletGenerator.nextFloat() > rrProbability)
 			return new Spectrum();
 		
