@@ -27,8 +27,12 @@ public class ClampTonemapper implements Tonemapper {
 			{
 				// Clamping
 				Spectrum s = film.getImage()[i][j];
-				s.clamp(0,1);
-				img.setRGB(i, film.getHeight()-1-j, ((int)(255.f*s.r) << 16) | ((int)(255.f*s.g) << 8) | ((int)(255.f*s.b)));
+				if (Float.isNaN(s.getLuminance())) {
+					img.setRGB(i, film.getHeight()-1-j, 0x00FF00);
+				} else {
+					s.clamp(0,1);
+					img.setRGB(i, film.getHeight()-1-j, ((int)(255.f*s.r) << 16) | ((int)(255.f*s.g) << 8) | ((int)(255.f*s.b)));
+				}
 			}
 		}
 		return img;
