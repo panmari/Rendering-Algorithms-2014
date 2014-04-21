@@ -20,7 +20,7 @@ public class Main {
 	 * The scene to be rendered.
 	 */
 	public static Scene scene = new PathtracingBoxPeople();
-	public static Point debugPixel;// = new Point(210, 270);
+	public static Point debugPixel;// = new Point(47, 475);
 	public static final int windowSize = 10;
 	
 	static LinkedList<RenderTask> queue;
@@ -86,16 +86,18 @@ public class Main {
 					{											
 						float samples[][] = task.integrator.makePixelSamples(task.sampler, task.scene.getSPP());
 						//for going in a s through pixels, adapt i here
-						int iAdapted = i;
+						int iAdapted;
 						if (j % 2 == 1)
-							iAdapted = task.scene.getFilm().getWidth() - i;
+							iAdapted = task.right + task.left - i - 1;
+						else
+							iAdapted = i;
 						// For all samples of the pixel
-						for(int k=0; k<samples.length; k++)
+						for(int k = 0; k < samples.length; k++)
 						{	
 							// Make ray
 							Ray r = task.scene.getCamera().makeWorldSpaceRay(iAdapted, j, samples[k]);
 
-							// Evaluate ray
+							// Evaluate ray0
 							Spectrum s = task.integrator.integrate(r);							
 							
 							// Write to film
@@ -131,6 +133,7 @@ public class Main {
 		queue = new LinkedList<RenderTask>();
 		// Make render tasks, split image into blocks to be rendered by the tasks
 		if (debugPixel != null) {
+			scene.outputFilename += "_DEBUG";
 			nTasks = 1;
 			RenderTask debugTask = new RenderTask(scene, debugPixel.x - windowSize, debugPixel.x + 1 + windowSize, 
 														 debugPixel.y - windowSize, debugPixel.y + 1 + windowSize);
