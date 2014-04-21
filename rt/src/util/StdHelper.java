@@ -37,7 +37,7 @@ public class StdHelper {
 	 */
 	public float getDelta() {
 		//plus epsilon to prevent NaN
-		float sqrDelta = getVar()/(meanCosts + 1e-7f);
+		float sqrDelta = Math.max(getVar()/(meanCosts + 1e-7f), 0);
 		return MyMath.sqrt(sqrDelta);
 	}
 	

@@ -16,13 +16,11 @@ import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
 import rt.samplers.RandomSampler;
-import util.MyMath;
 import util.StaticVecmath;
 import util.StdHelper;
 
 public class PathTracingIntegrator implements Integrator {
 
-	final int nrBounces = 1;
 	private LightList lightList;
 	private Intersectable root;
 	private RandomSampler sampler;
@@ -36,7 +34,7 @@ public class PathTracingIntegrator implements Integrator {
 		this.sampler = new RandomSampler();
 		this.bulletGenerator = new Random(count);
 		this.sampler.init(count++);
-		this.stdHelper = new StdHelper(10);
+		this.stdHelper = new StdHelper(scene.getSPP());
 	}
 	
 	@Override
@@ -105,7 +103,7 @@ public class PathTracingIntegrator implements Integrator {
 		
 		// russian roulette for shadow ray, probability for continuing ray
 		float delta = stdHelper.getDelta();
-		float rrProbability = Math.min(1, s.getLuminance()/delta);
+		float rrProbability = Math.min(1, s.getLuminance()/(delta + 1e-5f));
 		if (bulletGenerator.nextFloat() > rrProbability)
 			return new Spectrum();
 		

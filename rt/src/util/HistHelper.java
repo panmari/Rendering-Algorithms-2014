@@ -1,9 +1,10 @@
 package util;
 
 import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * Computes a histogram after repeatedly adding values using the add method. 
- *
+ * Computes a histogram of values added by the add method. By calling
+ * print the histogram is printed to the console.
  */
 public class HistHelper {
 
