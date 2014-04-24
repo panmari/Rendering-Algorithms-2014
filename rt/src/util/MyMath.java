@@ -65,4 +65,8 @@ public class MyMath {
 	public static float sin(float a) {
 		return (float) Math.sin(a);
 	}
+	
+	public static float inv(float f) {
+		return f == 0f ? 0 : 1/f;
+	}
 }
