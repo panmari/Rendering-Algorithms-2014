@@ -26,6 +26,7 @@ public class PathTracingIntegrator implements Integrator {
 	private RandomSampler sampler;
 	private Random bulletGenerator;
 	private StdHelper stdHelper;
+	private final int MAX_BOUNCES = 10;
 	private static int count = 0;
 	
 	public PathTracingIntegrator(Scene scene) {
@@ -42,9 +43,9 @@ public class PathTracingIntegrator implements Integrator {
 		Ray currentRay = primaryRay;
 		Spectrum outgoing = new Spectrum();
 		Spectrum alpha = new Spectrum(1);
-		RussianRouletteIterator rr = new RussianRouletteIterator(0,0,0,0,0,0.5f);
+		RussianRouletteIterator rr = new RussianRouletteIterator(0,0,0,0,.5f);
 		int bounce = 0;
-		for(;;bounce++) {
+		for(;bounce < MAX_BOUNCES ;bounce++) {
 			HitRecord hit = root.intersect(currentRay);
 			if (hit == null)
 				break;
@@ -67,7 +68,7 @@ public class PathTracingIntegrator implements Integrator {
 			alpha.mult(s.brdf);
 			alpha.mult(hit.normal.dot(s.w)/(s.p*(1 - rrProbability)));
 		}
-		stdHelper.update(outgoing.getLuminance(), bounce);
+		stdHelper.update(outgoing.getLuminance(), bounce + 1);
 		return outgoing;
 	}
 	
