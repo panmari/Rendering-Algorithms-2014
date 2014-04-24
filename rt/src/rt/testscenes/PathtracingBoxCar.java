@@ -19,14 +19,14 @@ public class PathtracingBoxCar extends Scene {
 	
 	public PathtracingBoxCar()
 	{	
-		outputFilename = new String("../output/testscenes/PathtracingBoxCar");
+		outputFilename = new String("../output/testscenes/PathtracingBoxCar-mine");
 				
 		// Specify pixel sampler to be used
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
 		SPP = 512;
-		outputFilename = outputFilename + " " + String.format("%d", SPP) + "SPP";
+		outputFilename += String.format("_%dSPP", SPP);
 		
 		// Make camera and film
 		Vector3f eye = new Vector3f(-3.f,1.f,4.f);

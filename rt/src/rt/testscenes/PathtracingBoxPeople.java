@@ -19,13 +19,13 @@ public class PathtracingBoxPeople extends Scene {
 	
 	public PathtracingBoxPeople()
 	{	
-		outputFilename = new String("../output/testscenes/PathtracingBoxPeople-mine");
+		outputFilename = new String("../output/testscenes/PathtracingBoxPeopletiny-mine");
 				
 		// Specify pixel sampler to be used
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 16;
+		SPP = 512;
 		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
@@ -33,8 +33,8 @@ public class PathtracingBoxPeople extends Scene {
 		Vector3f lookAt = new Vector3f(0.f,1.f,0.f);
 		Vector3f up = new Vector3f(0.f,1.f,0.f);
 		float fov = 60.f;
-		int width = 512;
-		int height = 512;
+		int width = 128;
+		int height = 128;
 		float aspect = (float)width/(float)height;
 		camera = new PinholeCamera(eye, lookAt, up, fov, aspect, width, height);
 		film = new BoxFilterFilm(width, height);						
@@ -83,6 +83,7 @@ public class PathtracingBoxPeople extends Scene {
 			t.setScale(1.f);
 			t.setTranslation(new Vector3f(-0.6f, 0.25f, 0.f));
 			Instance instance = new Instance(accelerator, t);
+			instance.material = new DoubleSidedDiffuse();
 			objects.add(instance); 	
 		} catch(IOException e) 
 		{
@@ -102,6 +103,7 @@ public class PathtracingBoxPeople extends Scene {
 			t.setScale(1.f);
 			t.setTranslation(new Vector3f(0.6f, 0.25f, 0.f));
 			Instance instance = new Instance(accelerator, t);
+			instance.material = new DoubleSidedDiffuse();
 			objects.add(instance); 	
 		} catch(IOException e) 
 		{

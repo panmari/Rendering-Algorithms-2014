@@ -80,10 +80,6 @@ public class Diffuse implements Material {
 		dir.z = MyMath.sqrt(1 - sample[0]);
 		assert(Math.abs(dir.lengthSquared() - 1) < 1e-5f);
 		
-		// TODO: highly experimental two directional diffuse thingy
-		if(hitRecord.normal.dot(hitRecord.w) < 0)
-			hitRecord.normal.negate();
-		
 		//map to directional vector
 		Matrix3f m = hitRecord.getTangentialMatrix();
 		m.transform(dir);
@@ -96,8 +92,7 @@ public class Diffuse implements Material {
 
 	}
 		
-	public boolean castsShadows()
-	{
+	public boolean castsShadows() {
 		return true;
 	}
 	
@@ -112,7 +107,6 @@ public class Diffuse implements Material {
 	@Override
 	public void evaluateBumpMap(HitRecord h) {
 		// TODO Auto-generated method stub
-		
 	}
 	
 }
