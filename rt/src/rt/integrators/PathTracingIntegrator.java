@@ -36,6 +36,7 @@ public class PathTracingIntegrator implements Integrator {
 		this.bulletGenerator = new Random(count);
 		this.sampler.init(count++);
 		this.stdHelper = new StdHelper(scene.getSPP());
+		this.stdHelper.update(1, 1); //add some dummy to prevent NaN in beginning
 	}
 	
 	@Override
