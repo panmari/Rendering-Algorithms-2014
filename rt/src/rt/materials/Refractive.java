@@ -20,7 +20,7 @@ public class Refractive implements Material {
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut,
 			Vector3f wIn) {
-		return new Spectrum(ks);
+		return new Spectrum();
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class Refractive implements Material {
 		
 		Spectrum brdf = new Spectrum(ks);
 		brdf.mult(reflectedPart);
-		return new ShadingSample(brdf, new Spectrum(0,0,0), r, false, reflectedPart);
+		return new ShadingSample(brdf, new Spectrum(0,0,0), r, true, reflectedPart);
 	}
 	
 	@Override
@@ -91,7 +91,7 @@ public class Refractive implements Material {
 
 	@Override
 	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
-		return new ShadingSample();
+		return null;
 	}
 
 	@Override

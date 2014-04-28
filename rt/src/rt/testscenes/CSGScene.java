@@ -18,7 +18,7 @@ public class CSGScene extends Scene {
 	public CSGScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/CSGScene");
+		outputFilename = new String("../output/testscenes/CSGScene-mine");
 		
 		// Image width and height in pixels
 		width = 640;
@@ -30,9 +30,7 @@ public class CSGScene extends Scene {
 		// Number of samples per pixel
 		SPP = 32;
 
-		outputFilename = outputFilename + " " + String.format("%d", SPP) + "SPP";
-		outputFilename = outputFilename + " " + String.format("%d", width) + "x";
-		outputFilename = outputFilename + String.format("%d", height);
+		outputFilename += String.format("_%d_SPP", SPP);
 
 		// Specify which camera, film, and tonemapper to use
 		Vector3f eye = new Vector3f(0.f, 0.f, 5.f);
@@ -45,9 +43,9 @@ public class CSGScene extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
-		integratorFactory = new WhittedIntegratorFactory();
+//		integratorFactory = new WhittedIntegratorFactory();
 //		integratorFactory = new BDPathTracingIntegratorFactory(this);
-//		integratorFactory = new PathTracingIntegratorFactory();
+		integratorFactory = new PathTracingIntegratorFactory();
 		
 		Material refractive = new Refractive(1.3f);
 		
@@ -145,7 +143,7 @@ public class CSGScene extends Scene {
 	private CSGSolid coneCrossSection(float a, Material material)
 	{
 		// Makes a two-sided infinite cone with apex angle 90 degrees
-		CSGTwoSidedInfiniteCone doubleCone = new CSGTwoSidedInfiniteCone(material);
+		CSGInfiniteDoubleCone doubleCone = new CSGInfiniteDoubleCone(material);
 		// Scaling factor along the cone axis corresponding to apex angle
 		float s = (float)Math.tan((90-a/2)/180.f*(float)Math.PI);
 		
