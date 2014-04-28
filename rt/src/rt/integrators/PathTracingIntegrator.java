@@ -64,6 +64,8 @@ public class PathTracingIntegrator implements Integrator {
 			if (bulletGenerator.nextFloat() < rrProbability)
 				break;
 			ShadingSample s = hit.material.getShadingSample(hit, this.sampler.makeSamples(1, 2)[0]);
+			if (s == null) // Total internal refraction or some bs
+				break;
 			currentRay = new Ray(hit.position, s.w, bounce + 1, true);
 			alpha.mult(s.brdf);
 			alpha.mult(hit.normal.dot(s.w)/(s.p*(1 - rrProbability)));

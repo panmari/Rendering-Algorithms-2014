@@ -37,7 +37,10 @@ public class Refractive implements Material {
 	@Override
 	public ShadingSample evaluateSpecularReflection(HitRecord hitRecord) {
 		RefractionHandler rf = new RefractionHandler(hitRecord);
-		float reflectedPart = rSchlick(rf);
+		return evaluateSpecularReflection(rf, rSchlick(rf));
+	}
+
+	private ShadingSample evaluateSpecularReflection(RefractionHandler rf, float reflectedPart) {
 		if (reflectedPart < 1e-5) //don't further trace this ray if impact too low
 			return null;
 		Vector3f r = new Vector3f(rf.i);
@@ -47,9 +50,9 @@ public class Refractive implements Material {
 		
 		Spectrum brdf = new Spectrum(ks);
 		brdf.mult(reflectedPart);
-		return new ShadingSample(brdf, new Spectrum(0,0,0), r, false, 1);
+		return new ShadingSample(brdf, new Spectrum(0,0,0), r, false, reflectedPart);
 	}
-
+	
 	@Override
 	public boolean hasSpecularRefraction() {
 		return true;
@@ -58,6 +61,10 @@ public class Refractive implements Material {
 	@Override
 	public ShadingSample evaluateSpecularRefraction(HitRecord hitRecord) {
 		RefractionHandler rf = new RefractionHandler(hitRecord);
+		return evaluateSpecularRefraction(rf, rSchlick(rf));
+	}
+	
+	private ShadingSample evaluateSpecularRefraction(RefractionHandler rf, float rSchlick) {
 		if (rf.totalInternalRefraction) //don't further track ray if energy is lost
 			return null;
 		
@@ -68,15 +75,18 @@ public class Refractive implements Material {
 		t.add(nScaled);
 		
 		Spectrum brdf = new Spectrum(ks);
-		brdf.mult(1 - rSchlick(rf));
-		return new ShadingSample(brdf, new Spectrum(0,0,0), t, true, 1);
+		brdf.mult(1 - rSchlick);
+		return new ShadingSample(brdf, new Spectrum(0,0,0), t, true, 1 - rSchlick);
 	}
 	
 	@Override
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
-		// TODO: either return refractive or reflective shading sample. 
-		// TODO Auto-generated method stub
-		return null;
+		RefractionHandler rf = new RefractionHandler(hitRecord);
+		float rSchlick = rSchlick(rf);
+		if (sample[0] < rSchlick)
+			return evaluateSpecularReflection(rf, rSchlick);
+		else
+			return evaluateSpecularRefraction(rf, rSchlick);
 	}
 
 	@Override

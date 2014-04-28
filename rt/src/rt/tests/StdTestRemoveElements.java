@@ -47,8 +47,15 @@ public class StdTestRemoveElements {
 	}
 	
 	@Test
+	public void testSomeFloatEdgeCases() {
+		assertTrue(0f == 1f/Float.POSITIVE_INFINITY);
+		assertTrue(0f == 1f/Float.NEGATIVE_INFINITY);
+
+	}
+	
+	
+	@Test
 	public void shouldNotReturnStupidNaN() {
-		h.update(0, 0);
 		assertFalse(Float.isNaN(h.getVar()));
 		assertEquals(0f, h.getVar(), EPSILON);
 		assertFalse(Float.isNaN(h.getDelta()));

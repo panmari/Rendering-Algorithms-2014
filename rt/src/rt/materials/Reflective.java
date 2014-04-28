@@ -60,8 +60,7 @@ public class Reflective implements Material {
 
 	@Override
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
-		// TODO Auto-generated method stub
-		return null;
+		return evaluateSpecularReflection(hitRecord);
 	}
 
 	@Override
