@@ -122,8 +122,9 @@ public class PathTracingIntegrator implements Integrator {
 		
 		// russian roulette for shadow ray, probability for continuing ray
 		float delta = stdHelper.getDelta();
-		float rrProbability = Math.min(1, s.getLuminance()/(delta + 1e-5f));
-		if (bulletGenerator.nextFloat() > rrProbability)
+		float contribution = s.getLuminance();
+		float rrProbability = Math.min(1, contribution/(delta + 1e-5f));
+		if (bulletGenerator.nextFloat() > rrProbability || contribution == 0)
 			return new Spectrum();
 		
 		Ray shadowRay = new Ray(hitRecord.position, lightDir, 0, true);
@@ -133,6 +134,7 @@ public class PathTracingIntegrator implements Integrator {
 			return new Spectrum();
 
 		s.mult(1f/rrProbability);
+		assert !Float.isNaN(s.getLuminance());
 		return s;
 	}
 

@@ -18,7 +18,7 @@ public class CSGScene extends Scene {
 	public CSGScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/CSGScene-mine");
+		outputFilename = new String("../output/testscenes/CSGScenePT-mine");
 		
 		// Image width and height in pixels
 		width = 640;
@@ -28,7 +28,7 @@ public class CSGScene extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 	
 		// Number of samples per pixel
-		SPP = 32;
+		SPP = 128;
 
 		outputFilename += String.format("_%d_SPP", SPP);
 
@@ -127,6 +127,7 @@ public class CSGScene extends Scene {
 		LightGeometry pointLight1 = new PointLight(lightPos, new Spectrum(14.f, 14.f, 14.f));
 		lightPos.add(new Vector3f(2.f, 0.f, 0.f));
 		LightGeometry pointLight2 = new PointLight(lightPos, new Spectrum(14.f, 14.f, 14.f));
+		//LightGeometry pointLight3 = new PointLight(new Vector3f(0.f, 5.f, 1.f), new Spectrum(24.f, 24.f, 24.f));
 		LightGeometry pointLight3 = new PointLight(new Vector3f(0.f, 3.f, 1.f), new Spectrum(44.f, 44.f, 44.f));
 		lightList = new LightList();
 		lightList.add(pointLight1);

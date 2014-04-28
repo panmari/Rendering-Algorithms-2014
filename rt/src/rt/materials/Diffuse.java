@@ -88,7 +88,7 @@ public class Diffuse implements Material {
 
 		float p = dir.dot(hitRecord.normal)/MyMath.PI;
 		assert p > 0;
-		return new ShadingSample(new Spectrum(kd), new Spectrum(), dir, false, p);
+		return new ShadingSample(evaluateBRDF(hitRecord, hitRecord.w, dir), new Spectrum(), dir, false, p);
 
 	}
 		

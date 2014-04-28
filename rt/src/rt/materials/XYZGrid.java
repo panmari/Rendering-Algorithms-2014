@@ -5,9 +5,8 @@ import javax.vecmath.Vector3f;
 import rt.HitRecord;
 import rt.Material;
 import rt.Spectrum;
-import util.StaticVecmath;
 
-public class XYZGrid implements Material {
+public class XYZGrid extends Diffuse implements Material  {
 
 	private Spectrum tileColor;
 	private Spectrum betweenColor;
@@ -17,6 +16,7 @@ public class XYZGrid implements Material {
 
 	public XYZGrid(Spectrum tileColor, Spectrum betweenColor, float betweenSize,
 			Vector3f offset, float tileSize) {
+		super(new Spectrum(1));
 		this.tileColor = tileColor;
 		this.betweenColor = betweenColor;
 		this.betweenSize = betweenSize;
@@ -31,6 +31,7 @@ public class XYZGrid implements Material {
 
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut, Vector3f wIn) {
+		Spectrum diffuse = super.evaluateBRDF(hitRecord, wOut, wIn);
 		Vector3f t = new Vector3f(hitRecord.position);
 		t.add(offset);
 		t.absolute();
@@ -44,62 +45,9 @@ public class XYZGrid implements Material {
 				t.x > spacer ||
 				t.y > spacer ||
 				t.z > spacer)
-			return tileColor;
-		else return betweenColor;
+			diffuse.mult(tileColor);
+		else 
+			diffuse.mult(betweenColor);
+		return diffuse;
 	}
-
-	@Override
-	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
-		//no emission
-		return null;
-	}
-
-	@Override
-	public boolean hasSpecularReflection() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public ShadingSample evaluateSpecularReflection(HitRecord hitRecord) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean hasSpecularRefraction() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public ShadingSample evaluateSpecularRefraction(HitRecord hitRecord) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean castsShadows() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public void evaluateBumpMap(HitRecord h) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
