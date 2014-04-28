@@ -45,13 +45,14 @@ public class PathTracingIntegrator implements Integrator {
 		Spectrum alpha = new Spectrum(1);
 		RussianRouletteIterator rr = new RussianRouletteIterator(0,0,0,0,.5f);
 		int bounce = 0;
+		boolean segmentIsSpecular = false;
 		for(;bounce < MAX_BOUNCES ;bounce++) {
 			HitRecord hit = root.intersect(currentRay);
 			if (hit == null)
 				break;
 			Spectrum emission = hit.material.evaluateEmission(hit, hit.w);
 			if (emission != null) {
-				if (bounce == 0)
+				if (bounce == 0 || segmentIsSpecular)
 					outgoing.add(emission);
 				break;
 			}
@@ -68,8 +69,11 @@ public class PathTracingIntegrator implements Integrator {
 				break;
 			currentRay = new Ray(hit.position, s.w, bounce + 1, true);
 			alpha.mult(s.brdf);
-			if (!s.isSpecular)
+			if (!s.isSpecular) {
+				segmentIsSpecular = true;
 				alpha.mult(hit.normal.dot(s.w));
+			} else
+				segmentIsSpecular = false;
 			alpha.mult(1/(s.p*(1 - rrProbability)));
 		}
 		stdHelper.update(outgoing.getLuminance(), bounce + 1);
