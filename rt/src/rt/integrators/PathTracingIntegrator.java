@@ -83,9 +83,11 @@ public class PathTracingIntegrator implements Integrator {
 		lightDir.normalize();
 		
 		float cosLight;
-		if (lightHit.normal != null)
-			cosLight = Math.max(lightHit.normal.dot(StaticVecmath.negate(lightDir)), 0);
-		else cosLight = 1; //for point lights
+		if (lightHit.normal != null) {
+			cosLight = lightHit.normal.dot(StaticVecmath.negate(lightDir));
+			if (cosLight <= 0)
+				return new Spectrum(); // stay black if hit light from behind
+		} else cosLight = 1; //for point lights
 		
 		// Evaluate the BRDF, probability is saved in p of hitRecord, must be done first bc may change hitRecord.normal
 		Spectrum brdfValue = hitRecord.material.evaluateBRDF(hitRecord, hitRecord.w, lightDir);		 
@@ -102,6 +104,14 @@ public class PathTracingIntegrator implements Integrator {
 		
 		s.mult(emission);	
 		
+		
+		// adapt probability to hit exactly that light
+		float probability = lightHit.p/lightList.size();
+
+		// turn into directional probability
+		float dirProbablity = probability * d2 / cosLight;
+		s.mult(1f/dirProbablity);
+		
 		// russian roulette for shadow ray, probability for continuing ray
 		float delta = stdHelper.getDelta();
 		float rrProbability = Math.min(1, s.getLuminance()/(delta + 1e-5f));
@@ -113,13 +123,8 @@ public class PathTracingIntegrator implements Integrator {
 		if (shadowHit != null &&
 				StaticVecmath.dist2(shadowHit.position, hitRecord.position) + 1e-5f < d2) //only if closer than light
 			return new Spectrum();
-	
-		// adapt probability to hit exactly that light
-		float probability = lightHit.p/lightList.size();
 
-		// turn into directional probability
-		float dirProbablity = probability * d2 /cosLight;
-		s.mult(1f/(dirProbablity*rrProbability));
+		s.mult(1f/rrProbability);
 		return s;
 	}
 
