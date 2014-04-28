@@ -1,6 +1,5 @@
 package rt.integrators;
 
-import java.util.Iterator;
 import java.util.Random;
 
 import javax.vecmath.Vector3f;
@@ -17,76 +16,76 @@ import rt.Scene;
 import rt.Spectrum;
 import rt.samplers.RandomSampler;
 import util.StaticVecmath;
-import util.StdHelper;
 
 public class BidirectionalPathTracingIntegrator implements Integrator {
 
 	private LightList lightList;
 	private Intersectable root;
 	private RandomSampler sampler;
-	private Random bulletGenerator;
-	private StdHelper stdHelper;
-	private final int MAX_BOUNCES = 10;
 	private static int count = 0;
 	
 	public BidirectionalPathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
 		this.root = scene.getIntersectable();
 		this.sampler = new RandomSampler();
-		this.bulletGenerator = new Random(count);
 		this.sampler.init(count++);
-		this.stdHelper = new StdHelper(scene.getSPP());
 	}
 	
 	
 	@Override
 	public Spectrum integrate(Ray primaryRay) {
-		
+		PathNode eye = traceEyeRay(primaryRay);
+		if (eye == null)
+			return new Spectrum();
+		PathNode light = traceLightRay();
+		return connect(eye, light);
+	}
+	
+	public Spectrum connect(PathNode eye, PathNode light) {
+		Spectrum s;
+		Vector3f connection = StaticVecmath.sub(eye.h.position, light.h.position);
+		float d2 = connection.lengthSquared();
+		Vector3f normedConnection = new Vector3f();
+		normedConnection.normalize(connection);
+
+		s = eye.h.material.evaluateBRDF(eye.h, null, StaticVecmath.negate(normedConnection));
+		s.mult(light.L);
+		s.mult(normedConnection.dot(light.h.normal)/(d2*eye.h.p));
+		s.mult(StaticVecmath.negate(normedConnection).dot(eye.h.normal));
+		// shadow ray
+		Ray r = new Ray(light.h.position, connection, 0, true);
+		HitRecord shadowHit = root.intersect(r);
+		if (shadowHit != null && shadowHit.t < 0.999f)
+			return new Spectrum();
+		else
+			return s;
 	}
 	
 	public PathNode traceEyeRay(Ray primaryRay) {
 		Ray currentRay = primaryRay;
-		Spectrum outgoing = new Spectrum();
-		Spectrum alpha = new Spectrum(1);
-		RussianRouletteIterator rr = new RussianRouletteIterator(0,0,0,0,.5f);
-		int bounce = 0;
-		for(;bounce < MAX_BOUNCES ;bounce++) {
-			HitRecord hit = root.intersect(currentRay);
-			if (hit == null)
-				break;
-			Spectrum emission = hit.material.evaluateEmission(hit, hit.w);
-			if (emission != null) {
-				if (bounce == 0)
-					outgoing.add(emission);
-				break;
-			}
-
-			Spectrum x = sampleLight(hit);
-			Spectrum currentBounceContribution = new Spectrum(alpha);
-			currentBounceContribution.mult(x);
-			outgoing.add(currentBounceContribution);
-			Float rrProbability = rr.next();
-			if (bulletGenerator.nextFloat() < rrProbability)
-				break;
-			ShadingSample s = hit.material.getShadingSample(hit, this.sampler.makeSamples(1, 2)[0]);
-			currentRay = new Ray(hit.position, s.w, bounce + 1, true);
-			alpha.mult(s.brdf);
-			alpha.mult(hit.normal.dot(s.w)/(s.p*(1 - rrProbability)));
-		}
-		stdHelper.update(outgoing.getLuminance(), bounce + 1);
-		return outgoing;
+		HitRecord h = root.intersect(currentRay);
+		if (h == null)
+				return null;
+		float G = h.normal.dot(h.w);
+		
+		float[][] sample = this.sampler.makeSamples(1, 2);
+		ShadingSample next = h.material.getShadingSample(h, sample[0]);
+		Spectrum L = next.brdf;
+		L.mult(1);
+		return new PathNode(h, G, L);
 	}
 	
 	private PathNode traceLightRay() {
-		Spectrum alpha = new Spectrum(1);
-		float[][] sample = this.sampler.makeSamples(1, 2);
 		LightGeometry lightSource = lightList.getRandomLight(this.sampler.makeSamples(1, 2));
-		
+		float[][] sample = this.sampler.makeSamples(1, 2);
 		HitRecord lightHit = lightSource.sample(sample[0]);
 		
 		sample = this.sampler.makeSamples(1, 2);
 		ShadingSample emission = lightHit.material.getEmissionSample(lightHit, sample[0]);
-		return new PathNode(lightHit.position, alpha, emission.brdf)
+		float G = lightHit.normal.dot(emission.w)/lightHit.p;
+		Spectrum L = emission.emission;
+		L.mult(lightList.size()); //emission.p only in subsequent hits
+		return new PathNode(lightHit, G, L);
 	}
 
 	@Override

@@ -1,12 +1,18 @@
 package rt.integrators;
 
-import javax.vecmath.Point3f;
-import javax.vecmath.Vector3f;
+import rt.HitRecord;
+import rt.Spectrum;
 
 public class PathNode {
 	
-	private Point3f position;
-	private Vector3f outgoingDir;
-	private float p;
+	public PathNode(HitRecord h, float G, Spectrum L) {
+		this.h = h;
+		this.G = G;
+		this.L = L;
+	}
+	
+	HitRecord h;
+	Spectrum L;
+	float G;
 	
 }

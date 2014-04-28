@@ -3,6 +3,7 @@ package rt;
 import javax.imageio.ImageIO;
 
 import rt.testscenes.*;
+import util.HistHelper;
 
 import java.util.*;
 import java.awt.Point;
@@ -19,7 +20,7 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new PathtracingBoxPeople();
+	public static Scene scene = new BiPathtracingBoxSphere();
 	public static Point debugPixel;// = new Point(47, 475);
 	public static final int windowSize = 10;
 	

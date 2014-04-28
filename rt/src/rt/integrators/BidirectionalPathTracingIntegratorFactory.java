@@ -8,7 +8,7 @@ public class BidirectionalPathTracingIntegratorFactory implements IntegratorFact
 
 	@Override
 	public Integrator make(Scene scene) {
-		return new PathTracingIntegrator(scene);
+		return new BidirectionalPathTracingIntegrator(scene);
 	}
 
 	@Override
