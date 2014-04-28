@@ -1,7 +1,5 @@
 package rt.integrators;
 
-import java.util.Random;
-
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
@@ -42,16 +40,18 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	}
 	
 	public Spectrum connect(PathNode eye, PathNode light) {
-		Spectrum s;
+		Spectrum s = eye.L;
 		Vector3f connection = StaticVecmath.sub(eye.h.position, light.h.position);
 		float d2 = connection.lengthSquared();
 		Vector3f normedConnection = new Vector3f();
 		normedConnection.normalize(connection);
 
-		s = eye.h.material.evaluateBRDF(eye.h, null, StaticVecmath.negate(normedConnection));
 		s.mult(light.L);
-		s.mult(normedConnection.dot(light.h.normal)/(d2*eye.h.p));
-		s.mult(StaticVecmath.negate(normedConnection).dot(eye.h.normal));
+		float cosLight = normedConnection.dot(light.h.normal);
+		s.mult(cosLight/(d2));
+		float cosSurface = StaticVecmath.negate(normedConnection).dot(eye.h.normal);
+		s.mult(cosSurface);
+		s.mult(eye.G);
 		// shadow ray
 		Ray r = new Ray(light.h.position, connection, 0, true);
 		HitRecord shadowHit = root.intersect(r);
@@ -66,7 +66,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		HitRecord h = root.intersect(currentRay);
 		if (h == null)
 				return null;
-		float G = h.normal.dot(h.w);
+		float G = h.normal.dot(h.w); // /StaticVecmath.dist2(currentRay.origin, h.position);
 		
 		float[][] sample = this.sampler.makeSamples(1, 2);
 		ShadingSample next = h.material.getShadingSample(h, sample[0]);
@@ -84,7 +84,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		ShadingSample emission = lightHit.material.getEmissionSample(lightHit, sample[0]);
 		float G = lightHit.normal.dot(emission.w)/lightHit.p;
 		Spectrum L = emission.emission;
-		L.mult(lightList.size()); //emission.p only in subsequent hits
+		L.mult(lightList.size()/lightHit.p); //emission.p only in subsequent hits
 		return new PathNode(lightHit, G, L);
 	}
 
