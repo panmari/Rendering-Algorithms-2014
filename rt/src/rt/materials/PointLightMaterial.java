@@ -1,12 +1,11 @@
 package rt.materials;
 
-import java.util.Random;
-
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
 import rt.Material;
 import rt.Spectrum;
+import util.MyMath;
 
 /**
  * This material should be used with {@link rt.lightsources.PointLight}.
@@ -14,12 +13,10 @@ import rt.Spectrum;
 public class PointLightMaterial implements Material {
 
 	Spectrum emission;
-	Random rand;
 	
 	public PointLightMaterial(Spectrum emission)
 	{
 		this.emission = new Spectrum(emission);
-		this.rand = new Random();
 	}
 	
 	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
@@ -30,8 +27,11 @@ public class PointLightMaterial implements Material {
 	 * Return a random direction over the full sphere of directions.
 	 */
 	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
-		// To be implemented
-		return null;
+		float theta = sample[0] * 2 * MyMath.PI;
+		float z = sample[1] * 2 - 1;
+		float s = MyMath.sqrt(1 - z*z);
+		Vector3f randomDir = new Vector3f(s*MyMath.cos(theta), s* MyMath.sin(theta), z);
+		return new ShadingSample(new Spectrum(), new Spectrum(emission), randomDir, false, 1/(4*MyMath.PI));
 	}
 
 	/** 
@@ -53,7 +53,7 @@ public class PointLightMaterial implements Material {
 	 */
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut,
 			Vector3f wIn) {
-		return new Spectrum(0.f, 0.f, 0.f);
+		return new Spectrum();
 	}
 	
 	/** 
@@ -85,10 +85,7 @@ public class PointLightMaterial implements Material {
 	}
 
 	@Override
-	public void evaluateBumpMap(HitRecord h) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void evaluateBumpMap(HitRecord h) {}
 
 
 }
