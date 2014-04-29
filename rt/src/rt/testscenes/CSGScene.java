@@ -18,7 +18,7 @@ public class CSGScene extends Scene {
 	public CSGScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/CSGScenePT-mine");
+		outputFilename = new String("../output/testscenes/CSGSceneBPT-mine");
 		
 		// Image width and height in pixels
 		width = 640;
@@ -28,7 +28,7 @@ public class CSGScene extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 	
 		// Number of samples per pixel
-		SPP = 128;
+		SPP = 8;
 
 		outputFilename += String.format("_%d_SPP", SPP);
 
@@ -44,8 +44,8 @@ public class CSGScene extends Scene {
 		
 		// Specify which integrator and sampler to use
 //		integratorFactory = new WhittedIntegratorFactory();
-//		integratorFactory = new BDPathTracingIntegratorFactory(this);
-		integratorFactory = new PathTracingIntegratorFactory();
+		integratorFactory = new BidirectionalPathTracingIntegratorFactory();
+//		integratorFactory = new PathTracingIntegratorFactory();
 		
 		Material refractive = new Refractive(1.3f);
 		

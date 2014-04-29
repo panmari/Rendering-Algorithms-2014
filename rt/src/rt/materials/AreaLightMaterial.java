@@ -25,7 +25,7 @@ public class AreaLightMaterial implements Material {
 	
 	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
 		Spectrum s = new Spectrum(emission);
-		s.mult((float) (1/(Math.PI*area))); // from L_i term
+		s.mult(1/(MyMath.PI*area)); // from L_i term
 		return s;
 	}
 
@@ -51,7 +51,7 @@ public class AreaLightMaterial implements Material {
 
 		float p = dir.dot(hitRecord.normal)/MyMath.PI;
 		assert p > 0;
-		return new ShadingSample(new Spectrum(), evaluateEmission(null, null), dir, false, p);
+		return new ShadingSample(new Spectrum(), evaluateEmission(hitRecord, dir), dir, false, p);
 	}
 
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {

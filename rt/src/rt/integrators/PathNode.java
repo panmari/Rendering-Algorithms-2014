@@ -1,18 +1,21 @@
 package rt.integrators;
 
 import rt.HitRecord;
+import rt.Material.ShadingSample;
 import rt.Spectrum;
 
 public class PathNode {
 	
-	public PathNode(HitRecord h, float G, Spectrum L) {
-		this.h = h;
-		this.G = G;
-		this.L = L;
-	}
-	
 	HitRecord h;
-	Spectrum L;
-	float G;
+	ShadingSample next;
+	float Gp;
+	final int bounce;
+	
+	public PathNode(HitRecord h, float Gp, ShadingSample next, int bounce) {
+		this.h = h;
+		this.Gp = Gp;
+		this.next = next;
+		this.bounce = bounce;
+	}
 	
 }
