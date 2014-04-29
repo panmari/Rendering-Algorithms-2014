@@ -3,6 +3,9 @@ package rt.integrators;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.directory.DirContext;
+import javax.vecmath.Point3f;
+import javax.vecmath.Tuple3f;
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
@@ -25,6 +28,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	private RandomSampler sampler;
 	private static int count = 0;
 	private final int MAX_EYE_BOUNCES = 1;
+	private final int MAX_LIGHT_BOUNCES = 1;
 	
 	public BidirectionalPathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
@@ -36,14 +40,24 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	
 	@Override
 	public Spectrum integrate(Ray primaryRay) {
-		List<PathNode> eyePath = new ArrayList<>();
-		
+		List<PathNode> lightPath = new ArrayList<>();
+		PathNode beforeLight = traceLightRay();
+		lightPath.add(beforeLight);
+		for (int t = 0; t < MAX_LIGHT_BOUNCES; t++) {
+			Vector3f lastDir = beforeLight.next.w;
+			Tuple3f lastOrigin = beforeLight.h.position;
+			Ray r = new Ray(lastOrigin, lastDir, 0, true);
+			beforeLight = makePathNode(r);
+			//TODO: russian roulette
+			if (beforeLight == null)
+				break;
+			lightPath.add(beforeLight);
+		}
 		PathNode eye = null;
-		PathNode light = traceLightRay();
 		Spectrum alpha = new Spectrum(1);
 		Spectrum outgoing = new Spectrum();
 		for (int s = 0; s < MAX_EYE_BOUNCES; s++) {
-			eye = traceEyeRay(primaryRay);
+			eye = makePathNode(primaryRay);
 			if (eye == null)
 				return outgoing;
 			alpha.mult(eye.next.brdf);
@@ -64,7 +78,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		Spectrum lightPathSpectrum;
 		if (light.bounce == 0) {
 			lightPathSpectrum = light.h.material.evaluateEmission(light.h, normedConnection);
-			s.mult(1/light.h.p);
+			lightPathSpectrum.mult(1/light.h.p);
 		} else {
 			lightPathSpectrum = light.h.material.evaluateBRDF(light.h, eye.h.w, normedConnection);
 		}
@@ -87,9 +101,8 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 			return s;
 	}
 	
-	public PathNode traceEyeRay(Ray primaryRay) {
-		Ray currentRay = primaryRay;
-		HitRecord h = root.intersect(currentRay);
+	public PathNode makePathNode(Ray r) {
+		HitRecord h = root.intersect(r);
 		if (h == null)
 			return null;		
 		float[][] sample = this.sampler.makeSamples(1, 2);
