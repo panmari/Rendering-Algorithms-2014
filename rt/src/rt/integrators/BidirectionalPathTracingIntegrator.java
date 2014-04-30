@@ -27,8 +27,8 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	private Intersectable root;
 	private RandomSampler sampler;
 	private static int count = 0;
-	private final int MAX_EYE_BOUNCES = 20;
-	private final int MAX_LIGHT_BOUNCES = 1; // minimum here is 1, 0 will be treated as 1
+	private final int MAX_EYE_BOUNCES = 1;
+	private final int MAX_LIGHT_BOUNCES = 10; // minimum here is 1, 0 will be treated as 1
 	
 	public BidirectionalPathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
@@ -41,17 +41,17 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	@Override
 	public Spectrum integrate(Ray primaryRay) {
 		List<PathNode> lightPath = new ArrayList<>();
-		PathNode beforeLight = traceLightRay();
-		lightPath.add(beforeLight);
+		PathNode lightNode = traceLightRay();
+		lightPath.add(lightNode);
 		for (int t = 1; t < MAX_LIGHT_BOUNCES; t++) {
-			Vector3f lastDir = beforeLight.next.w;
-			Tuple3f lastOrigin = beforeLight.h.position;
+			Vector3f lastDir = lightNode.next.w;
+			Tuple3f lastOrigin = lightNode.h.position;
 			Ray r = new Ray(lastOrigin, lastDir, t, true);
-			beforeLight = makePathNode(r);
+			lightNode = makePathNode(r);
 			//TODO: russian roulette
-			if (beforeLight == null)
+			if (lightNode == null)
 				break;
-			lightPath.add(beforeLight);
+			lightPath.add(lightNode);
 		}
 		Spectrum eyeAlpha = new Spectrum(1);
 		Spectrum outgoing = new Spectrum();
@@ -61,22 +61,21 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 			if (eye == null)
 				return outgoing;
 			Spectrum lightAlpha = new Spectrum(1);
-			for (PathNode lightNode: lightPath) {
-				Spectrum contribution = connect(eye, lightNode);
+			for (PathNode light: lightPath) {
+				Spectrum contribution = connect(eye, light);
 				contribution.mult(lightAlpha);
 				contribution.mult(eyeAlpha);
-				if (lightNode.bounce == 0)
-					lightAlpha.mult(lightNode.next.emission);
+				if (light.bounce == 0)
+					lightAlpha.mult(light.next.emission);
 				else
-					lightAlpha.mult(lightNode.next.brdf);
-				lightAlpha.mult(lightNode.Gp);
+					lightAlpha.mult(light.next.brdf);
+				lightAlpha.mult(light.Gp);
 				outgoing.add(contribution);
 			}
 			r = new Ray(eye.h.position, eye.next.w, r.depth + 1, true);
 			eyeAlpha.mult(eye.next.brdf);
 			eyeAlpha.mult(eye.Gp);
 		}
-		outgoing.mult(1.f/2);
 		return outgoing;
 	}
 	
@@ -100,6 +99,8 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		float cosLightPath;
 		if (light.h.normal != null) {
 			cosLightPath = light.h.normal.dot(normedConnection);
+			if (cosLightPath <= 0)
+				return new Spectrum(); // stay black if hit light from behind
 		} else cosLightPath = 1; //for point lights
 		float cosEyePath = StaticVecmath.negate(normedConnection).dot(eye.h.normal);
 		float connectionG = cosLightPath*cosEyePath/connection_d2;
