@@ -27,8 +27,8 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	private Intersectable root;
 	private RandomSampler sampler;
 	private static int count = 0;
-	private final int MAX_EYE_BOUNCES = 1;
-	private final int MAX_LIGHT_BOUNCES = 1;
+	private final int MAX_EYE_BOUNCES = 5;
+	private final int MAX_LIGHT_BOUNCES = 5;
 	
 	public BidirectionalPathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
@@ -43,26 +43,29 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		List<PathNode> lightPath = new ArrayList<>();
 		PathNode beforeLight = traceLightRay();
 		lightPath.add(beforeLight);
-		for (int t = 0; t < MAX_LIGHT_BOUNCES; t++) {
+		for (int t = 1; t < MAX_LIGHT_BOUNCES; t++) {
 			Vector3f lastDir = beforeLight.next.w;
 			Tuple3f lastOrigin = beforeLight.h.position;
-			Ray r = new Ray(lastOrigin, lastDir, 0, true);
+			Ray r = new Ray(lastOrigin, lastDir, t, true);
 			beforeLight = makePathNode(r);
 			//TODO: russian roulette
 			if (beforeLight == null)
 				break;
 			lightPath.add(beforeLight);
 		}
-		PathNode eye = null;
 		Spectrum alpha = new Spectrum(1);
 		Spectrum outgoing = new Spectrum();
+		Ray r = primaryRay;
 		for (int s = 0; s < MAX_EYE_BOUNCES; s++) {
-			eye = makePathNode(primaryRay);
+			PathNode eye = makePathNode(r);
 			if (eye == null)
 				return outgoing;
+			r = new Ray(eye.h.position, eye.next.w, r.depth + 1, true);
 			alpha.mult(eye.next.brdf);
-			Spectrum currentContribution = connect(eye, light);
-			outgoing.add(currentContribution);
+			for (PathNode lightNode: lightPath) {
+				Spectrum contribution = connect(eye, lightNode);
+				outgoing.add(contribution);
+			}
 		}
 		return outgoing;
 	}
@@ -108,7 +111,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		float[][] sample = this.sampler.makeSamples(1, 2);
 		ShadingSample next = h.material.getShadingSample(h, sample[0]);
 		float Gp = h.normal.dot(next.w)/next.p;
-		return new PathNode(h, Gp, next, 0);
+		return new PathNode(h, Gp, next, r.depth);
 	}
 	
 	private PathNode traceLightRay() {
