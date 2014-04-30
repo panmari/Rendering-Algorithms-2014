@@ -28,8 +28,8 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	private Intersectable root;
 	private RandomSampler sampler;
 	private static int count = 0;
-	private final int MAX_EYE_BOUNCES = 1;
-	private final int MAX_LIGHT_BOUNCES = 10; // minimum here is 1, 0 will be treated as 1
+	private final int MAX_EYE_BOUNCES = 20;
+	private final int MAX_LIGHT_BOUNCES = 20; // minimum here is 1, 0 will be treated as 1
 	
 	public BidirectionalPathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
@@ -55,13 +55,21 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 			}
 			lightPath.add(lightNode);
 		}
+		
 		Spectrum eyeAlpha = new Spectrum(1);
 		Spectrum outgoing = new Spectrum();
 		Ray r = primaryRay;
+		boolean segmentIsSpecular = false;
 		for (int s = 0; s < MAX_EYE_BOUNCES; s++) {
 			PathNode eye = makePathNode(r);
 			if (eye == null)
 				return outgoing;
+			Spectrum emission = eye.h.material.evaluateEmission(eye.h, eye.h.w);
+			if (emission != null) {
+				if (eye.bounce == 0 || segmentIsSpecular)
+					outgoing.add(emission);
+				break;
+			}
 			Spectrum lightAlpha = new Spectrum(1);
 			for (PathNode light: lightPath) {
 				Spectrum contribution = connect(eye, light);
@@ -72,8 +80,10 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 				else
 					lightAlpha.mult(light.next.brdf);
 				lightAlpha.mult(light.Gp);
+				contribution.mult(1f/(s+light.bounce+1));
 				outgoing.add(contribution);
 			}
+			segmentIsSpecular = eye.next.isSpecular;
 			r = new Ray(eye.h.position, eye.next.w, r.depth + 1, true);
 			eyeAlpha.mult(eye.next.brdf);
 			eyeAlpha.mult(eye.Gp);

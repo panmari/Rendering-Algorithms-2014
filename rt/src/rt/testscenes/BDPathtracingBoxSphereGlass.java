@@ -37,8 +37,8 @@ public class BDPathtracingBoxSphereGlass extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify integrator to be used
-//		integratorFactory = new BidirectionalPathTracingIntegratorFactory(this);
-		integratorFactory = new PathTracingIntegratorFactory();
+		integratorFactory = new BidirectionalPathTracingIntegratorFactory(this);
+		//integratorFactory = new PathTracingIntegratorFactory();
 		
 		// List of objects
 		IntersectableList objects = new IntersectableList();	
