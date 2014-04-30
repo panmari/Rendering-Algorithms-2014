@@ -7,7 +7,7 @@ public class PathNode {
 	
 	final HitRecord h;
 	final ShadingSample next;
-	final float Gp;
+	float Gp;
 	final int bounce;
 	
 	public PathNode(HitRecord h, float Gp, ShadingSample next, int bounce) {

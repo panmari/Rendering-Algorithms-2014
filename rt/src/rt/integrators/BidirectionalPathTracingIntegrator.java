@@ -19,6 +19,7 @@ import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
 import rt.samplers.RandomSampler;
+import util.HistHelper;
 import util.StaticVecmath;
 
 public class BidirectionalPathTracingIntegrator implements Integrator {
@@ -49,8 +50,9 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 			Ray r = new Ray(lastOrigin, lastDir, t, true);
 			lightNode = makePathNode(r);
 			//TODO: russian roulette
-			if (lightNode == null)
+			if (lightNode == null) {
 				break;
+			}
 			lightPath.add(lightNode);
 		}
 		Spectrum eyeAlpha = new Spectrum(1);
@@ -121,7 +123,9 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 			return null;		
 		float[][] sample = this.sampler.makeSamples(1, 2);
 		ShadingSample next = h.material.getShadingSample(h, sample[0]);
-		float Gp = h.normal.dot(next.w)/next.p;
+		float Gp = 1/next.p;
+		if (!next.isSpecular)
+			Gp *= h.normal.dot(next.w);
 		return new PathNode(h, Gp, next, r.depth);
 	}
 	
@@ -133,12 +137,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		sample = this.sampler.makeSamples(1, 2);
 		ShadingSample emission = lightHit.material.getEmissionSample(lightHit, sample[0]);
 
-		float cosLight;
-		if (lightHit.normal != null) {
-			cosLight = lightHit.normal.dot(emission.w);
-		} else cosLight = 1; //for point lights
-		
-		float Gp = cosLight/emission.p;
+		float Gp = 1/lightHit.p;
 		return new PathNode(lightHit, Gp, emission, 0);
 	}
 
