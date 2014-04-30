@@ -15,14 +15,14 @@ public class BDPathtracingBoxSphereGlass extends Scene {
 	
 	public BDPathtracingBoxSphereGlass()
 	{	
-		outputFilename = new String("../output/testscenes/BDPathtracingBoxSphereGlass");
+		outputFilename = new String("../output/testscenes/BDPathtracingBoxSphereGlass-mine");
 				
 		// Specify pixel sampler to be used
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
 		SPP = 128;
-		outputFilename = outputFilename + " " + String.format("%d", SPP) + "SPP";
+		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
 		Vector3f eye = new Vector3f(-3.f,1.f,4.f);
@@ -37,41 +37,40 @@ public class BDPathtracingBoxSphereGlass extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify integrator to be used
-		integratorFactory = new BDPathTracingIntegratorFactory(this);
+		integratorFactory = new BidirectionalPathTracingIntegratorFactory(this);
 //		integratorFactory = new PathTracingIntegratorFactory();
 		
 		// List of objects
 		IntersectableList objects = new IntersectableList();	
 		
-		Sphere sphere = new Sphere(new Vector3f(-.5f,-0.2f,1.f), .5f);
-		sphere.material = new Refractive(1.3f);
+		CSGSphere sphere = new CSGSphere(new Point3f(-.5f,-0.2f,1.f), .5f,  new Refractive(1.3f));
 		objects.add(sphere);
 
 		// Right, red wall
-		Rectangle rectangle = new Rectangle(new Vector3f(2.f, -.75f, 2.f), new Vector3f(0.f, 4.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
+		Rectangle rectangle = new Rectangle(new Point3f(2.f, -.75f, 2.f), new Vector3f(0.f, 4.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
 		rectangle.material = new Diffuse(new Spectrum(0.8f, 0.f, 0.f));
 		objects.add(rectangle);
 	
 		// Bottom
-		rectangle = new Rectangle(new Vector3f(-2.f, -.75f, 2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
+		rectangle = new Rectangle(new Point3f(-2.f, -.75f, 2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
 		rectangle.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
 		objects.add(rectangle);
 
 		// Top
-		rectangle = new Rectangle(new Vector3f(-2.f, 3.25f, 2.f), new Vector3f(0.f, 0.f, -4.f), new Vector3f(4.f, 0.f, 0.f));
+		rectangle = new Rectangle(new Point3f(-2.f, 3.25f, 2.f), new Vector3f(0.f, 0.f, -4.f), new Vector3f(4.f, 0.f, 0.f));
 		rectangle.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
 		objects.add(rectangle);
 		
 		// Left
-		rectangle = new Rectangle(new Vector3f(-2.f, -.75f, -2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 4.f, 0.f));
+		rectangle = new Rectangle(new Point3f(-2.f, -.75f, -2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 4.f, 0.f));
 		rectangle.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
 		objects.add(rectangle);
 		
 		// Light source
-		Vector3f bottomLeft = new Vector3f(-0.25f, 3.f, 0.25f);
+		Point3f bottomLeft = new Point3f(-0.25f, 3.f, 0.25f);
 		Vector3f right = new Vector3f(0.f, 0.f, -0.5f);
 		Vector3f top = new Vector3f(0.5f, 0.f, 0.f);
-		RectangleLight rectangleLight = new RectangleLight(bottomLeft, right, top, new Spectrum(100.f, 100.f, 100.f));
+		AreaLight rectangleLight = new AreaLight(bottomLeft, right, top, new Spectrum(100.f, 100.f, 100.f));
 		objects.add(rectangleLight);
 		
 		// Connect objects to root
@@ -81,7 +80,7 @@ public class BDPathtracingBoxSphereGlass extends Scene {
 		lightList = new LightList();
 		lightList.add(rectangleLight);
 	}
-	
+	/*
 	public void finish()
 	{
 		if(integratorFactory instanceof BDPathTracingIntegratorFactory)
@@ -90,4 +89,5 @@ public class BDPathtracingBoxSphereGlass extends Scene {
 			((BDPathTracingIntegratorFactory)integratorFactory).addLightImage(film);
 		}
 	}
+	*/
 }
