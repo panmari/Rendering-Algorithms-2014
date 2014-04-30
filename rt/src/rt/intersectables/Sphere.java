@@ -81,7 +81,10 @@ public class Sphere implements Intersectable {
 		
 		if(t == null) 	
 			return null;
-		HitRecord h0 = makeHitRecord(t.x, r);
-		return h0;
+		if (t.x > 0)
+			return makeHitRecord(t.x, r);
+		if (t.y > 0)
+			return makeHitRecord(t.y, r);
+		else return null;
 	}
 }
