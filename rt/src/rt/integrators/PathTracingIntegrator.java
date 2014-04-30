@@ -70,10 +70,11 @@ public class PathTracingIntegrator implements Integrator {
 			currentRay = new Ray(hit.position, s.w, bounce + 1, true);
 			alpha.mult(s.brdf);
 			if (!s.isSpecular) {
-				segmentIsSpecular = true;
-				alpha.mult(hit.normal.dot(s.w));
-			} else
 				segmentIsSpecular = false;
+				float cosTerm = hit.normal.dot(s.w);
+				alpha.mult(cosTerm);
+			} else
+				segmentIsSpecular = true;
 			alpha.mult(1/(s.p*(1 - rrProbability)));
 		}
 		stdHelper.update(outgoing.getLuminance(), bounce + 1);

@@ -21,7 +21,7 @@ public class BDPathtracingBoxSphereGlass extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 128;
+		SPP = 1024;
 		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
@@ -37,13 +37,13 @@ public class BDPathtracingBoxSphereGlass extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify integrator to be used
-		integratorFactory = new BidirectionalPathTracingIntegratorFactory(this);
-//		integratorFactory = new PathTracingIntegratorFactory();
+//		integratorFactory = new BidirectionalPathTracingIntegratorFactory(this);
+		integratorFactory = new PathTracingIntegratorFactory();
 		
 		// List of objects
 		IntersectableList objects = new IntersectableList();	
 		
-		CSGSphere sphere = new CSGSphere(new Point3f(-.5f,-0.2f,1.f), .5f,  new Refractive(1.3f));
+		Intersectable sphere = new Sphere(new Point3f(-.5f,-0.2f,1.f), .5f,  new Refractive(1.3f));
 		objects.add(sphere);
 
 		// Right, red wall
