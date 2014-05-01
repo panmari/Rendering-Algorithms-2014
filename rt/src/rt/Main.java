@@ -190,14 +190,21 @@ public class Main {
 		
 		// Tone map output image and writ to file
 		BufferedImage image = scene.getTonemapper().process(scene.getFilm());
-		try
-		{
-			ImageIO.write(image, "png", new File(scene.getOutputFilename()+".png"));
+		
+		ImageWriter.writePng(image, scene.getOutputFilename());
+		try {
 			PrintWriter writer = new PrintWriter(scene.getOutputFilename()+".txt", "UTF-8");
 			writer.print(timing_output);
 			writer.close();
-			
-		} catch (IOException e) {}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 	
 }

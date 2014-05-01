@@ -121,7 +121,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		// shadow ray
 		Ray r = new Ray(light.h.position, connection, 0, true);
 		HitRecord shadowHit = root.intersect(r);
-		if (shadowHit != null && shadowHit.t < 0.99f)
+		if (shadowHit != null && shadowHit.t < 0.99f && shadowHit.material.castsShadows())
 			return new Spectrum();
 		else
 			return s;

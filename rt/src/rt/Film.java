@@ -38,5 +38,11 @@ public interface Film {
 	 * @return height in pixels
 	 */
 	public int getHeight();
+	
+	/**
+	 * Adds another Film to this films
+	 * @param f Film to be added
+	 */
+	public void addImage(Film f);
 
 }
