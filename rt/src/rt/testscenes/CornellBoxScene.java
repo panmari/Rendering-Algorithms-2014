@@ -22,7 +22,7 @@ public class CornellBoxScene extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 16;
+		SPP = 1024;
 		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
@@ -44,6 +44,9 @@ public class CornellBoxScene extends Scene {
 		IntersectableList objects = new IntersectableList();	
 		
 		Material gray = new Diffuse(new Spectrum(.5f));
+		Material green = new Diffuse(new Spectrum(.3f, .5f, .3f));
+		Material red = new Diffuse(new Spectrum(.9f, .5f, .5f));
+		
 		Rectangle floor = new Rectangle(new Point3f(552.8f,0,0), new Point3f(0,0,0), new Point3f(0,0,559.2f));
 		floor.material = gray;
 		Rectangle roof = new Rectangle(new Point3f(556, 548.8f, 0), new Point3f(556, 548.8f, 559.2f), new Point3f(0, 548.8f, 559.2f));
@@ -51,10 +54,9 @@ public class CornellBoxScene extends Scene {
 		Rectangle back = new Rectangle(new Point3f(549.6f, 0, 559.2f), new Point3f(0, 0, 559.2f), new Point3f(0, 548.8f, 559.2f));
 		back.material = gray;
 		Rectangle right = new Rectangle(new Point3f(0, 0, 559.2f), new Point3f(0, 0, 0), new Point3f(0, 548.8f, 0f));
-		right.material = gray;
-		Rectangle left = new Rectangle(new Point3f(552.8f, 0, 0f), new Point3f(549.6f, 0, 559.2f), new Point3f(556, 548.8f, 559.2f));
-		Material red = new Diffuse(new Spectrum(.9f, .5f, .5f));
-		right.material = red;
+		right.material = green;
+		Rectangle left = new Rectangle(new Point3f(552.8f, 0, 0f), new Point3f(549.6f, 0, 559.2f), new Point3f(556, 548.8f, 559.2f));	
+		left.material = red;
 
 		objects.add(floor);
 		objects.add(roof);
@@ -78,9 +80,9 @@ public class CornellBoxScene extends Scene {
 		trans.setIdentity();
 		trans.setTranslation(new Vector3f(185, 83.5f, 169));
 		t.mul(trans, t);
-		Instance greenBox = new Instance(unitBox, t);
-		greenBox.material = new Diffuse(new Spectrum(.3f, .5f, .3f));
-		objects.add(greenBox);
+		Instance smallBox = new Instance(unitBox, t);
+		smallBox.material = gray;
+		objects.add(smallBox);
 		
 		t = new Matrix4f();
 		t.setIdentity();
@@ -93,9 +95,9 @@ public class CornellBoxScene extends Scene {
 		trans.setIdentity();
 		trans.setTranslation(new Vector3f(368, 167.5f, 351));
 		t.mul(trans, t);
-		Instance redBox = new Instance(unitBox, t);
-		redBox.material = new Diffuse(new Spectrum(.5f, .2f, .2f));
-		objects.add(redBox);
+		Instance bigBox = new Instance(unitBox, t);
+		bigBox.material = gray;
+		objects.add(bigBox);
 		// Connect objects to root
 		root = objects;
 				
@@ -103,13 +105,12 @@ public class CornellBoxScene extends Scene {
 		lightList = new LightList();
 		//point light
 		LightGeometry l;
-		// l = new PointLight(new Vector3f(278, 478, 279.5f), new Spectrum(412300, 341100, 298600));
+		l = new PointLight(new Vector3f(278, 478, 279.5f), new Spectrum(412300, 341100, 298600));
 		
 		//area light
 		Spectrum emission = new Spectrum(41.23f, 34.11f, 29.86f);
 		emission.mult(50000);
-		l = new AreaLight(new Point3f(343, 548.7f, 227), new Vector3f(0, 0, 105), 
-				new Vector3f(-130, 0, 0), emission);
+		//l = new AreaLight(new Point3f(343, 548.6f, 227), new Vector3f(0, 0, 105), new Vector3f(-130, 0, 0), emission);
 		lightList.add(l);
 		objects.add(l);
 	}
