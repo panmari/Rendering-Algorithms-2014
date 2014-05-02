@@ -1,20 +1,26 @@
 package rt.testscenes;
 
-import java.io.IOException;
-
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
-import rt.*;
-import rt.accelerators.BSPAccelerator;
+import rt.Intersectable;
+import rt.IntersectableList;
+import rt.LightGeometry;
+import rt.LightList;
+import rt.Material;
+import rt.Scene;
+import rt.Spectrum;
 import rt.cameras.PinholeCamera;
 import rt.films.BoxFilterFilm;
-import rt.integrators.*;
-import rt.intersectables.*;
-import rt.lightsources.*;
-import rt.materials.*;
-import rt.samplers.*;
+import rt.integrators.PointLightIntegratorFactory;
+import rt.intersectables.CSGPlane;
+import rt.intersectables.Sphere;
+import rt.lightsources.PointLight;
+import rt.materials.Glossy;
+import rt.materials.NoisyTexture;
+import rt.materials.Textured;
+import rt.materials.XYZGrid;
+import rt.samplers.RandomSamplerFactory;
 import rt.tonemappers.ClampTonemapper;
 
 public class NoisyTextureTestScene extends Scene {
@@ -54,7 +60,7 @@ public class NoisyTextureTestScene extends Scene {
 		
 		Material m = new Glossy( 8.f, new Spectrum(0.27f, 0.82f, 1.16f), new Spectrum(3.23f, 2.6f, 2.5f));
 		Material noisyMaterial = new NoisyTexture(m);
-		Intersectable noisySphere = new Sphere(new Point3f(0,0,0), .5f, noisyMaterial);
+		Intersectable noisySphere = new Sphere(new Point3f(0,0,0), 1f, noisyMaterial);
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
 		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);

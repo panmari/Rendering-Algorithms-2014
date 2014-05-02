@@ -6,19 +6,23 @@ import rt.HitRecord;
 import rt.Material;
 import rt.Spectrum;
 import util.ImprovedNoise;
+import util.MyMath;
 
 public class NoisyTexture implements Material {
 
-	
-	final static float SCALE = 15;
+	public enum Type {NORMAL, WOOD, MARBLE};
+
+	private final float SCALE = 15;
+	private final Type type;
 	
 	private Material m;
 	public NoisyTexture(Material m) {
 		this.m = m;
+		type = Type.MARBLE;
 	}
 	
 	public NoisyTexture(Spectrum s) {
-		m = new Diffuse(s);
+		this(new Diffuse(s));
 	}
 	
 	public NoisyTexture() {
@@ -34,8 +38,25 @@ public class NoisyTexture implements Material {
 	
 	private void addNoise(HitRecord h, Spectrum brdf) {
 		Vector3f p = new Vector3f(h.position);
-		p.scale(SCALE);
-		float noise = (float) (ImprovedNoise.noise(p.x, p.y, p.z) + 1) /2;
+		float noise = 0f;
+		switch (type) {
+		case NORMAL:
+			p.scale(SCALE);
+			noise = (float) (ImprovedNoise.noise(p.x, p.y, p.z) + 1) /2;
+			break;
+		case MARBLE:
+			float xBefore = p.x*10;
+			p.scale(SCALE);
+			noise = (float) (ImprovedNoise.noise(p.x, p.y, p.z) + 1) /2;
+			noise = MyMath.cos(noise + xBefore);
+			break;
+		case WOOD:
+			noise = (float) (ImprovedNoise.noise(p.x, p.y, p.z) + 1) /2;
+			noise = noise * 20;
+			noise = noise - (int) noise;
+			break;
+		}
+		
 		brdf.mult(noise);
 	}
 
