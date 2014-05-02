@@ -89,11 +89,11 @@ public class Textured implements Material {
 	}
 
 	private float getScaledX(float x, int width) {
-		return x*(width - 1);
+		return Math.min(x*(width - 1), width - 2);
 	}
 
 	private float getScaledY(float y, int height) {
-		return (1 - y)*(height - 1);
+		return Math.min((1 - y)*(height - 1), height - 2);
 	}
 	
 	@Override
