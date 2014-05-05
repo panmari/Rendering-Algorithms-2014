@@ -81,13 +81,4 @@ public class BDPathtracingBoxSphereGlass extends Scene {
 		lightList.add(rectangleLight);
 	}
 	
-	public void finish()
-	{
-		if(integratorFactory instanceof BidirectionalPathTracingIntegratorFactory)
-		{
-			((BidirectionalPathTracingIntegratorFactory)integratorFactory).writeLightImage("../output/testscenes/lightimage");
-			((BidirectionalPathTracingIntegratorFactory)integratorFactory).addLightImage(film);
-		}
-	}
-	
 }

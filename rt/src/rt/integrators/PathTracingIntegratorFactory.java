@@ -16,4 +16,6 @@ public class PathTracingIntegratorFactory implements IntegratorFactory {
 		// NOTHING
 	}
 
+	@Override
+	public void finish(Scene scene) {}
 }

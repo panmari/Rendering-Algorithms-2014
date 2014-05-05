@@ -17,4 +17,6 @@ public class PointLightIntegratorFactory implements IntegratorFactory {
 		// not needed for point lights
 	}
 
+	@Override
+	public void finish(Scene scene) {}
 }

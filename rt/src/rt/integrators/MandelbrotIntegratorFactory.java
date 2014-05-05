@@ -18,4 +18,6 @@ public class MandelbrotIntegratorFactory implements IntegratorFactory {
 	{		
 	}
 
+	@Override
+	public void finish(Scene scene) {}
 }

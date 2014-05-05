@@ -53,4 +53,10 @@ public class BidirectionalPathTracingIntegratorFactory implements IntegratorFact
 		combined = true;
 	}
 
+	@Override
+	public void finish(Scene scene) {
+		writeLightImage("../output/testscenes/lightimage");
+		addLightImage(scene.getFilm());
+	}
+
 }
