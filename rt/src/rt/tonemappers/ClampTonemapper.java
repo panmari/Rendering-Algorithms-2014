@@ -20,7 +20,7 @@ public class ClampTonemapper implements Tonemapper {
 	public BufferedImage process(Film film)
 	{
 		BufferedImage img = new BufferedImage(film.getWidth(), film.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-		Spectrum[][] imgUnprocessed = film.getImage();
+		Spectrum[][] imgUnprocessed = film.makeImage();
 		
 		for(int i=0; i<film.getWidth(); i++)
 		{

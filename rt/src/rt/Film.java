@@ -20,10 +20,10 @@ public interface Film {
 	
 	/**
 	 * Returns the image stored in the film.
-	 * 
+	 * Careful, this is more than a getter and should be called as few as possible.
 	 * @return the image
 	 */
-	public Spectrum[][] getImage();
+	public Spectrum[][] makeImage();
 	
 	/**
 	 * Returns width (in pixels) of film.

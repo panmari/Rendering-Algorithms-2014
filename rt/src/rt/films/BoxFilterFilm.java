@@ -55,7 +55,7 @@ public class BoxFilterFilm implements Film {
 		return height;
 	}
 	
-	public Spectrum[][] getImage()
+	public Spectrum[][] makeImage()
 	{
 		for(int x=0; x<width; x++)
 		{
@@ -73,7 +73,7 @@ public class BoxFilterFilm implements Film {
 	public void addImage(Film f) {
 		assert f.getHeight() == this.height;
 		assert f.getWidth() == this.width;
-		Spectrum[][] img = f.getImage();
+		Spectrum[][] img = f.makeImage();
 		for(int i=0; i<width; i++)
 		{
 			for(int j=0; j<height; j++)
