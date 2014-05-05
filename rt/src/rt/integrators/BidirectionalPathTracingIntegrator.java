@@ -8,6 +8,7 @@ import javax.vecmath.Point3f;
 import javax.vecmath.Tuple3f;
 import javax.vecmath.Vector3f;
 
+import rt.Film;
 import rt.HitRecord;
 import rt.Integrator;
 import rt.Intersectable;
@@ -18,6 +19,7 @@ import rt.Ray;
 import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
+import rt.films.BoxFilterFilm;
 import rt.samplers.RandomSampler;
 import util.HistHelper;
 import util.StaticVecmath;
@@ -25,6 +27,7 @@ import util.StaticVecmath;
 public class BidirectionalPathTracingIntegrator implements Integrator {
 
 	private LightList lightList;
+	private Film lightFilm;
 	private Intersectable root;
 	private RandomSampler sampler;
 	private static int count = 0;
@@ -36,6 +39,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		this.root = scene.getIntersectable();
 		this.sampler = new RandomSampler();
 		this.sampler.init(count++);
+		//this.lightFilm = new BoxFilterFilm(scene.width, scene.height);
 	}
 	
 	
@@ -154,5 +158,9 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	@Override
 	public float[][] makePixelSamples(Sampler sampler, int n) {
 		return sampler.makeSamples(n, 2);
+	}
+	
+	protected Film getLightFilm() {
+		return lightFilm;
 	}
 }

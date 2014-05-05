@@ -1,30 +1,31 @@
 package rt.integrators;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import rt.Film;
 import rt.Integrator;
 import rt.IntegratorFactory;
 import rt.Scene;
-import rt.Spectrum;
 import rt.films.BoxFilterFilm;
 import rt.tonemappers.ClampTonemapper;
 import util.ImageWriter;
 
 public class BidirectionalPathTracingIntegratorFactory implements IntegratorFactory {
 
-
-	private Film lightFilm;
+	private List<BidirectionalPathTracingIntegrator> integrators;
+	private Film combinedLightFilm;
+	private boolean combined = false;
 
 	public BidirectionalPathTracingIntegratorFactory(Scene scene) {
-		int width = scene.getFilm().getWidth();
-		int height = scene.getFilm().getHeight();
-		lightFilm = new BoxFilterFilm(width,height);
+		this.combinedLightFilm = new BoxFilterFilm(scene.getFilm().getWidth(), scene.getFilm().getHeight());
 	}
 
 	@Override
 	public Integrator make(Scene scene) {
-		return new BidirectionalPathTracingIntegrator(scene);
+		BidirectionalPathTracingIntegrator bdp = new BidirectionalPathTracingIntegrator(scene);
+		integrators.add(bdp);
+		return bdp;
 	}
 
 	@Override
@@ -33,12 +34,23 @@ public class BidirectionalPathTracingIntegratorFactory implements IntegratorFact
 	}
 
 	public void writeLightImage(String path) {
-		BufferedImage img = new ClampTonemapper().process(lightFilm);
+		combineLightFilms();
+		BufferedImage img = new ClampTonemapper().process(combinedLightFilm);
 		ImageWriter.writePng(img, path);
 	}
 
 	public void addLightImage(Film film) {
-		film.addImage(lightFilm);
+		combineLightFilms();
+		film.addImage(combinedLightFilm);
+	}
+	
+	private void combineLightFilms(){
+		if (combined) {
+			for (BidirectionalPathTracingIntegrator i: integrators) {
+				combinedLightFilm.addImage(i.getLightFilm());
+			}
+		}
+		combined = true;
 	}
 
 }
