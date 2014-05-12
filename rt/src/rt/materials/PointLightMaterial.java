@@ -87,5 +87,8 @@ public class PointLightMaterial implements Material {
 	@Override
 	public void evaluateBumpMap(HitRecord h) {}
 
-
+	@Override
+	public float getDirectionalProbability(HitRecord h, Vector3f out) {
+		throw new RuntimeException("Should certainly not be called on point lights");
+	}
 }

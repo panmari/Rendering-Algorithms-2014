@@ -129,4 +129,13 @@ public interface Material {
 	 * Does nothing, if no bump map present.
 	 */
 	void evaluateBumpMap(HitRecord hitRecord);
+	
+	/**
+	 * Computes probability of given outgoing direction given a hitrecord with a certain position, normal and incoming direction.
+	 * @param in
+	 * @param out
+	 * @return
+	 */
+	public float getDirectionalProbability(HitRecord h, Vector3f out);
+	
 }

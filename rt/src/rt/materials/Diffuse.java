@@ -85,7 +85,7 @@ public class Diffuse implements Material {
 		//TODO: why do I need to normalize here?
 		dir.normalize();
 
-		float p = dir.dot(hitRecord.normal)/MyMath.PI;
+		float p = getDirectionalProbability(hitRecord, dir);
 		assert p > 0;
 		return new ShadingSample(evaluateBRDF(hitRecord, hitRecord.w, dir), new Spectrum(), dir, false, p);
 
@@ -106,6 +106,12 @@ public class Diffuse implements Material {
 	@Override
 	public void evaluateBumpMap(HitRecord h) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public float getDirectionalProbability(HitRecord h, Vector3f out) {
+		float p = out.dot(h.normal)/MyMath.PI;
+		return p;
 	}
 	
 }

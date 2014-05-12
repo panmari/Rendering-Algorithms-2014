@@ -23,7 +23,7 @@ public class PathtracingBoxSphereMotion extends Scene {
 		samplerFactory = new RandomSamplerFactory();
 		
 		// Samples per pixel
-		SPP = 128;
+		SPP = 512;
 		outputFilename += String.format("_%d_SPP", SPP);
 		
 		// Make camera and film
@@ -31,8 +31,8 @@ public class PathtracingBoxSphereMotion extends Scene {
 		Vector3f lookAt = new Vector3f(0.f,1.f,0.f);
 		Vector3f up = new Vector3f(0.f,1.f,0.f);
 		float fov = 60.f;
-		int width = 128;
-		int height = 128;
+		int width = 512;
+		int height = 512;
 		float aspect = (float)width/(float)height;
 		camera = new PinholeCamera(eye, lookAt, up, fov, aspect, width, height);
 		film = new BoxFilterFilm(width, height);						
@@ -55,6 +55,7 @@ public class PathtracingBoxSphereMotion extends Scene {
 		Matrix4f motion = new Matrix4f();
 		motion.rotY((float) Math.toRadians(20));;
 		//motion.setTranslation(trans);
+		motion.setIdentity();
 		AnimatedInstance sphereI = new AnimatedInstance(i, motion);
 		
 		sphereI.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
@@ -70,7 +71,7 @@ public class PathtracingBoxSphereMotion extends Scene {
 		rectangle = new Rectangle(new Point3f(-2.f, -.75f, 2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
 		Spectrum ext = new Spectrum(3.88f, 3.45f, 2.56f);
 		Material g = new rt.materials.Glossy( 8.f, new Spectrum(0.131f, 0.12f, 0.144f), ext);
-		rectangle.material = new NoisyTexture(g, Type.WOOD);
+		rectangle.material = new NoisyTexture(g, Type.CONTINENT);
 		objects.add(rectangle);
 
 		// Top

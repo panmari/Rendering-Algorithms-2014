@@ -180,6 +180,7 @@ public class Main {
 				printed += toPrint;
 			}
 		}
+		scene.getIntegratorFactory().finish(scene);
 		
 		System.out.printf("\n");
 		long time_ms = timer.timeElapsed();

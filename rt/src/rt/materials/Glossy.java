@@ -156,7 +156,7 @@ public class Glossy implements Material {
 		float p_w_i = makeProbability(cosTheta, w_o, w_h);
 		
 		if (w_i.dot(hitRecord.normal) <= 0) { //below horizon
-			return new ShadingSample(new Spectrum(0), new Spectrum(0), w_i, false, p_w_i);
+			return new ShadingSample(new Spectrum(0), new Spectrum(0), w_i, false, 0);
 		} else {
 			return new ShadingSample(evaluateBRDF(hitRecord, w_o, w_i), new Spectrum(0), w_i, false, p_w_i);
 		}
@@ -188,6 +188,16 @@ public class Glossy implements Material {
 	@Override
 	public void evaluateBumpMap(HitRecord hitRecord) {
 		// meh
+	}
+
+	@Override
+	public float getDirectionalProbability(HitRecord h, Vector3f out) {
+		float cosTheta = h.normal.dot(h.w);
+		Vector3f w_h = new Vector3f();
+		w_h.add(h.w, out);
+		w_h.normalize();
+		float p_w_i = makeProbability(cosTheta, h.w, w_h);
+		return p_w_i;
 	}
 
 }

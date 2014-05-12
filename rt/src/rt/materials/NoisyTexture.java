@@ -155,4 +155,8 @@ public class NoisyTexture implements Material {
 		hitRecord.normal.sub(n);
 		hitRecord.normal.normalize();
 	}
+	@Override
+	public float getDirectionalProbability(HitRecord h, Vector3f out) {
+		return m.getDirectionalProbability(h, out);
+	}
 }

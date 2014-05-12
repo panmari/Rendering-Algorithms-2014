@@ -161,6 +161,12 @@ public class Refractive implements Material {
 	@Override
 	public void evaluateBumpMap(HitRecord h) {
 		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public float getDirectionalProbability(HitRecord h, Vector3f out) {
+		// RefractionHandler rf = new RefractionHandler(hitRecord);
+		//TODO: Is nonzero for two directions. Worth it?
+		return 0;
 	}
 }

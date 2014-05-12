@@ -16,12 +16,13 @@ import static util.MyMath.ceil;
 import static util.MyMath.floor;
 
 
-public class Textured implements Material {
+public class Textured extends Diffuse implements Material {
 
 	private BufferedImage texture;
 	private BufferedImage bumpMap;
 
 	public Textured(String textureFileName, String bumpMapFileName) {
+		super(new Spectrum(1));
 		try {
 			texture = ImageIO.read(new File(textureFileName));
 			if (bumpMapFileName != null)
@@ -99,47 +100,10 @@ public class Textured implements Material {
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut,
 			Vector3f wIn) {
-		return getBilinearInterpolated(hitRecord.u, hitRecord.v, texture);
-	}
-
-	@Override
-	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
-		return null;
-	}
-
-	@Override
-	public boolean hasSpecularReflection() {
-		return false;
-	}
-
-	@Override
-	public ShadingSample evaluateSpecularReflection(HitRecord hitRecord) {
-		return null;
-	}
-
-	@Override
-	public boolean hasSpecularRefraction() {
-		return false;
-	}
-
-	@Override
-	public ShadingSample evaluateSpecularRefraction(HitRecord hitRecord) {
-		return null;
-	}
-
-	@Override
-	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
-		return null;
-	}
-
-	@Override
-	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
-		return new ShadingSample();
-	}
-
-	@Override
-	public boolean castsShadows() {
-		return true;
+		Spectrum brdf = super.evaluateBRDF(hitRecord, wOut, wIn);
+		Spectrum tex = getBilinearInterpolated(hitRecord.u, hitRecord.v, texture);
+		brdf.mult(tex);
+		return brdf;
 	}
 
 	@Override

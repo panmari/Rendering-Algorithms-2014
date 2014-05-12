@@ -76,7 +76,16 @@ public class Reflective implements Material {
 	@Override
 	public void evaluateBumpMap(HitRecord h) {
 		// TODO Auto-generated method stub
-		
+	}
+	
+	@Override
+	public float getDirectionalProbability(HitRecord h, Vector3f out) {
+		//is nonzero only in one direction.
+		/* Vector3f reflected = StaticVecmath.reflect(h.normal, h.w);
+		if (StaticVecmath.dist2(out, reflected) < 1e-3)
+			return 1;
+		else */
+		return 0;
 	}
 
 }

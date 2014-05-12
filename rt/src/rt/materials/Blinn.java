@@ -91,4 +91,10 @@ public class Blinn implements Material {
 		
 	}
 
+
+	@Override
+	public float getDirectionalProbability(HitRecord h, Vector3f out) {
+		throw new RuntimeException("Oh cmon, just use the glossy material, its much nicer anyway");
+	}
+
 }
