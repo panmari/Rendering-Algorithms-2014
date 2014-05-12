@@ -38,7 +38,7 @@ public class BiPathtracingBoxSphere extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify integrator to be used
-		integratorFactory = new BidirectionalPathTracingIntegratorFactory();
+		integratorFactory = new BidirectionalPathTracingIntegratorFactory(this);
 		
 		// List of objects
 		IntersectableList objects = new IntersectableList();	

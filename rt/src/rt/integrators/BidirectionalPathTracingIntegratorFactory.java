@@ -1,6 +1,7 @@
 package rt.integrators;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 import rt.Film;
@@ -13,7 +14,7 @@ import util.ImageWriter;
 
 public class BidirectionalPathTracingIntegratorFactory implements IntegratorFactory {
 
-	private List<BidirectionalPathTracingIntegrator> integrators;
+	private List<BidirectionalPathTracingIntegrator> integrators = new ArrayList<>();
 	private Film combinedLightFilm;
 	private boolean combined = false;
 

@@ -39,7 +39,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		this.root = scene.getIntersectable();
 		this.sampler = new RandomSampler();
 		this.sampler.init(count++);
-		//this.lightFilm = new BoxFilterFilm(scene.width, scene.height);
+		this.lightFilm = new BoxFilterFilm(scene.getFilm().getWidth(), scene.getFilm().getHeight());
 	}
 	
 	
