@@ -10,15 +10,16 @@ public class Ray {
 	public Vector3f origin;
 	public Vector3f direction;
 	public int depth;
+	public float t;
 	
 	/**
 	 * Stores copies of the given tuples
 	 * @param origin
 	 * @param direction
 	 */
-	public Ray(Tuple3f origin, Tuple3f direction)
+	public Ray(Tuple3f origin, Tuple3f direction, float t)
 	{
-		this(origin, direction, 0);
+		this(origin, direction, t, 0);
 	}
 	
 	/**
@@ -26,9 +27,9 @@ public class Ray {
 	 * @param origin
 	 * @param direction
 	 */
-	public Ray(Tuple3f origin, Tuple3f direction, int depth)
+	public Ray(Tuple3f origin, Tuple3f direction, float t, int depth)
 	{
-		this(origin, direction, 0, false);
+		this(origin, direction, t, 0, false);
 	}
 	
 	/**
@@ -36,13 +37,14 @@ public class Ray {
 	 * @param origin
 	 * @param direction
 	 */
-	public Ray(Tuple3f origin, Tuple3f direction, int depth, boolean epsilon)
+	public Ray(Tuple3f origin, Tuple3f direction, float t, int depth, boolean epsilon)
 	{
 		Vector3f o = new Vector3f();
 		if (epsilon) {
-			o.scaleAdd(1e-4f, direction, origin);
+			o.scaleAdd(1e-3f, direction, origin);
 		} else
 			o.set(origin);
+		this.t = t;
 		this.origin = o; 
 		this.direction = new Vector3f(direction);
 		this.depth = depth;
@@ -55,6 +57,6 @@ public class Ray {
 	}
 	
 	public String toString() {
-		return "orig: " + origin + " dir: " + direction;
+		return "orig: " + origin + " dir: " + direction + " time: " + t;
 	}
 }

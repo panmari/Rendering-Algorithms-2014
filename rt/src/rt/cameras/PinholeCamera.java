@@ -56,8 +56,8 @@ public class PinholeCamera implements Camera {
 		// Make ray consisting of origin and direction in world coordinates
 		Vector3f dir = new Vector3f(d.x, d.y, d.z);
 		dir.sub(eye);
-		
-		return new Ray(new Vector3f(eye), dir);
+		//TODO: somehow decide on time in a cleaner fashion
+		return new Ray(new Vector3f(eye), dir, (float) Math.random());
 	}
 
 }

@@ -57,7 +57,7 @@ public class PathTracingIntegrator implements Integrator {
 				break;
 			}
 
-			Spectrum x = sampleLight(hit);
+			Spectrum x = sampleLight(hit, currentRay.t);
 			Spectrum currentBounceContribution = new Spectrum(alpha);
 			currentBounceContribution.mult(x);
 			outgoing.add(currentBounceContribution);
@@ -67,7 +67,7 @@ public class PathTracingIntegrator implements Integrator {
 			ShadingSample s = hit.material.getShadingSample(hit, this.sampler.makeSamples(1, 2)[0]);
 			if (s == null) // Total internal refraction or some bs
 				break;
-			currentRay = new Ray(hit.position, s.w, bounce + 1, true);
+			currentRay = new Ray(hit.position, s.w, currentRay.t, bounce + 1, true);
 			alpha.mult(s.brdf);
 			if (!s.isSpecular) {
 				segmentIsSpecular = false;
@@ -81,7 +81,7 @@ public class PathTracingIntegrator implements Integrator {
 		return outgoing;
 	}
 	
-	private Spectrum sampleLight(HitRecord hitRecord) {
+	private Spectrum sampleLight(HitRecord hitRecord, float t) {
 		float[][] sample = this.sampler.makeSamples(1, 2);
 		LightGeometry lightSource = lightList.getRandomLight(this.sampler.makeSamples(1, 2));
 
@@ -128,7 +128,7 @@ public class PathTracingIntegrator implements Integrator {
 		if (bulletGenerator.nextFloat() > rrProbability || contribution == 0)
 			return new Spectrum();
 		
-		Ray shadowRay = new Ray(hitRecord.position, lightDir, 0, true);
+		Ray shadowRay = new Ray(hitRecord.position, lightDir, t, 0, true);
 		HitRecord shadowHit = root.intersect(shadowRay);
 		if (shadowHit != null &&
 				StaticVecmath.dist2(shadowHit.position, hitRecord.position) + 1e-5f < d2) //only if closer than light

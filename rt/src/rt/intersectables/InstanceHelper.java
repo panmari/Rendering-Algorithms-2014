@@ -27,7 +27,7 @@ public class InstanceHelper {
 		Vector3f instanceDir = new Vector3f(r.direction);
 		tinverse.transform(instanceOrigin);
 		tinverse.transform(instanceDir);
-		return new Ray(instanceOrigin, instanceDir);
+		return new Ray(instanceOrigin, instanceDir, r.t);
 	}
 	
 	public BoundingBox transform(BoundingBox b) {

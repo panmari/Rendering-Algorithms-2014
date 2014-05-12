@@ -86,7 +86,7 @@ public class FixedCamera implements Camera {
 		// Make ray consisting of origin and direction in world coordinates
 		Vector3f dir = new Vector3f();
 		dir.sub(new Vector3f(d.x, d.y, d.z), eye);
-		Ray r = new Ray(new Vector3f(eye), dir);
+		Ray r = new Ray(new Vector3f(eye), dir, 0);
 		return r;
 	}
 

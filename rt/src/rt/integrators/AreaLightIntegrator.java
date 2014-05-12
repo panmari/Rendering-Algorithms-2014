@@ -48,8 +48,8 @@ public class AreaLightIntegrator implements Integrator {
 			if (emission != null) // hit light => return emission of light directly
 				return emission;
 							
-			Spectrum lightSampledSpectrum = sampleLight(hitRecord, lightList.getRandomLight(sampler.makeSamples(1, 1)));
-			Spectrum brdfSampledSpectrum = sampleBRDF(hitRecord);
+			Spectrum lightSampledSpectrum = sampleLight(hitRecord, lightList.getRandomLight(sampler.makeSamples(1, 1)), r.t);
+			Spectrum brdfSampledSpectrum = sampleBRDF(hitRecord, r.t);
 						
 			Spectrum[] specs = new Spectrum[]{lightSampledSpectrum, brdfSampledSpectrum};
 			Spectrum outgoing = new Spectrum();
@@ -63,11 +63,11 @@ public class AreaLightIntegrator implements Integrator {
 	
 	}
 	
-	private Spectrum sampleBRDF(HitRecord hitRecord) {
+	private Spectrum sampleBRDF(HitRecord hitRecord, float t) {
 		ShadingSample shadingSample = hitRecord.material.getShadingSample(hitRecord, this.sampler.makeSamples(1, 2)[0]);
 		//TODO: every material should return a shading sample
 		if (shadingSample != null) { 
-			Ray shadingSampleRay = new Ray(hitRecord.position, shadingSample.w, 0, true);
+			Ray shadingSampleRay = new Ray(hitRecord.position, shadingSample.w, t, 0, true);
 			HitRecord shadingSampleHit = root.intersect(shadingSampleRay);
 			
 			if (shadingSampleHit != null) {
@@ -100,7 +100,7 @@ public class AreaLightIntegrator implements Integrator {
 			return new Spectrum(1,0,0);
 	}
 	
-	private Spectrum sampleLight(HitRecord hitRecord, LightGeometry lightSource) {
+	private Spectrum sampleLight(HitRecord hitRecord, LightGeometry lightSource, float t) {
 		float[][] sample = this.sampler.makeSamples(1, 2);
 		// Make direction from hit point to light source position; this is only supposed to work with point lights
 		HitRecord lightHit = lightSource.sample(sample[0]);
@@ -111,7 +111,7 @@ public class AreaLightIntegrator implements Integrator {
 		float d2 = lightDir.lengthSquared();
 		lightDir.normalize();
 		
-		Ray shadowRay = new Ray(hitRecord.position, lightDir, 0, true);
+		Ray shadowRay = new Ray(hitRecord.position, lightDir, t, 0, true);
 		HitRecord shadowHit = root.intersect(shadowRay);
 		if (shadowHit != null &&
 				StaticVecmath.dist2(shadowHit.position, hitRecord.position) + 1e-5f < d2) //only if closer than light
