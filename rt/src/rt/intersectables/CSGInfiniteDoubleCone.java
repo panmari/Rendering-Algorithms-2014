@@ -91,8 +91,7 @@ public class CSGInfiniteDoubleCone extends CSGSolid {
 
 	@Override
 	public BoundingBox getBoundingBox() {
-		return new BoundingBox(new Point3f(Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY), 
-				new Point3f(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
+		return BoundingBox.INFINITE_BOUNDING_BOX;
 	}
 
 }

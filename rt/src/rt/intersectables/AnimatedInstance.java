@@ -2,7 +2,9 @@ package rt.intersectables;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
 import rt.HitRecord;
 import rt.Intersectable;
@@ -15,8 +17,8 @@ public class AnimatedInstance implements Intersectable {
 
 	private Intersectable intersectable;
 	public Material material;
-	private InstanceHelper instanceHelper;
-	private Vector3f movement;
+	private Quat4f rotMotion;
+	private Vector3f transMotion;
 
 	/**
 	 * Only supports linear movement at the time of writing...
@@ -24,30 +26,35 @@ public class AnimatedInstance implements Intersectable {
 	 * @param t
 	 * @param movement
 	 */
-	public AnimatedInstance(Intersectable i, Matrix4f t, Vector3f movement) {
+	public AnimatedInstance(Intersectable i, Matrix4f motion) {
 		this.intersectable = i;
-		this.instanceHelper = new InstanceHelper(t);
-		this.movement = movement;
+		this.rotMotion = new Quat4f();
+		motion.get(rotMotion);
+		this.transMotion = new Vector3f(motion.getM03(), motion.getM13(), motion.getM23());
 		this.material = new Diffuse(); //default material
 	}
 
 	@Override
 	public HitRecord intersect(Ray r) {
-		Ray instanceRay = instanceHelper.transform(r);
-		Vector3f m = new Vector3f(movement);
+		Quat4f q = new Quat4f(rotMotion);
+		q.scale(r.t);
+		Vector3f m = new Vector3f(transMotion);
 		m.scale(r.t);
-		instanceRay.origin.sub(m);
-		//instanceRay.direction.sub(m);
+		Matrix4f mot = new Matrix4f(q, m, 1);
+		InstanceHelper ih = new InstanceHelper(mot);
+		
+		Ray instanceRay = ih.transform(r);
 		HitRecord instanceHitRecord = intersectable.intersect(instanceRay);
 		if (instanceHitRecord == null)
 			return null;
-		HitRecord h = instanceHelper.transformBack(instanceHitRecord);
+		
+		HitRecord h = ih.transformBack(instanceHitRecord);
 		h.material = this.material;
 		return h;
 	}
 
 	@Override
 	public BoundingBox getBoundingBox() {
-		return instanceHelper.transform(intersectable.getBoundingBox());
+		return BoundingBox.INFINITE_BOUNDING_BOX;
 	}
 }

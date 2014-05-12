@@ -11,6 +11,9 @@ import util.StaticVecmath;
 
 public class BoundingBox implements Intersectable {
 
+	final public static BoundingBox INFINITE_BOUNDING_BOX = new BoundingBox(new Point3f(Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY), 
+			new Point3f(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
+	
 	final public Point3f min;
 	final public Point3f max;
 	final public Point3f[] bounds;

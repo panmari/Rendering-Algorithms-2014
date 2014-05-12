@@ -16,9 +16,12 @@ public class NoisyTexture implements Material {
 	private final Type type;
 	
 	private Material m;
-	public NoisyTexture(Material m) {
+	public NoisyTexture(Material m, Type t) {
 		this.m = m;
-		type = Type.MARBLE;
+		type = t;
+	}
+	public NoisyTexture(Material m) {
+		this(m, Type.WOOD);
 	}
 	
 	public NoisyTexture(Spectrum s) {

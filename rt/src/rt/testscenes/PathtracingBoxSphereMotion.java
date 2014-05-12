@@ -8,6 +8,7 @@ import rt.tonemappers.*;
 import rt.integrators.*;
 import rt.lightsources.*;
 import rt.materials.*;
+import rt.materials.NoisyTexture.Type;
 import rt.samplers.*;
 import rt.cameras.*;
 import rt.films.*;
@@ -47,9 +48,15 @@ public class PathtracingBoxSphereMotion extends Scene {
 		Matrix4f t = new Matrix4f();
 		t.setIdentity();
 		t.setScale(.5f);
-		t.setTranslation(new Vector3f(-.5f,-.2f,1.f));
-		Vector3f trans = new Vector3f(1,0,1);
-		AnimatedInstance sphereI = new AnimatedInstance(sphere, t, trans);
+		t.setTranslation(new Vector3f(-1.3f,-.25f,.7f));
+		//Vector3f trans = new Vector3f(2,0,2);
+		Instance i = new Instance(sphere, t);
+		Vector3f trans = new Vector3f(.3f,0,.3f);
+		Matrix4f motion = new Matrix4f();
+		motion.rotY((float) Math.toRadians(20));;
+		//motion.setTranslation(trans);
+		AnimatedInstance sphereI = new AnimatedInstance(i, motion);
+		
 		sphereI.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
 		
 		objects.add(sphereI);
@@ -61,7 +68,9 @@ public class PathtracingBoxSphereMotion extends Scene {
 	
 		// Bottom
 		rectangle = new Rectangle(new Point3f(-2.f, -.75f, 2.f), new Vector3f(4.f, 0.f, 0.f), new Vector3f(0.f, 0.f, -4.f));
-		rectangle.material = new Diffuse(new Spectrum(0.8f, 0.8f, 0.8f));
+		Spectrum ext = new Spectrum(3.88f, 3.45f, 2.56f);
+		Material g = new rt.materials.Glossy( 8.f, new Spectrum(0.131f, 0.12f, 0.144f), ext);
+		rectangle.material = new NoisyTexture(g, Type.WOOD);
 		objects.add(rectangle);
 
 		// Top
