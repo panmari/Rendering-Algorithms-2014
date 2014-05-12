@@ -1,5 +1,8 @@
 package rt.materials;
 
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Point3f;
+import javax.vecmath.Tuple3f;
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
@@ -10,7 +13,7 @@ import util.MyMath;
 
 public class NoisyTexture implements Material {
 
-	public enum Type {NORMAL, WOOD, MARBLE};
+	public enum Type {NORMAL, CONTINENT, SWIRLY_STRIPES, WOOD_FLAT};
 
 	private final float SCALE = 15;
 	private final Type type;
@@ -21,7 +24,7 @@ public class NoisyTexture implements Material {
 		type = t;
 	}
 	public NoisyTexture(Material m) {
-		this(m, Type.WOOD);
+		this(m, Type.CONTINENT);
 	}
 	
 	public NoisyTexture(Spectrum s) {
@@ -35,32 +38,46 @@ public class NoisyTexture implements Material {
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut, Vector3f wIn) {
 		Spectrum brdf = m.evaluateBRDF(hitRecord, wOut, wIn);
-		addNoise(hitRecord, brdf);
+		addNoise(hitRecord.position, brdf);
 		return brdf;
 	}
 	
-	private void addNoise(HitRecord h, Spectrum brdf) {
-		Vector3f p = new Vector3f(h.position);
+	private void addNoise(Tuple3f p, Spectrum brdf) {
+		float noise = getNoise(p);
+		brdf.add(noise);
+	}
+	
+	private float getNoise(Tuple3f pos) {
+		Vector3f p = new Vector3f(pos); //make copy to be sure we can change it
 		float noise = 0f;
 		switch (type) {
+		default:
 		case NORMAL:
 			p.scale(SCALE);
-			noise = (float) (ImprovedNoise.noise(p.x, p.y, p.z) + 1) /2;
+			noise = (float) ImprovedNoise.noise(p.x, p.y, p.z);
 			break;
-		case MARBLE:
-			float xBefore = p.x*10;
+		case SWIRLY_STRIPES:
+			float xBefore = p.x;
+			float yBefore = p.y;
 			p.scale(SCALE);
-			noise = (float) (ImprovedNoise.noise(p.x, p.y, p.z) + 1) /2;
-			noise = MyMath.cos(noise + xBefore);
+			noise = (float) ImprovedNoise.noise(p.x, p.y, p.z);
+			noise = MyMath.cos(noise + xBefore*20);
 			break;
-		case WOOD:
-			noise = (float) (ImprovedNoise.noise(p.x, p.y, p.z) + 1) /2;
+		case CONTINENT:
+			p.scale(SCALE);
+			noise = (float) ImprovedNoise.noise(p.x, p.y, p.z);
 			noise = noise * 20;
 			noise = noise - (int) noise;
 			break;
+		case WOOD_FLAT:
+			p.scale(SCALE);
+			noise = (float) ImprovedNoise.noise(Math.sin(p.x), Math.cos(p.y), Math.sin(p.z));
+			//noise = noise * 20;
+			//noise = noise - (int) noise;
+			//noise += ImprovedNoise.noise(p.x, p.y, p.z);
+			break;
 		}
-		
-		brdf.mult(noise);
+		return noise/10;
 	}
 
 	@Override
@@ -78,7 +95,7 @@ public class NoisyTexture implements Material {
 		ShadingSample s = m.evaluateSpecularReflection(hitRecord);
 		if (s == null)
 			return s;
-		addNoise(hitRecord, s.brdf);
+		addNoise(hitRecord.position, s.brdf);
 		return s;
 	}
 
@@ -92,7 +109,7 @@ public class NoisyTexture implements Material {
 		ShadingSample s = m.evaluateSpecularRefraction(hitRecord);
 		if (s == null)
 			return s;
-		addNoise(hitRecord, s.brdf);
+		addNoise(hitRecord.position, s.brdf);
 		return s;
 	}
 
@@ -100,7 +117,7 @@ public class NoisyTexture implements Material {
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
 		//should never be null
 		ShadingSample s = m.getShadingSample(hitRecord, sample);
-		addNoise(hitRecord, s.brdf);
+		addNoise(hitRecord.position, s.brdf);
 		return s;
 	}
 
@@ -118,5 +135,24 @@ public class NoisyTexture implements Material {
 	@Override
 	public void evaluateBumpMap(HitRecord hitRecord) {
 		m.evaluateBumpMap(hitRecord);
+		Tuple3f p = hitRecord.position;
+		float F_0 = getNoise(p);
+		Vector3f n = new Vector3f(-F_0, -F_0, -F_0);
+		float epsilon = 0.01f;
+		Point3f p_x = new Point3f(p);
+		p_x.x += epsilon;
+		n.x += getNoise(p_x);
+		
+		Point3f p_y = new Point3f(p);
+		p_y.y += epsilon;
+		n.y += getNoise(p_y);
+		
+		Point3f p_z = new Point3f(p);
+		p_z.z += epsilon;
+		n.z += getNoise(p_z);
+		
+		//n.scale(1/epsilon);
+		hitRecord.normal.sub(n);
+		hitRecord.normal.normalize();
 	}
 }
