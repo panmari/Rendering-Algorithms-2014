@@ -65,7 +65,7 @@ public class Reflective implements Material {
 
 	@Override
 	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
-		return new ShadingSample();
+		return null;
 	}
 
 	@Override
