@@ -46,7 +46,7 @@ public class BidirectionalPathTracingIntegratorFactory implements IntegratorFact
 	}
 	
 	private void combineLightFilms(){
-		if (combined) {
+		if (!combined) {
 			for (BidirectionalPathTracingIntegrator i: integrators) {
 				combinedLightFilm.addImage(i.getLightFilm());
 			}
