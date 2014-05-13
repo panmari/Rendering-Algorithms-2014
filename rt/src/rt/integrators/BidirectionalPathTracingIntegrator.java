@@ -54,7 +54,6 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 			return new Spectrum();
 		ShadingSample sampleBefore = hBefore.material.getShadingSample(hBefore, sampler.makeSamples(2, 2)[0]);
 		float g = 1;
-		float cosBefore = 1;
 		Spectrum alpha = new Spectrum(1);
 		boolean segmentIsSpecular = false;
 		//z_0 is camera, z_1 is first in scene, z_3 is second in scene
@@ -84,17 +83,16 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 			//multiply brdf to alpha
 			alpha.mult(sampleBefore.brdf);
 			// multiply geometry term to alpha
-			alpha.mult(cosBefore);
-			alpha.mult(1/sampleBefore.p);
+			float cosTerm = hBefore.normal.dot(sampleBefore.w);
+			alpha.mult(cosTerm);
+			alpha.mult(1/sampleBefore.p);	
 			
-			g = hBefore.normal.dot(sampleBefore.w);
+			g = cosTerm;
 			assert g >= 0: "Got " + g;
 			g *= h.normal.dot(h.w);
 			g = Math.max(g, 0);
 			assert g >= 0: "Got " + g;
 			g /= StaticVecmath.dist2(hBefore.position, h.position);
-			cosBefore = hBefore.normal.dot(sampleBefore.w);
-			assert cosBefore >= 0;
 			hBefore = h;
 			sampleBefore = sample;
 		}
@@ -119,7 +117,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	}
 
 	public Spectrum connect(PathNode eye, PathNode light, float time) {
-		// pointing from light to eye spot
+		// pointing from light to eye spot$
 		Vector3f connection = StaticVecmath.sub(eye.h.position, light.h.position);
 		float connection_d2 = connection.lengthSquared();
 		Vector3f normedConnection = new Vector3f();
