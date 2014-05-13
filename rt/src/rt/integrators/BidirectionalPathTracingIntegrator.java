@@ -48,50 +48,55 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		//make eye path
 		//make first node
 		List<PathNode> eyePath = new ArrayList<>();
-		Spectrum alphaBefore = new Spectrum(1);
 		Ray r = primaryRay;
-		HitRecord lastHit = root.intersect(r);
-		if (lastHit == null)
+		HitRecord hBefore = root.intersect(r);
+		if (hBefore == null)
 			return new Spectrum();
-		ShadingSample sample = lastHit.material.getShadingSample(lastHit, sampler.makeSamples(2, 2)[0]);
+		ShadingSample sampleBefore = hBefore.material.getShadingSample(hBefore, sampler.makeSamples(2, 2)[0]);
 		float g = 1;
 		float cosBefore = 1;
-		float dirProbBefore = 1;
+		Spectrum alpha = new Spectrum(1);
 		boolean segmentIsSpecular = false;
+		//z_0 is camera, z_1 is first in scene, z_3 is second in scene
+		// alpha is 1  , alpha is 1           , alpha = brdf(z1)*cos(z_1 -> z->2)/prob(z_1 -> z_2)
 		for (int eyeBounce = 1; eyeBounce < MAX_EYE_BOUNCES; eyeBounce++) {
-			Spectrum emission = lastHit.material.evaluateEmission(lastHit, lastHit.w);
+			Spectrum emission = hBefore.material.evaluateEmission(hBefore, hBefore.w);
 			if (emission != null) {
 				if (segmentIsSpecular)
 					outgoing.add(emission);
 				break;
 			}
-
-			Spectrum alpha = new Spectrum(alphaBefore);
-			//multiply brdf to alpha
-			alpha.mult(lastHit.material.evaluateBRDF(lastHit, lastHit.w, sample.w));
-			// multiply geometry term to alpha
-			alpha.mult(cosBefore);
-			alpha.mult(1/dirProbBefore);
 			
 			//make new ray, intersect with scene
-			r = new Ray(lastHit.position, sample.w, r.t);
+			r = new Ray(hBefore.position, sampleBefore.w, r.t, eyeBounce, true);
 			HitRecord h = root.intersect(r);
 			if (h == null) {
-				PathNode node = new PathNode(lastHit, alphaBefore, g, 0, sample.p, eyeBounce);
+				PathNode node = new PathNode(hBefore, alpha, g, 0, sampleBefore.p, eyeBounce);
 				eyePath.add(node);
 				break;
 			}
-			ShadingSample nextSample = h.material.getShadingSample(h, sampler.makeSamples(2, 2)[0]);
-			float p_L = h.material.getDirectionalProbability(h, nextSample.w);
-			PathNode node = new PathNode(lastHit, alphaBefore, g, p_L, sample.p, eyeBounce);
+			ShadingSample sample = h.material.getShadingSample(h, sampler.makeSamples(2, 2)[0]);
+			float p_L = h.material.getDirectionalProbability(h, sample.w);
+			PathNode node = new PathNode(hBefore, alpha, g, p_L, sampleBefore.p, eyeBounce);
 			eyePath.add(node);
-			g = lastHit.normal.dot(sample.w)*h.normal.dot(h.w);
-			g /= StaticVecmath.dist2(lastHit.position, h.position);
-			cosBefore = lastHit.normal.dot(sample.w);
-			dirProbBefore = sample.p;
-			lastHit = h;
-			sample = nextSample;
-			alphaBefore = alpha;
+			
+			alpha = new Spectrum(alpha);
+			//multiply brdf to alpha
+			alpha.mult(sampleBefore.brdf);
+			// multiply geometry term to alpha
+			alpha.mult(cosBefore);
+			alpha.mult(1/sampleBefore.p);
+			
+			g = hBefore.normal.dot(sampleBefore.w);
+			assert g >= 0: "Got " + g;
+			g *= h.normal.dot(h.w);
+			g = Math.max(g, 0);
+			assert g >= 0: "Got " + g;
+			g /= StaticVecmath.dist2(hBefore.position, h.position);
+			cosBefore = hBefore.normal.dot(sampleBefore.w);
+			assert cosBefore >= 0;
+			hBefore = h;
+			sampleBefore = sample;
 		}
 		
 		Spectrum alphaL = new Spectrum(1);
@@ -99,7 +104,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		HitRecord lightHit = light.sample(sampler.makeSamples(2, 2)[0]);
 		alphaL.mult(lightList.size()/(lightHit.p));
 		PathNode LightNode = new PathNode(lightHit, alphaL, 1, 1, 1, 0);
-		sample = lightHit.material.getEmissionSample(lightHit, sampler.makeSamples(2, 2)[0]);
+		sampleBefore = lightHit.material.getEmissionSample(lightHit, sampler.makeSamples(2, 2)[0]);
 		
 		for (PathNode eyeNode: eyePath) {
 			Spectrum contribution = connect(eyeNode, LightNode, r.t);
@@ -120,7 +125,9 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		Vector3f normedConnection = new Vector3f();
 		normedConnection.normalize(connection);
 
-		Spectrum s = eye.h.material.evaluateBRDF(eye.h, eye.h.w, StaticVecmath.negate(normedConnection));
+		Spectrum s = new Spectrum(1);
+		Spectrum eyePathSpectrum = eye.h.material.evaluateBRDF(eye.h, eye.h.w, StaticVecmath.negate(normedConnection));
+		s.mult(eyePathSpectrum);
 		Spectrum lightPathSpectrum;
 		if (light.bounce == 0) {
 			lightPathSpectrum = light.h.material.evaluateEmission(light.h, normedConnection);
@@ -132,7 +139,8 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		s.mult(eye.alpha);
 		s.mult(light.alpha);
 		
-		float cosEyePath = StaticVecmath.negate(normedConnection).dot(eye.h.normal);
+		float cosEyePath = Math.max(StaticVecmath.negate(normedConnection).dot(eye.h.normal), 0);
+		assert cosEyePath >= 0;
 		float cosLightPath;
 		if (light.h.normal != null) {
 			cosLightPath = light.h.normal.dot(normedConnection);
