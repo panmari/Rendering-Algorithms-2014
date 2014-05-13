@@ -32,7 +32,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 	private RandomSampler sampler;
 	private static int count = 0;
 	private final int MAX_EYE_BOUNCES = 10;
-	private final int MAX_LIGHT_BOUNCES = 20; // minimum here is 1, 0 will be treated as 1
+	private final int MAX_LIGHT_BOUNCES = 2; // minimum here is 1, 0 will be treated as 1
 	
 	public BidirectionalPathTracingIntegrator(Scene scene) {
 		this.lightList = scene.getLightList();
@@ -55,33 +55,48 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		ShadingSample sampleBefore = hBefore.material.getShadingSample(hBefore, sampler.makeSamples(2, 2)[0]);
 		float g = 1;
 		Spectrum alpha = new Spectrum(1);
-		boolean segmentIsSpecular = false;
-		//z_0 is camera, z_1 is first in scene, z_3 is second in scene
-		// alpha is 1  , alpha is 1           , alpha = brdf(z1)*cos(z_1 -> z->2)/prob(z_1 -> z_2)
-		for (int eyeBounce = 1; eyeBounce < MAX_EYE_BOUNCES; eyeBounce++) {
-			Spectrum emission = hBefore.material.evaluateEmission(hBefore, hBefore.w);
-			if (emission != null) {
-				if (segmentIsSpecular)
-					outgoing.add(emission);
-				break;
+		generateNodes(MAX_EYE_BOUNCES, r, alpha, sampleBefore, hBefore, g, eyePath, false);
+		
+		List<PathNode> lightPath = new ArrayList<>();
+		alpha = new Spectrum(1);
+		LightGeometry light = lightList.getRandomLight(sampler.makeSamples(2, 2));
+		HitRecord lightHit = light.sample(sampler.makeSamples(2, 2)[0]);
+		alpha.mult(lightList.size()/(lightHit.p));
+		sampleBefore = lightHit.material.getEmissionSample(lightHit, sampler.makeSamples(2, 2)[0]);
+		r = new Ray(lightHit.position, sampleBefore.w, primaryRay.t, 0, true);
+		generateNodes(MAX_LIGHT_BOUNCES, r, alpha, sampleBefore, lightHit, g, lightPath, true);
+		
+		for (PathNode eyeNode: eyePath) {
+			for (PathNode lightNode: lightPath) {
+				Spectrum contribution = connect(eyeNode, lightNode, r.t);
+				outgoing.add(contribution);
 			}
-			
+		}	
+		return outgoing;
+	}
+	
+	private void generateNodes(int MAX_BOUNCES, Ray r, Spectrum alpha, 
+			ShadingSample sampleBefore, HitRecord hBefore, float g, List<PathNode> path, boolean light) {
+		for (int bounces = 1; bounces < MAX_BOUNCES; bounces++) {			
 			//make new ray, intersect with scene
-			r = new Ray(hBefore.position, sampleBefore.w, r.t, eyeBounce, true);
+			r = new Ray(hBefore.position, sampleBefore.w, r.t, bounces, true);
 			HitRecord h = root.intersect(r);
 			if (h == null) {
-				PathNode node = new PathNode(hBefore, alpha, g, 0, sampleBefore.p, eyeBounce);
-				eyePath.add(node);
+				PathNode node = new PathNode(hBefore, alpha, g, 0, sampleBefore.p, bounces);
+				path.add(node);
 				break;
 			}
 			ShadingSample sample = h.material.getShadingSample(h, sampler.makeSamples(2, 2)[0]);
 			float p_L = h.material.getDirectionalProbability(h, sample.w);
-			PathNode node = new PathNode(hBefore, alpha, g, p_L, sampleBefore.p, eyeBounce);
-			eyePath.add(node);
+			PathNode node = new PathNode(hBefore, alpha, g, p_L, sampleBefore.p, bounces);
+			path.add(node);
 			
 			alpha = new Spectrum(alpha);
 			//multiply brdf to alpha
-			alpha.mult(sampleBefore.brdf);
+			if (light && bounces == 1)
+				alpha.mult(sampleBefore.emission);
+			else
+				alpha.mult(sampleBefore.brdf);
 			// multiply geometry term to alpha
 			float cosTerm = hBefore.normal.dot(sampleBefore.w);
 			alpha.mult(cosTerm);
@@ -97,25 +112,8 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 			sampleBefore = sample;
 		}
 		
-		Spectrum alphaL = new Spectrum(1);
-		LightGeometry light = lightList.getRandomLight(sampler.makeSamples(2, 2));
-		HitRecord lightHit = light.sample(sampler.makeSamples(2, 2)[0]);
-		alphaL.mult(lightList.size()/(lightHit.p));
-		PathNode LightNode = new PathNode(lightHit, alphaL, 1, 1, 1, 0);
-		sampleBefore = lightHit.material.getEmissionSample(lightHit, sampler.makeSamples(2, 2)[0]);
-		
-		for (PathNode eyeNode: eyePath) {
-			Spectrum contribution = connect(eyeNode, LightNode, r.t);
-			outgoing.add(contribution);
-		}
-		//for (int lightBounce = 0; lightBounce < MAX_LIGHT_BOUNCES; lightBounce++) {
-			
-			
-		//}
-		
-		return outgoing;
 	}
-
+	
 	public Spectrum connect(PathNode eye, PathNode light, float time) {
 		// pointing from light to eye spot$
 		Vector3f connection = StaticVecmath.sub(eye.h.position, light.h.position);
@@ -127,7 +125,7 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		Spectrum eyePathSpectrum = eye.h.material.evaluateBRDF(eye.h, eye.h.w, StaticVecmath.negate(normedConnection));
 		s.mult(eyePathSpectrum);
 		Spectrum lightPathSpectrum;
-		if (light.bounce == 0) {
+		if (light.bounce == 1) {
 			lightPathSpectrum = light.h.material.evaluateEmission(light.h, normedConnection);
 		} else {
 			lightPathSpectrum = light.h.material.evaluateBRDF(light.h, eye.h.w, normedConnection);
@@ -156,34 +154,6 @@ public class BidirectionalPathTracingIntegrator implements Integrator {
 		else
 			return s;
 	}
-	private void generateNodes(int MAX_BOUNCES, Ray r, Spectrum alpha, ShadingSample sample, HitRecord lastHit, List<PathNode> list) {
-		float g = 1;
-		float cosBefore = 1;
-		float dirProbBefore = 1;
-		for (int bounces = 0; bounces < MAX_BOUNCES; bounces++) {
-			alpha = new Spectrum(alpha);
-			//multiply brdf to alpha
-			alpha.mult(lastHit.material.evaluateBRDF(lastHit, lastHit.w, sample.w));
-			// multiply geometry term to alpha
-			alpha.mult(cosBefore);
-			alpha.mult(1/dirProbBefore);
-			
-			//make new ray, intersect with scene
-			r = new Ray(lastHit.position, sample.w, r.t);
-			HitRecord h = root.intersect(r);
-			ShadingSample nextSample = h.material.getShadingSample(h, sampler.makeSamples(2, 2)[0]);
-			float p_L = h.material.getDirectionalProbability(h, nextSample.w);
-			PathNode node = new PathNode(lastHit, alpha, g, p_L, sample.p, bounces);
-			list.add(node);
-			g = lastHit.normal.dot(sample.w)*h.normal.dot(h.w);
-			g /= StaticVecmath.dist2(lastHit.position, h.position);
-			cosBefore = lastHit.normal.dot(sample.w);
-			dirProbBefore = sample.p;
-			lastHit = h;
-			sample = nextSample;
-		}
-	}
-	
 	@Override
 	public float[][] makePixelSamples(Sampler sampler, int n) {
 		return sampler.makeSamples(n, 2);
