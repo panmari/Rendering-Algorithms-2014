@@ -45,4 +45,6 @@ public interface Film {
 	 */
 	public void addImage(Film f);
 
+	public Spectrum[][] getUnnormalizedImage();
+
 }
