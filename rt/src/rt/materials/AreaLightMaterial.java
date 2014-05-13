@@ -120,7 +120,7 @@ public class AreaLightMaterial implements Material {
 
 	@Override
 	public float getDirectionalProbability(HitRecord h, Vector3f out) {
-		throw new RuntimeException("Should not be called on lights");
+		return 0;
 	}
 	
 

@@ -1,9 +1,8 @@
 package rt;
 
-import javax.imageio.ImageIO;
-
 import rt.testscenes.*;
 import util.HistHelper;
+import util.ImageWriter;
 
 import java.util.*;
 import java.awt.Point;
@@ -180,9 +179,9 @@ public class Main {
 				printed += toPrint;
 			}
 		}
+		System.out.println("\nFinishing scene...");
 		scene.getIntegratorFactory().finish(scene);
 		
-		System.out.printf("\n");
 		long time_ms = timer.timeElapsed();
 		long time_s = time_ms / 1000;
 		long time_min =  time_s / 60;

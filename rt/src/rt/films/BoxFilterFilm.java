@@ -73,13 +73,19 @@ public class BoxFilterFilm implements Film {
 	public void addImage(Film f) {
 		assert f.getHeight() == this.height;
 		assert f.getWidth() == this.width;
-		Spectrum[][] img = f.makeImage();
+		Spectrum[][] img = f.getUnnormalizedImage();
 		for(int i=0; i<width; i++)
 		{
 			for(int j=0; j<height; j++)
 			{
+				//TODO: some normalization?
 				addSample(i,j, img[i][j]);
 			}
 		}
+	}
+
+	@Override
+	public Spectrum[][] getUnnormalizedImage() {
+		return unnormalized;
 	}
 }
