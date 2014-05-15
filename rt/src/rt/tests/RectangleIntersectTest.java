@@ -25,28 +25,28 @@ public class RectangleIntersectTest {
 	
 	@Test
 	public void rectangleShouldIntersectCorrectly() {
-		Ray r = new Ray(new Point3f(.5f, .5f, 5), new Vector3f(0,0,-1));
+		Ray r = new Ray(new Point3f(.5f, .5f, 5), new Vector3f(0,0,-1),0);
 		HitRecord h = rect.intersect(r);
 		assertEquals(new Point3f(.5f, .5f, 0), h.position);
 	}
 	
 	@Test
 	public void rectangleShouldNotIntersectRayIntoOppositeDirection() {
-		Ray r = new Ray(new Point3f(.5f, .5f, 5), new Vector3f(0,0, 1));
+		Ray r = new Ray(new Point3f(.5f, .5f, 5), new Vector3f(0,0, 1),0);
 		HitRecord h = rect.intersect(r);
 		assertNull(h);
 	}
 	
 	@Test
 	public void rectangleNotInOriginShouldIntersectCorrectly() {
-		Ray r = new Ray(new Point3f(1f, 1f, 1), new Vector3f(0,0, -1));
+		Ray r = new Ray(new Point3f(1f, 1f, 1), new Vector3f(0,0, -1),0);
 		HitRecord h = rectUp.intersect(r);
 		assertEquals(new Point3f(1,1,0), h.position);
 	}
 
 	@Test
 	public void rectangleNotInOriginShouldNotIntersectCorrectly() {
-		Ray r = new Ray(new Point3f(1.5f, 1.5f, 1), new Vector3f(0,-.1f, -1f));
+		Ray r = new Ray(new Point3f(1.5f, 1.5f, 1), new Vector3f(0,-.1f, -1f),0);
 		HitRecord h = rectUp.intersect(r);
 		assertNotNull(h);
 		assertEquals(new Point3f(1.5f, 1.4f,0), h.position);
