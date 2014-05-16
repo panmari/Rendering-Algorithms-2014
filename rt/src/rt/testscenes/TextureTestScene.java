@@ -27,7 +27,7 @@ public class TextureTestScene extends Scene {
 		height = 360;
 		
 		// Number of samples per pixel
-		SPP = 4;
+		SPP = 128;
 		
 		// Specify which camera, film, and tonemapper to use
 		Vector3f eye = new Vector3f(0.f, 0.f, 5.f);
@@ -40,8 +40,8 @@ public class TextureTestScene extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
-		integratorFactory = new PointLightIntegratorFactory();
-		samplerFactory = new OneSamplerFactory();		
+		integratorFactory = new PathTracingIntegratorFactory();
+		samplerFactory = new RandomSamplerFactory();		
 		
 		Material chessTexture = new Textured("../textures/chessboard.jpg", "../normalmaps/normal.gif");
 		Material forestfloor = new Textured("../textures/egg.jpg", "../normalmaps/forestfloor.jpg");
@@ -81,7 +81,7 @@ public class TextureTestScene extends Scene {
 		LightGeometry pointLight1 = new PointLight(lightPos, new Spectrum(14.f, 14.f, 14.f));
 		lightPos.add(new Vector3f(2.f, 0.f, 0.f));
 		LightGeometry pointLight2 = new PointLight(lightPos, new Spectrum(14.f, 14.f, 14.f));
-		LightGeometry pointLight3 = new PointLight(new Vector3f(0.f, 5.f, 1.f), new Spectrum(24.f, 24.f, 24.f));
+		LightGeometry pointLight3 = new PointLight(new Vector3f(0.f, 5.f, 1.f), new Spectrum(50.f, 50.f,50.f));
 		lightList = new LightList();
 		lightList.add(pointLight1);
 		lightList.add(pointLight2);

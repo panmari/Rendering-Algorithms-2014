@@ -1,6 +1,7 @@
 package rt.lightsources;
 
 import javax.vecmath.Vector3f;
+
 import rt.*;
 import rt.accelerators.BoundingBox;
 import rt.materials.PointLightMaterial;
@@ -32,10 +33,7 @@ public class PointLight implements LightGeometry {
 	 * Set normal to null.
 	 */
 	public HitRecord sample(float[] s) {
-		HitRecord hitRecord = new HitRecord();
-		hitRecord.position = new Vector3f(position);
-		hitRecord.material = pointLightMaterial;
-		hitRecord.normal = null;
+		HitRecord hitRecord = new HitRecord(0, new Vector3f(position), null, null, this, this.pointLightMaterial, 0, 0);
 		hitRecord.p = 1.f;
 		return hitRecord;
 	}

@@ -55,12 +55,6 @@ public class HitRecord  {
 	 */
 	public float p;
 	
-	
-	public HitRecord ()
-	{
-		// do nothing
-	}
-	
 	public HitRecord(float t, Tuple3f position, Vector3f normal, 
 			Vector3f w, Intersectable intersectable, 
 			Material material, float u, float v)
@@ -73,6 +67,7 @@ public class HitRecord  {
 		this.material = material;
 		this.u = u;
 		this.v = v;
+		this.material.evaluateBumpMap(this);
 	}
 	
 	public Matrix3f getTangentialMatrix() {

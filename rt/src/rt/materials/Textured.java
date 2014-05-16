@@ -16,13 +16,18 @@ import static util.MyMath.ceil;
 import static util.MyMath.floor;
 
 
-public class Textured extends Diffuse implements Material {
+public class Textured implements Material {
 
 	private BufferedImage texture;
 	private BufferedImage bumpMap;
+	private Material m;
 
 	public Textured(String textureFileName, String bumpMapFileName) {
-		super(new Spectrum(1));
+		this(new Diffuse(new Spectrum(1)), textureFileName, bumpMapFileName);
+	}
+
+	public Textured(Material m, String textureFileName, String bumpMapFileName) {
+		this.m = m;
 		try {
 			texture = ImageIO.read(new File(textureFileName));
 			if (bumpMapFileName != null)
@@ -100,7 +105,7 @@ public class Textured extends Diffuse implements Material {
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut,
 			Vector3f wIn) {
-		Spectrum brdf = super.evaluateBRDF(hitRecord, wOut, wIn);
+		Spectrum brdf = m.evaluateBRDF(hitRecord, wOut, wIn);
 		Spectrum tex = getBilinearInterpolated(hitRecord.u, hitRecord.v, texture);
 		brdf.mult(tex);
 		return brdf;
@@ -117,6 +122,51 @@ public class Textured extends Diffuse implements Material {
 			m.transform(n);
 			hitRecord.normal = n;
 		}
+	}
+
+	@Override
+	public Spectrum evaluateEmission(HitRecord hitRecord, Vector3f wOut) {
+		return m.evaluateEmission(hitRecord, wOut);
+	}
+
+	@Override
+	public boolean hasSpecularReflection() {
+		return m.hasSpecularReflection();
+	}
+
+	@Override
+	public ShadingSample evaluateSpecularReflection(HitRecord hitRecord) {
+		return m.evaluateSpecularReflection(hitRecord);
+	}
+
+	@Override
+	public boolean hasSpecularRefraction() {
+		return m.hasSpecularRefraction();
+	}
+
+	@Override
+	public ShadingSample evaluateSpecularRefraction(HitRecord hitRecord) {
+		return m.evaluateSpecularRefraction(hitRecord);
+	}
+
+	@Override
+	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
+		return m.getShadingSample(hitRecord, sample);
+	}
+
+	@Override
+	public ShadingSample getEmissionSample(HitRecord hitRecord, float[] sample) {
+		return m.getEmissionSample(hitRecord, sample);
+	}
+
+	@Override
+	public boolean castsShadows() {
+		return m.castsShadows();
+	}
+
+	@Override
+	public float getDirectionalProbability(HitRecord h, Vector3f out) {
+		return m.getDirectionalProbability(h, out);
 	}
 
 }

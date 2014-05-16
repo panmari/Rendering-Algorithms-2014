@@ -58,7 +58,6 @@ public class AreaLight implements LightGeometry {
 	 * Sample a point on the light geometry.
 	 */
 	public HitRecord sample(float[] s) {
-		HitRecord hitRecord = new HitRecord();
 		Vector3f edge1Sampled = new Vector3f(edge1);
 		edge1Sampled.scale(s[0]);
 		Vector3f edge2Sampled = new Vector3f(edge2);
@@ -66,10 +65,7 @@ public class AreaLight implements LightGeometry {
 		Point3f position = new Point3f(this.lightPos);
 		position.add(edge1Sampled);
 		position.add(edge2Sampled);
-		hitRecord.position = position;
-		hitRecord.intersectable = this;
-		hitRecord.material = this.areaLightMaterial;
-		hitRecord.normal = new Vector3f(this.normal);
+		HitRecord hitRecord = new HitRecord(0, position, new Vector3f(this.normal), null, this, this.areaLightMaterial, 0, 0);
 		hitRecord.p = 1.f/area;
 		return hitRecord;
 	}

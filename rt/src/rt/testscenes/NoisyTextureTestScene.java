@@ -60,7 +60,7 @@ public class NoisyTextureTestScene extends Scene {
 		//some noisy sphere
 		
 		Material m = new Glossy( 8.f, new Spectrum(0.27f, 0.82f, 1.16f), new Spectrum(3.23f, 2.6f, 2.5f));
-		Material noisyMaterial = new NoisyTexture(m, Type.SWIRLY_STRIPES);
+		Material noisyMaterial = new NoisyTexture(m, Type.CONTINENT);
 		Intersectable noisySphere = new Sphere(new Point3f(0,0,0), 1f, noisyMaterial);
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
