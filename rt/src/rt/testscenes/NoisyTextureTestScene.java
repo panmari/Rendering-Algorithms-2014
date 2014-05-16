@@ -1,5 +1,6 @@
 package rt.testscenes;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
@@ -14,8 +15,11 @@ import rt.cameras.PinholeCamera;
 import rt.films.BoxFilterFilm;
 import rt.integrators.PointLightIntegratorFactory;
 import rt.intersectables.CSGPlane;
+import rt.intersectables.Instance;
+import rt.intersectables.Rectangle;
 import rt.intersectables.Sphere;
 import rt.lightsources.PointLight;
+import rt.materials.Diffuse;
 import rt.materials.Glossy;
 import rt.materials.NoisyTexture;
 import rt.materials.Textured;
@@ -29,14 +33,14 @@ public class NoisyTextureTestScene extends Scene {
 	public NoisyTextureTestScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/NoisyTextureTestSceneNoBumpy");
+		outputFilename = new String("../output/testscenes/NoisyTextureTestScene");
 		
 		// Image width and height in pixels
 		width = 640;
 		height = 360;
 		
 		// Number of samples per pixel
-		SPP = 128;
+		SPP = 16;
 		
 		// Specify which camera, film, and tonemapper to use
 		Vector3f eye = new Vector3f(0.f, 0.f, 5.f);
@@ -59,12 +63,20 @@ public class NoisyTextureTestScene extends Scene {
 		// Add objects
 		//some noisy sphere
 		
-		Material m = new Glossy( 8.f, new Spectrum(0.27f, 0.82f, 1.16f), new Spectrum(3.23f, 2.6f, 2.5f));
-		Material noisyMaterial = new NoisyTexture(m, Type.CONTINENT);
+		Material glossy = new Glossy( 8.f, new Spectrum(0.27f, 0.82f, 1.16f), new Spectrum(3.23f, 2.6f, 2.5f));
+		Material diffuse = new Diffuse(new Spectrum(1));
+		Material noisyMaterial = new NoisyTexture(glossy, Type.CONTINENT);
 		Intersectable noisySphere = new Sphere(new Point3f(0,0,0), 1f, noisyMaterial);
+		
+		Matrix4f t = new Matrix4f();
+		t.setIdentity();
+		t.setTranslation(new Vector3f(-3,0,0));
+		Instance leftSphere = new Instance(noisySphere, t);
+		leftSphere.material = new NoisyTexture(glossy, Type.ROUGH);
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
-		CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
+		//CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
+		Rectangle groundPlane = new Rectangle(new Point3f(-9,-1.5f, -4), new Vector3f(0,0,9),new Vector3f(17,0,0));
 		groundPlane.material = chessTexture;
 		CSGPlane backPlane = new CSGPlane(new Vector3f(0.f, 0.f, 1.f), 3.15f);
 		backPlane.material = grid;		
@@ -74,6 +86,7 @@ public class NoisyTextureTestScene extends Scene {
 		intersectableList.add(noisySphere);	
 		intersectableList.add(groundPlane);
 		intersectableList.add(backPlane);
+		intersectableList.add(leftSphere);
 		
 		// Set the root node for the scene
 		root = intersectableList;
@@ -89,5 +102,6 @@ public class NoisyTextureTestScene extends Scene {
 		lightList.add(pointLight1);
 		lightList.add(pointLight2);
 		lightList.add(pointLight3);
+		lightList.add(new PointLight(new Vector3f(-5, 3, 3), new Spectrum(35,35,35)));
 	}
 }

@@ -13,7 +13,7 @@ import util.MyMath;
 
 public class NoisyTexture implements Material {
 
-	public enum Type {NORMAL, CONTINENT, SWIRLY_STRIPES, WOOD_FLAT};
+	public enum Type {NORMAL, ROUGH, CONTINENT, SWIRLY_STRIPES, WOOD_FLAT};
 
 	private final float SCALE = 15;
 	private final Type type;
@@ -44,7 +44,9 @@ public class NoisyTexture implements Material {
 	
 	private void addNoise(Tuple3f p, Spectrum brdf) {
 		float noise = getNoise(p);
-		brdf.add(noise);
+		noise = (noise + 1) /2;
+		brdf.mult(noise);
+		//brdf.add(noise);
 	}
 	
 	private float getNoise(Tuple3f pos) {
@@ -55,6 +57,15 @@ public class NoisyTexture implements Material {
 		case NORMAL:
 			p.scale(SCALE);
 			noise = (float) ImprovedNoise.noise(p.x, p.y, p.z);
+			break;
+		case ROUGH:
+			p.scale(SCALE);
+			for (int i = 0; i < 5; i++)  {
+				Vector3f pScaled = new Vector3f(p);
+				float pow = (float)Math.pow(2, i);
+				pScaled.scale(pow);
+				noise += (float) ImprovedNoise.noise(pScaled.x, pScaled.y, pScaled.z)/pow;
+			}
 			break;
 		case SWIRLY_STRIPES:
 			float xBefore = p.x;
