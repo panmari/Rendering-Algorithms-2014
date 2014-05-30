@@ -15,10 +15,7 @@ import rt.cameras.PinholeCamera;
 import rt.cameras.ThinLensCamera;
 import rt.films.BoxFilterFilm;
 import rt.integrators.PointLightIntegratorFactory;
-import rt.intersectables.CSGPlane;
-import rt.intersectables.Instance;
-import rt.intersectables.Rectangle;
-import rt.intersectables.Sphere;
+import rt.intersectables.*;
 import rt.lightsources.PointLight;
 import rt.materials.Diffuse;
 import rt.materials.Glossy;
@@ -41,7 +38,7 @@ public class NoisyTextureTestScene extends Scene {
 		height = 360;
 		
 		// Number of samples per pixel
-		SPP = 16;
+		SPP = 4;
 		
 		// Specify which camera, film, and tonemapper to use
 		Vector3f eye = new Vector3f(0.f, 0.f, 5.f);
@@ -74,19 +71,28 @@ public class NoisyTextureTestScene extends Scene {
 		
 		t = new Matrix4f();
 		t.setIdentity();
-		t.setTranslation(new Vector3f(-3,0,0));
+		t.setTranslation(new Vector3f(-2.5f,0,0));
+		Instance movingMiddleInst = new Instance(sphere, t);
+		t = new Matrix4f();
+		t.setTranslation(new Vector3f(0,1f,0));
+		AnimatedInstance movingMiddle = new AnimatedInstance(movingMiddleInst, t);
+		movingMiddle.material = new NoisyTexture(glossy, Type.CONTINENT);
+		
+		t = new Matrix4f();
+		t.setIdentity();
+		t.setTranslation(new Vector3f(-3,0,3));
 		Instance leftSphere = new Instance(sphere, t);
 		leftSphere.material = new NoisyTexture(glossy, Type.ROUGH);
 		
 		t = new Matrix4f();
 		t.setIdentity();
-		t.setTranslation(new Vector3f(3,0,0));
+		t.setTranslation(new Vector3f(3,0,1.5f));
 		Instance rightSphere = new Instance(sphere, t);
 		rightSphere.material = new NoisyTexture(glossy, Type.STRANGE);
 		
 		t = new Matrix4f();
 		t.setIdentity();
-		t.setTranslation(new Vector3f(3,3,0));
+		t.setTranslation(new Vector3f(3,3,-2));
 		Instance upperRightSphere = new Instance(sphere, t);
 		upperRightSphere.material = new NoisyTexture(glossy, Type.EXPANDED);
 		
@@ -95,12 +101,13 @@ public class NoisyTextureTestScene extends Scene {
 		//CSGPlane groundPlane = new CSGPlane(new Vector3f(0.f, 1.f, 0.f), 1.5f);
 		Rectangle groundPlane = new Rectangle(new Point3f(-9,-1.5f, -4), new Vector3f(0,0,9),new Vector3f(17,0,0));
 		groundPlane.material = chessTexture;
-		CSGPlane backPlane = new CSGPlane(new Vector3f(0.f, 0.f, 1.f), 3.15f);
+		CSGPlane backPlane = new CSGPlane(new Vector3f(0.f, 0.f, 1.f), 10.15f);
 		backPlane.material = grid;		
 		
 		// Collect objects in intersectable list
 		IntersectableList intersectableList = new IntersectableList();
 		intersectableList.add(middleSphere);	
+		intersectableList.add(movingMiddle);
 		intersectableList.add(groundPlane);
 		intersectableList.add(backPlane);
 		intersectableList.add(leftSphere);
