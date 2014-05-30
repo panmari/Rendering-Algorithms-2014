@@ -38,6 +38,7 @@ public class NoisyTexture implements Material {
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut, Vector3f wIn) {
 		Spectrum brdf = m.evaluateBRDF(hitRecord, wOut, wIn);
 		addNoise(hitRecord.position, brdf);
+		assert !Float.isNaN(brdf.getLuminance());
 		return brdf;
 	}
 	

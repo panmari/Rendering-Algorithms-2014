@@ -29,9 +29,9 @@ public class Glossy implements Material {
 
 	@Override
 	public Spectrum evaluateBRDF(HitRecord hitRecord, Vector3f wOut, Vector3f wIn) {
-		assert(Math.abs(wIn.lengthSquared() - 1) < 1e-6f);
-		assert(Math.abs(wOut.lengthSquared() - 1) < 1e-6f);
-		assert(Math.abs(hitRecord.normal.lengthSquared() - 1) < 1e-6f);
+		assert(Math.abs(wIn.lengthSquared() - 1) < 1e-3f): wIn.lengthSquared();
+		assert(Math.abs(wOut.lengthSquared() - 1) < 1e-3f);
+		assert(Math.abs(hitRecord.normal.lengthSquared() - 1) < 1e-3f);
 		
 		Vector3f normal = hitRecord.normal;
 		Vector3f w_h = new Vector3f(wOut);
@@ -40,23 +40,24 @@ public class Glossy implements Material {
 		assert(Math.abs(w_h.lengthSquared() - 1) < 1e-6f);
 		
 		hitRecord.p = makeProbability(normal.dot(wOut), wOut, w_h);
+		float cosTheta_i = normal.dot(wIn);
+		float cosTheta_o = normal.dot(wOut);
 		//can shorten computation in these cases
-		if (hitRecord.normal.dot(wIn) < 0 || hitRecord.normal.dot(wOut) < 0)
+
+		if (cosTheta_i <= 0 || cosTheta_o <= 0)
 			return new Spectrum(0);
 		
 		
 		// G is the geometric term
 		float g_term = 2*normal.dot(w_h)/wOut.dot(w_h);
-		float g_term_one = normal.dot(wOut)*g_term;
-		float g_term_two = normal.dot(wIn)*g_term;
+		float g_term_one = cosTheta_o*g_term;
+		float g_term_two = cosTheta_i*g_term;
 		float G = Math.min(1, Math.min(g_term_one, g_term_two));
 		
 		// D is Microfacet distribution, determines BRDF.
 		float D = (e + 2)*MyMath.pow(w_h.dot(normal),e)/(2*MyMath.PI);
 		
 		//fresnel term, channel wise
-		float cosTheta_i = normal.dot(wIn);
-		float cosTheta_o = normal.dot(wOut);
 		float cosTheta_i2 = cosTheta_i*cosTheta_i;
 		Spectrum r1 = new Spectrum(nkterm);
 		r1.mult(cosTheta_i2);
@@ -86,6 +87,7 @@ public class Glossy implements Material {
 		Spectrum r = new Spectrum(F);
 		r.mult(G*D);
 		r.mult(1/(4f * cosTheta_i * cosTheta_o));
+		assert !Float.isNaN(r.getLuminance());
 		return r;
 	}
 	
