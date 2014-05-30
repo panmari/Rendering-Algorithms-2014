@@ -156,7 +156,7 @@ public class Glossy implements Material {
 		float p_w_i = makeProbability(cosTheta, w_o, w_h);
 		
 		if (w_i.dot(hitRecord.normal) <= 0) { //below horizon
-			return new ShadingSample(new Spectrum(0), new Spectrum(0), w_i, false, 0);
+			return null;
 		} else {
 			return new ShadingSample(evaluateBRDF(hitRecord, w_o, w_i), new Spectrum(0), w_i, false, p_w_i);
 		}

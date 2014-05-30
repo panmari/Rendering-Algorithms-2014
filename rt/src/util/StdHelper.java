@@ -45,6 +45,7 @@ public class StdHelper {
 	}
 	
 	public void update(float newValue, int bounce) {
+		assert !Float.isNaN(newValue);
 		values.addLast(newValue);
 		costs.addLast(bounce);
 		if (values.size() > maxSize) {
@@ -52,6 +53,7 @@ public class StdHelper {
 		} else {
 			addNewValue(newValue, bounce);
 		}
+		assert !Float.isNaN(mean);
 	}
 	
 	private void swapValues(float oldValue, float newValue, int oldCost, int newCost) {
@@ -70,5 +72,6 @@ public class StdHelper {
 		M2 += delta*(newValue - mean);
 		float costDelta = newCost - meanCosts;
 		this.meanCosts += costDelta/costs.size();
+		
 	}
 }

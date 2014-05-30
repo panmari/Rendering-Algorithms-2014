@@ -150,7 +150,8 @@ public class NoisyTexture implements Material {
 	public ShadingSample getShadingSample(HitRecord hitRecord, float[] sample) {
 		//should never be null
 		ShadingSample s = m.getShadingSample(hitRecord, sample);
-		addNoise(hitRecord.position, s.brdf);
+		if (s != null)
+			addNoise(hitRecord.position, s.brdf);
 		return s;
 	}
 

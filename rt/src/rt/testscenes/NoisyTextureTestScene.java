@@ -14,6 +14,7 @@ import rt.Spectrum;
 import rt.cameras.PinholeCamera;
 import rt.cameras.ThinLensCamera;
 import rt.films.BoxFilterFilm;
+import rt.integrators.PathTracingIntegratorFactory;
 import rt.integrators.PointLightIntegratorFactory;
 import rt.intersectables.*;
 import rt.lightsources.PointLight;
@@ -31,14 +32,14 @@ public class NoisyTextureTestScene extends Scene {
 	public NoisyTextureTestScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/NoisyTextureTestSceneBlur");
+		outputFilename = new String("../output/testscenes/NoisyTextureTestSceneBlurPath");
 		
 		// Image width and height in pixels
 		width = 640;
 		height = 360;
 		
 		// Number of samples per pixel
-		SPP = 4;
+		SPP = 2048;
 		
 		// Specify which camera, film, and tonemapper to use
 		Vector3f eye = new Vector3f(0.f, 0.f, 5.f);
@@ -51,8 +52,8 @@ public class NoisyTextureTestScene extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
-		//integratorFactory = new PathTracingIntegratorFactory();
 		integratorFactory = new PointLightIntegratorFactory();
+		integratorFactory = new PathTracingIntegratorFactory();
 		samplerFactory = new RandomSamplerFactory();		
 		Material chessTexture = null;
 		
@@ -61,6 +62,9 @@ public class NoisyTextureTestScene extends Scene {
 		//some initialization
 		Material glossy = new Glossy( 8.f, new Spectrum(0.27f, 0.82f, 1.16f), new Spectrum(3.23f, 2.6f, 2.5f));
 		Material diffuse = new Diffuse(new Spectrum(1));
+		
+		Material silver = new rt.materials.Glossy( 8.f, new Spectrum(0.131f, 0.12f, 0.144f), new Spectrum(3.88f, 3.45f, 2.56f));
+		Material gold = new rt.materials.Glossy( 8.f, new Spectrum(0.25f, 0.306f, 1.426f), new Spectrum(3.f, 2.88f, 1.846f));
 		//glossy = diffuse;
 		Intersectable sphere = new Sphere();
 		
@@ -76,7 +80,7 @@ public class NoisyTextureTestScene extends Scene {
 		t = new Matrix4f();
 		t.setTranslation(new Vector3f(0,1f,0));
 		AnimatedInstance movingMiddle = new AnimatedInstance(movingMiddleInst, t);
-		movingMiddle.material = new NoisyTexture(glossy, Type.CONTINENT);
+		movingMiddle.material = glossy; //new NoisyTexture(glossy, Type.CONTINENT);
 		
 		t = new Matrix4f();
 		t.setIdentity();
@@ -88,13 +92,13 @@ public class NoisyTextureTestScene extends Scene {
 		t.setIdentity();
 		t.setTranslation(new Vector3f(3,0,1.5f));
 		Instance rightSphere = new Instance(sphere, t);
-		rightSphere.material = new NoisyTexture(glossy, Type.STRANGE);
+		rightSphere.material = new NoisyTexture(gold, Type.STRANGE);
 		
 		t = new Matrix4f();
 		t.setIdentity();
 		t.setTranslation(new Vector3f(3,3,-2));
 		Instance upperRightSphere = new Instance(sphere, t);
-		upperRightSphere.material = new NoisyTexture(glossy, Type.EXPANDED);
+		upperRightSphere.material = new NoisyTexture(silver, Type.EXPANDED);
 		
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
@@ -119,8 +123,8 @@ public class NoisyTextureTestScene extends Scene {
 		
 		// Light sources
 		Vector3f lightPos = new Vector3f(eye);
-		lightPos.add(new Vector3f(-1.f, 0.f, 0.f));
-		LightGeometry pointLight1 = new PointLight(lightPos, new Spectrum(18.f, 18.f, 18.f));
+		lightPos.add(new Vector3f(-4.f, 4.f, -7.f));
+		LightGeometry pointLight1 = new PointLight(lightPos, new Spectrum(50.f, 50.f, 50.f));
 		lightPos.add(new Vector3f(2.f, 0.f, 0.f));
 		LightGeometry pointLight2 = new PointLight(lightPos, new Spectrum(14.f, 14.f, 14.f));
 		LightGeometry pointLight3 = new PointLight(new Vector3f(2.f, 2.f, 4.f), new Spectrum(80.f, 80.f, 80.f));

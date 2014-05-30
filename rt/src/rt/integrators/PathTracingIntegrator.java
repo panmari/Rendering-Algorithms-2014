@@ -61,6 +61,7 @@ public class PathTracingIntegrator implements Integrator {
 			Spectrum currentBounceContribution = new Spectrum(alpha);
 			currentBounceContribution.mult(x);
 			outgoing.add(currentBounceContribution);
+			assert !Float.isNaN(outgoing.getLuminance());
 			Float rrProbability = rr.next();
 			if (bulletGenerator.nextFloat() < rrProbability)
 				break;
@@ -76,6 +77,7 @@ public class PathTracingIntegrator implements Integrator {
 			} else
 				segmentIsSpecular = true;
 			alpha.mult(1/(s.p*(1 - rrProbability)));
+			assert !Float.isNaN(alpha.getLuminance());
 		}
 		stdHelper.update(outgoing.getLuminance(), bounce + 1);
 		return outgoing;
