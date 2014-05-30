@@ -19,9 +19,9 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new BiPathtracingBoxSphere();
-	public static Point debugPixel;// = new Point(47, 475);
-	public static final int windowSize = 10;
+	public static Scene scene = new NoisyTextureTestScene();
+	public static Point debugPixel;// = new Point(92, 114);
+	public static final int windowSize = 0;
 	
 	static LinkedList<RenderTask> queue;
 	static Counter tasksLeft;
@@ -180,7 +180,7 @@ public class Main {
 			}
 		}
 		System.out.println("\nFinishing scene...");
-		scene.getIntegratorFactory().finish(scene);
+		//scene.getIntegratorFactory().finish(scene);
 		
 		long time_ms = timer.timeElapsed();
 		long time_s = time_ms / 1000;
