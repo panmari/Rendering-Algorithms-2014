@@ -11,6 +11,20 @@ public class MyMath {
 	public final static float PI = (float)Math.PI;
 	
 	/**
+	 * Uniformly samples a unit sphere using two random samples uniformly between 0 and 1 
+	 * @param sample
+	 * @return
+	 */
+	public static Point2f sampleUnitCircle(float[] sample) {
+		Point2f sampledPos = new Point2f();
+		float sqr_psi_1 = MyMath.sqrt(sample[0]);
+		float two_pi_psi_2 = sample[1]*2*MyMath.PI;
+				
+		sampledPos.x = MyMath.cos(two_pi_psi_2)*sqr_psi_1;
+		sampledPos.y = MyMath.sin(two_pi_psi_2)*sqr_psi_1;
+		return sampledPos;
+	}
+	/**
 	 * Assumes parameters given as ax² + bx + c = 0
 	 * @param a
 	 * @param b

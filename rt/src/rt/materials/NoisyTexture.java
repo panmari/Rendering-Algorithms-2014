@@ -184,7 +184,7 @@ public class NoisyTexture implements Material {
 		p_z.z += epsilon;
 		n.z += getNoise(p_z);
 		
-		//n.scale(1/epsilon);
+		n.scale(1/epsilon);
 		hitRecord.normal.sub(n);
 		hitRecord.normal.normalize();
 	}

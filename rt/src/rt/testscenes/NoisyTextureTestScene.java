@@ -12,6 +12,7 @@ import rt.Material;
 import rt.Scene;
 import rt.Spectrum;
 import rt.cameras.PinholeCamera;
+import rt.cameras.ThinLensCamera;
 import rt.films.BoxFilterFilm;
 import rt.integrators.PointLightIntegratorFactory;
 import rt.intersectables.CSGPlane;
@@ -33,7 +34,7 @@ public class NoisyTextureTestScene extends Scene {
 	public NoisyTextureTestScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/NoisyTextureTestScene");
+		outputFilename = new String("../output/testscenes/NoisyTextureTestSceneBlur");
 		
 		// Image width and height in pixels
 		width = 640;
@@ -48,7 +49,7 @@ public class NoisyTextureTestScene extends Scene {
 		Vector3f up = new Vector3f(0.f, 1.f, 0.f);
 		float fov = 70.f;
 		float aspect = 16.f/9.f;
-		camera = new PinholeCamera(eye, lookAt, up, fov, aspect, width, height);
+		camera = new ThinLensCamera(eye, lookAt, up, fov, aspect, width, height, 5, 0.1f);
 		film = new BoxFilterFilm(width, height);
 		tonemapper = new ClampTonemapper();
 		

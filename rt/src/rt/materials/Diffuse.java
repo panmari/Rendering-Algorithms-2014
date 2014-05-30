@@ -1,8 +1,9 @@
 package rt.materials;
 
 import javax.vecmath.Matrix3f;
+import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
-
+import static util.MyMath.*;
 import rt.*;
 import util.MyMath;
 
@@ -71,11 +72,9 @@ public class Diffuse implements Material {
 	{
 		
 		Vector3f dir = new Vector3f();
-		float sqr_psi_1 = MyMath.sqrt(sample[0]);
-		float two_pi_psi_2 = sample[1]*2*MyMath.PI;
-				
-		dir.x = MyMath.cos(two_pi_psi_2)*sqr_psi_1;
-		dir.y = MyMath.sin(two_pi_psi_2)*sqr_psi_1;
+		Point2f circleSample = sampleUnitCircle(sample);
+		dir.x = circleSample.x;
+		dir.y = circleSample.y;
 		dir.z = MyMath.sqrt(1 - sample[0]);
 		assert(Math.abs(dir.lengthSquared() - 1) < 1e-5f);
 		
