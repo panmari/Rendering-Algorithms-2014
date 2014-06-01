@@ -91,14 +91,13 @@ public class ObjReader {
 				int[][] indices = new int[s.length - 1][3];
 				
 				// For all vertices
-				int i=1;
-				while(i < s.length)
+				for(int i = 1; i < s.length; i++)
 				{	
 					// Get indices for vertex position, tex. coords., and normals, format is v/tc/n -> int[]{ v, tc, n }
 					// if only two are given, it is v/tc -> int[]{v, tc}
 					String[] ss = s[i].split("/");
-					int k=0;
-					while(k < ss.length)
+					
+					for(int k=0; k < ss.length; k++)
 					{
 						if(ss[k].length()>0)
 							indices[i-1][k] = Integer.parseInt(ss[k]);
@@ -108,7 +107,6 @@ public class ObjReader {
 							if(k == 1) hasTexCoords = false;
 							if(k == 2) hasNormals = false;
 						}
-						k++;
 					}
 					if(ss.length < 2)
 					{
@@ -117,7 +115,6 @@ public class ObjReader {
 					if(ss.length < 3) {
 						hasNormals = false;
 					}
-					i++;
 				}
 				if (s.length == 4) //triangle
 					faces.add(indices);
