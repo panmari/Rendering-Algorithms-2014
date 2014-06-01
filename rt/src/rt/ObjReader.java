@@ -48,10 +48,10 @@ public class ObjReader {
 		while((line = reader.readLine()) != null)
 		{	
 			// Read line
-			String[] s = line.split("\\s+");
+			String[] s = line.split("\\s+"); //split on whitespace
 			
 			// Parse
-			if(s[0].compareTo("v")==0)
+			if(s[0].equals("v"))
 			{
 				// Position
 				float[] v = new float[3];
@@ -68,7 +68,7 @@ public class ObjReader {
 				if(v[2] < zMin) zMin = v[2];
 				if(v[2] > zMax) zMax = v[2];
 			} 
-			else if(s[0].compareTo("vn")==0)
+			else if(s[0].equals("vn"))
 			{
 				// Normal
 				float[] n = new float[3];
@@ -77,7 +77,7 @@ public class ObjReader {
 				n[2] = Float.valueOf(s[3]).floatValue();
 				normals.add(n);
 			}
-			else if(s[0].compareTo("vt")==0)
+			else if(s[0].equals("vt"))
 			{
 				// Texture
 				float[] t = new float[2];
@@ -85,45 +85,54 @@ public class ObjReader {
 				t[1] = Float.valueOf(s[2]).floatValue();
 				texCoords.add(t);
 			}
-			else if(s[0].compareTo("f")==0)
+			else if(s[0].equals("f"))
 			{
 				// Indices
-				int[][] indices = new int[3][3];
+				int[][] indices = new int[s.length - 1][3];
 				
 				// For all vertices
-				int i=1;
-				while(i < s.length)
+				for(int i = 1; i < s.length; i++)
 				{	
-					// Get indices for vertex position, tex. coords., and normals
+					// Get indices for vertex position, tex. coords., and normals, format is v/tc/n -> int[]{ v, tc, n }
+					// if only two are given, it is v/tc -> int[]{v, tc}
 					String[] ss = s[i].split("/");
-					int k=0;
-					while(k < ss.length)
+					
+					for(int k=0; k < ss.length; k++)
 					{
 						if(ss[k].length()>0)
-							indices[i-1][k] = Integer.valueOf(ss[k]).intValue();
+							indices[i-1][k] = Integer.parseInt(ss[k]);
 						else
 						{
 							indices[i-1][k] = -1;
 							if(k == 1) hasTexCoords = false;
 							if(k == 2) hasNormals = false;
 						}
-						k++;
 					}
-					if(ss.length == 1)
+					if(ss.length < 2)
 					{
 						hasTexCoords = false;
+					}
+					if(ss.length < 3) {
 						hasNormals = false;
 					}
-					i++;
 				}
-				faces.add(indices);
+				if (s.length == 4) //triangle
+					faces.add(indices);
+				else if (s.length == 5) { // quadrangle
+					int[][] t1 = new int[][]{ indices[0],  indices[1], indices[2]};
+					faces.add(t1);
+					int[][] t2 = new int[][]{ indices[0],  indices[2], indices[3]};
+					faces.add(t2);
+				} else {
+					System.out.println("Unsupported polygon: " + s.length);
+				}
+					
 			}
 			else if(s[0].length()>0 && s[0].charAt(0)!='#')
 			{
 				System.out.print("Unknown token '".concat(line).concat("'\n"));
 			}
 		}
-
 		// Normalization
 		float xTrans = -(xMax+xMin)/2;
 		float yTrans = -(yMax+yMin)/2;
@@ -164,9 +173,10 @@ public class ObjReader {
 				
 				if(hasNormals)
 				{
-					normalsFinal[vertexNr*3] = normals.get(faces.get(i)[j][2]-1)[0];
-					normalsFinal[vertexNr*3+1] = normals.get(faces.get(i)[j][2]-1)[1];
-					normalsFinal[vertexNr*3+2] = normals.get(faces.get(i)[j][2]-1)[2];
+					int normalIdx = faces.get(i)[j][2]-1;
+					normalsFinal[vertexNr*3] = normals.get(normalIdx)[0];
+					normalsFinal[vertexNr*3+1] = normals.get(normalIdx)[1];
+					normalsFinal[vertexNr*3+2] = normals.get(normalIdx)[2];
 				} 
 				
 				if(hasTexCoords)
@@ -200,7 +210,7 @@ public class ObjReader {
 		}
 
 		reader.close();
-		return new Mesh(verticesFinal, normalsFinal, indices);
+		return new Mesh(verticesFinal, normalsFinal, texCoordsFinal, indices);
 	}
 }
  

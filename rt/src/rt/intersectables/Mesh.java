@@ -38,7 +38,7 @@ public class Mesh extends Aggregate {
 	/**
 	 * Array of triangles stored in the mesh.
 	 */
-	private MeshTriangle[] triangles;
+	MeshTriangle[] triangles;
 	
 	/**
 	 * A material.
@@ -46,16 +46,20 @@ public class Mesh extends Aggregate {
 	public Material material;
 
 	private final BoundingBox boundingBox;
+
+	public float[] texCoords;
 	
 	/**
 	 * Make a mesh from arrays with vertices, normals, and indices.
+	 * @param texCoordsFinal 
 	 */
-	public Mesh(float[] vertices, float[] normals, int[] indices)
+	public Mesh(float[] vertices, float[] normals, float[] texCoords, int[] indices)
 	{
 		material = new Diffuse(new Spectrum(1.f, 1.f, 1.f));
 		
 		this.vertices = vertices;
 		this.normals = normals;
+		this.texCoords = texCoords;
 		this.indices = indices;
 		triangles = new MeshTriangle[indices.length/3];		
 		
