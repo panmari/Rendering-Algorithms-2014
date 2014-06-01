@@ -23,6 +23,16 @@ public class PerforatedMesh extends Aggregate {
 		}
 	}
 	
+	public PerforatedMesh(Mesh m, int intervall)
+	{
+		this.m = m;
+		isHole = new boolean[m.triangles.length];
+		for (int i = 0; i < m.triangles.length; i++) {
+			if(i % intervall == 0)
+				isHole[i] = true;
+		}
+	}
+	
 	public Iterator<Intersectable> iterator() {
 		return new PerforatedMeshIterator(m.triangles);
 	}
