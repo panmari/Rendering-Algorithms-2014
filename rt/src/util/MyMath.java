@@ -2,6 +2,8 @@ package util;
 
 import javax.vecmath.Point2f;
 
+import rt.Spectrum;
+
 /**
  * Some math utility functions, using float precision instead of double to make less awkward casting in code.
  *
@@ -82,5 +84,8 @@ public class MyMath {
 	
 	public static float inv(float f) {
 		return f == 0f ? 0 : 1/f;
+	}
+	public static float powE(float f) {
+		return (float) Math.pow(Math.E, f);
 	}
 }

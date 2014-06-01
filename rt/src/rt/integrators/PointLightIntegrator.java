@@ -87,6 +87,7 @@ public class PointLightIntegrator implements Integrator {
 			float dist = MyMath.sqrt(StaticVecmath.dist2(r.origin, hitRecord.position));
 			float ds = dist/100;
 			HitRecord lightHit = lightList.get(0).sample(null);
+			float sigma = 0.2f;
 			for (float s_i = ds; s_i <= dist; s_i += ds) {
 				
 				Point3f p = r.pointAt(s_i); //asserts r.dir is normalized!!!
@@ -101,22 +102,24 @@ public class PointLightIntegrator implements Integrator {
 						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
 					inscattering.mult(0);
 				else {
-					inscattering.mult(0.3f); //not in shadow
-					//Spectrum l = lightHit.material.evaluateEmission(lightHit, StaticVecmath.negate(lightDir));
+					inscattering.mult(0.005f); //not in shadow
+					Spectrum l = lightHit.material.evaluateEmission(lightHit, StaticVecmath.negate(lightDir));
 					//l.mult(1/d2);
-					//inscattering.mult(l);
+					l.mult(MyMath.powE(-sigma*MyMath.sqrt(d2)));
+					inscattering.mult(l);
 				}
 				
 				L.add(inscattering);
 				p.scale(20);
 				//float sigma = (float)(ImprovedNoise.noise(p.x, p.y, p.z) + 1)/2; // sigma at the current point p
-				float sigma = 0.5f;
+				
 				T.mult(1 - sigma*ds);
 			}
 			L.mult(ds);
 			outgoing.mult(T); //times surface reflection L_s
 			L.add(outgoing);
-			return L; //outgoing;
+			return L;
+			//return outgoing;
 		} else 
 			return new Spectrum(0.f,0.f,0.f);
 		

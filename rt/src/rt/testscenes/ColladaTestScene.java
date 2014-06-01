@@ -92,7 +92,7 @@ public class ColladaTestScene extends Scene {
 		root = intersectableList;
 		
 		// Light sources
-		LightGeometry pointLight3 = new PointLight(new Vector3f(0.f, 5.f, 1.f), new Spectrum(200.f));
+		LightGeometry pointLight3 = new PointLight(new Vector3f(0.f, 5.f, 1.f), new Spectrum(100.f));
 		lightList = new LightList();
 		lightList.add(pointLight3);
 	}
