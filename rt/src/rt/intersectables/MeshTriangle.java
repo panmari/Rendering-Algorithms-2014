@@ -90,11 +90,12 @@ public class MeshTriangle implements Intersectable {
 		if (betaGammaT != null && isInside(betaGammaT)) {
 			float tHit = betaGammaT.z;
 			Point3f position = r.pointAt(tHit);
-			Vector3f normal = makeNormal(betaGammaT);
+			Vector3f normal = makeNormal(v0, v1, v2, betaGammaT);
 			Vector3f wIn = new Vector3f(r.direction);
 			wIn.normalize();
 			wIn.negate();
-			return new HitRecord(tHit, position, normal, wIn, this, mesh.material, 0, 0);
+			Point2f tex = makeTextureCoordinates(v0, v1, v2, betaGammaT);
+			return new HitRecord(tHit, position, normal, wIn, this, mesh.material, tex.x, tex.y);
 		}
 		else
 			return null;
@@ -151,12 +152,9 @@ public class MeshTriangle implements Intersectable {
 		return rightHand;
 	}
 	
-	private Vector3f makeNormal(Vector3f betaGammaT) {
+	private Vector3f makeNormal(int v0, int v1, int v2, Vector3f betaGammaT) {
 		float normals[] = mesh.normals;
 
-		int v0 = mesh.indices[index*3];
-		int v1 = mesh.indices[index*3+1];
-		int v2 = mesh.indices[index*3+2];
 		
 		// 2. Access x,y,z coordinates for each vertex
 		Vector3f n_a = new Vector3f(normals[v0*3], normals[v0*3 + 1], normals[v0*3 + 2]);
@@ -171,6 +169,23 @@ public class MeshTriangle implements Intersectable {
 		// this should not be needed, but most meshes suck...
 		normal.normalize();
 		return normal;
+	}
+	
+	private Point2f makeTextureCoordinates(int v0, int v1, int v2, Vector3f betaGammaT) {
+		float texCoords[] = mesh.texCoords;
+		
+		// 2. Access x,y,z coordinates for each vertex
+		Vector2f n_a = new Vector2f(texCoords[v0*2], texCoords[v0*2 + 1]);
+		Vector2f n_b = new Vector2f(texCoords[v1*2], texCoords[v1*2 + 1]);
+		Vector2f n_c = new Vector2f(texCoords[v2*2], texCoords[v2*2 + 1]);
+		n_a.scale(1 - betaGammaT.x - betaGammaT.y);
+		n_b.scale(betaGammaT.x);
+		n_c.scale(betaGammaT.y);
+		Point2f texCoord = new Point2f(n_a);
+		texCoord.add(n_b);
+		texCoord.add(n_c);
+		// this should not be needed, but most meshes suck...
+		return texCoord;
 	}
 
 	private boolean isInside(Vector3f betaGammaT) {

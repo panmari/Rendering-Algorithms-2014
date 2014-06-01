@@ -52,10 +52,12 @@ public class ColladaTestScene extends Scene {
 		Material couch = new Textured("../textures/pink.jpg", "../normalmaps/couch.png");
 
 		//Intersectable sphere = new BSPAccelerator(ColladaParser.parse("../obj/Heart.dae"));
-		Mesh pokeball = null;
+		BSPAccelerator pokeball = null;
 		Intersectable sphere = null;
 		try {
-			pokeball = ObjReader.read("../obj/Pokeball.obj", 1);
+			Mesh o = ObjReader.read("../obj/Pokeball.obj", 1);
+			o.material = chessTexture;
+			pokeball = new BSPAccelerator(o);
 			//sphere = ObjReader.read("../obj/teapot.obj", 1);
 			Mesh m = ObjReader.read("../obj/Heart.obj", 1);
 			PerforatedMesh perforated = new PerforatedMesh(m, .5f);
@@ -64,8 +66,7 @@ public class ColladaTestScene extends Scene {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		pokeball.material = chessTexture;
-		sphere = pokeball;
+		//sphere = pokeball;
 		
 		Matrix4f t = new Matrix4f();
 		t.rotY((float) Math.toRadians(90));

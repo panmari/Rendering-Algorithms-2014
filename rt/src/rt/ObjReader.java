@@ -213,7 +213,7 @@ public class ObjReader {
 		}
 
 		reader.close();
-		return new Mesh(verticesFinal, normalsFinal, indices);
+		return new Mesh(verticesFinal, normalsFinal, texCoordsFinal, indices);
 	}
 }
  
