@@ -38,7 +38,7 @@ public class Mesh extends Aggregate {
 	/**
 	 * Array of triangles stored in the mesh.
 	 */
-	private MeshTriangle[] triangles;
+	MeshTriangle[] triangles;
 	
 	/**
 	 * A material.

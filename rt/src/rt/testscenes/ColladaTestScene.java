@@ -42,9 +42,9 @@ public class ColladaTestScene extends Scene {
 		tonemapper = new ClampTonemapper();
 		
 		// Specify which integrator and sampler to use
-		integratorFactory = new PathTracingIntegratorFactory();
+		//integratorFactory = new PathTracingIntegratorFactory();
 		integratorFactory = new PointLightIntegratorFactory();
-		samplerFactory = new RandomSamplerFactory();		
+		samplerFactory = new RandomSamplerFactory();
 		
 		Material chessTexture = new Textured("../textures/chessboard.jpg", "../normalmaps/normal.gif");
 		Material forestfloor = new Textured("../textures/egg.jpg", "../normalmaps/forestfloor.jpg");
@@ -52,19 +52,24 @@ public class ColladaTestScene extends Scene {
 		Material couch = new Textured("../textures/pink.jpg", "../normalmaps/couch.png");
 
 		//Intersectable sphere = new BSPAccelerator(ColladaParser.parse("../obj/Heart.dae"));
-		Intersectable sphere = ColladaParser.parse("../obj/Heart.dae");
+		Mesh pokeball = null;
+		Intersectable sphere = null;
 		try {
+			pokeball = ObjReader.read("../obj/Pokeball.obj", 1);
 			//sphere = ObjReader.read("../obj/teapot.obj", 1);
-			Mesh obj = ObjReader.read("../obj/Heart.obj", 1);
-			sphere = new BSPAccelerator(obj);
+			Mesh m = ObjReader.read("../obj/Heart.obj", 1);
+			PerforatedMesh perforated = new PerforatedMesh(m, .5f);
+			sphere = new BSPAccelerator(perforated);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(sphere.getBoundingBox());
+		pokeball.material = chessTexture;
+		sphere = pokeball;
+		
 		Matrix4f t = new Matrix4f();
 		t.rotY((float) Math.toRadians(90));
-		sphere = new Instance(sphere, t);
+		//sphere = new Instance(sphere, t);
 
 		// Ground and back plane
 		XYZGrid grid = new XYZGrid(new Spectrum(0.2f, 0.f, 0.f), new Spectrum(1.f, 1.f, 1.f), 0.1f, new Vector3f(0.f, 0.3f, 0.f));
