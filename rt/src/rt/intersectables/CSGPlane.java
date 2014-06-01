@@ -135,18 +135,18 @@ public class CSGPlane extends CSGSolid {
 			Vector3f wIn = new Vector3f(r.direction);
 			wIn.negate();
 		
-			HitRecord h = new HitRecord(t, position, retNormal, wIn, null, material, 0, 0);
 			Point3f texPosition = new Point3f(position);
 			
 			m.transform(texPosition);
-
+			float u, v;
 			if (retNormal.x == 1) {
-				h.u = Math.abs(texPosition.x % 1);
-				h.v = Math.abs(texPosition.z % 1);
+				u = Math.abs(texPosition.x % 1);
+				v = Math.abs(texPosition.z % 1);
 			} else {
-				h.u = Math.abs(texPosition.x % 1);
-				h.v = Math.abs(texPosition.y % 1);
+				u = Math.abs(texPosition.x % 1);
+				v = Math.abs(texPosition.y % 1);
 			}
+			HitRecord h = new HitRecord(t, position, retNormal, wIn, null, material, u, v);
 			return h;
 		} else
 		{
