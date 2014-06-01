@@ -13,6 +13,8 @@ import rt.Ray;
 import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
+import util.ImprovedNoise;
+import util.MyMath;
 import util.StaticVecmath;
 
 /**
@@ -80,8 +82,41 @@ public class PointLightIntegrator implements Integrator {
 				// Accumulate
 				outgoing.add(s);
 			}
-			
-			return outgoing;
+			Spectrum T = new Spectrum(1);
+			Spectrum L = new Spectrum(0);
+			float dist = MyMath.sqrt(StaticVecmath.dist2(r.origin, hitRecord.position));
+			float ds = dist/100;
+			HitRecord lightHit = lightList.get(0).sample(null);
+			for (float s_i = ds; s_i <= dist; s_i += ds) {
+				
+				Point3f p = r.pointAt(s_i); //asserts r.dir is normalized!!!
+				Spectrum inscattering = new Spectrum(T);
+				
+				Vector3f lightDir = StaticVecmath.sub(lightHit.position, p);
+				float d2 = lightDir.lengthSquared();
+				lightDir.normalize();
+				Ray shadowRay = new Ray(p, lightDir, r.t, 0, true);
+				HitRecord shadowHit = root.intersect(shadowRay);
+				if (shadowHit != null &&
+						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
+					inscattering.mult(0);
+				else {
+					inscattering.mult(0.3f); //not in shadow
+					//Spectrum l = lightHit.material.evaluateEmission(lightHit, StaticVecmath.negate(lightDir));
+					//l.mult(1/d2);
+					//inscattering.mult(l);
+				}
+				
+				L.add(inscattering);
+				p.scale(20);
+				//float sigma = (float)(ImprovedNoise.noise(p.x, p.y, p.z) + 1)/2; // sigma at the current point p
+				float sigma = 0.5f;
+				T.mult(1 - sigma*ds);
+			}
+			L.mult(ds);
+			outgoing.mult(T); //times surface reflection L_s
+			L.add(outgoing);
+			return L; //outgoing;
 		} else 
 			return new Spectrum(0.f,0.f,0.f);
 		
