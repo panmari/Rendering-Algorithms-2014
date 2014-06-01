@@ -88,6 +88,7 @@ public class PointLightIntegrator implements Integrator {
 			float ds = dist/100;
 			HitRecord lightHit = lightList.get(0).sample(null);
 			float sigma = 0.2f;
+			Spectrum L_ve = new Spectrum(0.005f);
 			for (float s_i = ds; s_i <= dist; s_i += ds) {
 				
 				Point3f p = r.pointAt(s_i); //asserts r.dir is normalized!!!
@@ -102,18 +103,17 @@ public class PointLightIntegrator implements Integrator {
 						StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
 					inscattering.mult(0);
 				else {
-					inscattering.mult(0.005f); //not in shadow
+					inscattering.mult(L_ve); //not in shadow
 					Spectrum l = lightHit.material.evaluateEmission(lightHit, StaticVecmath.negate(lightDir));
-					//l.mult(1/d2);
+					//TODO: do ray marching on shadow ray for transmittance?
 					l.mult(MyMath.powE(-sigma*MyMath.sqrt(d2)));
 					inscattering.mult(l);
 				}
 				
 				L.add(inscattering);
-				p.scale(20);
-				//float sigma = (float)(ImprovedNoise.noise(p.x, p.y, p.z) + 1)/2; // sigma at the current point p
+				float sigma_s = sigmaS(p);
 				
-				T.mult(1 - sigma*ds);
+				T.mult(1 - sigma_s*ds);
 			}
 			L.mult(ds);
 			outgoing.mult(T); //times surface reflection L_s
@@ -123,6 +123,17 @@ public class PointLightIntegrator implements Integrator {
 		} else 
 			return new Spectrum(0.f,0.f,0.f);
 		
+	}
+	
+	/**
+	 * For now only float is returned, but could be spectrum
+	 * @param p
+	 * @return
+	 */
+	public float sigmaS(Point3f p){
+		p.scale(20);
+		float s = (float)(ImprovedNoise.noise(p.x, p.y, p.z) + 1)/5; // sigma at the current point p
+		return s;
 	}
 
 	public float[][] makePixelSamples(Sampler sampler, int n) {
