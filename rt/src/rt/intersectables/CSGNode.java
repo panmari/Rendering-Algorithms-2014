@@ -8,6 +8,7 @@ import javax.vecmath.Point3f;
 
 import rt.Ray;
 import rt.accelerators.BoundingBox;
+import util.StaticVecmath;
 
 /**
  * A CSG node combines two CSG solids using a set operation, such as intersection,
@@ -19,12 +20,18 @@ public class CSGNode extends CSGSolid {
 	
 	protected CSGSolid left, right;
 	protected OperationType operation;
+	private BoundingBox boundingBox;
 	
 	public CSGNode(CSGSolid left, CSGSolid right, OperationType operation)
 	{
 		this.left = left;
 		this.right = right;
 		this.operation = operation;
+		Point3f computedMin = new Point3f(left.getBoundingBox().min);
+		StaticVecmath.elementwiseMin(computedMin, right.getBoundingBox().min);
+		Point3f computedMax = new Point3f(left.getBoundingBox().max);
+		StaticVecmath.elementwiseMin(computedMax, right.getBoundingBox().max);
+		this.boundingBox = new BoundingBox(computedMin, computedMax);
 	}
 
 	/**
@@ -143,8 +150,6 @@ public class CSGNode extends CSGSolid {
 
 	@Override
 	public BoundingBox getBoundingBox() {
-		//TODO: make something smarter
-		return new BoundingBox(new Point3f(Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY), 
-				new Point3f(Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
+		return boundingBox;
 	}
 }
