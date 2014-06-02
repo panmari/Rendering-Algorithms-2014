@@ -62,43 +62,44 @@ public class CSGNode extends CSGSolid {
 		inLeft = false;
 		inRight = false;
 		for (IntervalBoundary b: combined) {
-			if (b.belongsTo == BelongsTo.LEFT) {
-				inLeft = b.type == BoundaryType.START;
-			}
-			if (b.belongsTo == BelongsTo.RIGHT) {
-				inRight = b.type == BoundaryType.START;
+			//decide if we're in left or right part 
+			switch (b.belongsTo) {
+				case LEFT:
+					inLeft = b.type == BoundaryType.START;
+					break;
+				case RIGHT:
+					inRight = b.type == BoundaryType.START;
+					break; 
 			}
 
+			// apply operation
 			switch (operation) {
-			case INTERSECT: {
-				if (inLeft && inRight)
-					b.type = BoundaryType.START;
-				else
-					b.type = BoundaryType.END;
-				break;
-			}
-			case SUBTRACT: {
-				if (inLeft && !inRight)
-					b.type = BoundaryType.START;
-				else
-					b.type = BoundaryType.END;
-
-				// In a subtract operation, the subtracted solid is turned
-				// inside out,
-				// or it "switches sign", so we need to flip its normal
-				// direction
-				if (b.belongsTo == BelongsTo.RIGHT && b.hitRecord != null) {
-					b.hitRecord.normal.negate();
-				}
-				break;
-			}
-			case ADD: {
-				if (inLeft || inRight)
-					b.type = BoundaryType.START;
-				else
-					b.type = BoundaryType.END;
-				break;
-			}
+				case INTERSECT: 
+					if (inLeft && inRight)
+						b.type = BoundaryType.START;
+					else
+						b.type = BoundaryType.END;
+					break;
+				case SUBTRACT: 
+					if (inLeft && !inRight)
+						b.type = BoundaryType.START;
+					else
+						b.type = BoundaryType.END;
+	
+					// In a subtract operation, the subtracted solid is turned
+					// inside out,
+					// or it "switches sign", so we need to flip its normal
+					// direction
+					if (b.belongsTo == BelongsTo.RIGHT && b.hitRecord != null) {
+						b.hitRecord.normal.negate();
+					}
+					break;
+				case ADD: 
+					if (inLeft || inRight)
+						b.type = BoundaryType.START;
+					else
+						b.type = BoundaryType.END;
+					break;
 			}
 		}
 
@@ -117,8 +118,8 @@ public class CSGNode extends CSGSolid {
 	}
 
 	private void tagAndCombine(Collection<IntervalBoundary> combined,
-			Collection<IntervalBoundary> leftIntervals, BelongsTo tag) {
-		for (IntervalBoundary b: leftIntervals) {
+			Collection<IntervalBoundary> intervals, BelongsTo tag) {
+		for (IntervalBoundary b: intervals) {
 			b.belongsTo = tag;
 			combined.add(b);
 		}
