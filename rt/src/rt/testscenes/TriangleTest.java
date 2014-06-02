@@ -44,9 +44,10 @@ public class TriangleTest extends Scene {
 		// the direction the normal points into).
 		float[] vertices = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f, 0.f};
 		float[] normals = {0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f};
+		float[] textureCoordinates = {0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f};
 		int[] indices = {0, 1, 2};
 		
-		Mesh mesh = new Mesh(vertices, normals, indices);
+		Mesh mesh = new Mesh(vertices, normals, textureCoordinates, indices);
 		
 		IntersectableList intersectableList = new IntersectableList();
 		intersectableList.add(mesh);
