@@ -87,7 +87,6 @@ public class PointLightIntegrator implements Integrator {
 			float dist = MyMath.sqrt(StaticVecmath.dist2(r.origin, hitRecord.position));
 			float ds = dist/100;
 			HitRecord lightHit = lightList.get(0).sample(null);
-			float sigma = 0.2f;
 			Spectrum L_ve = new Spectrum(0.005f);
 			for (float s_i = ds; s_i <= dist; s_i += ds) {
 				
@@ -105,8 +104,13 @@ public class PointLightIntegrator implements Integrator {
 				else {
 					inscattering.mult(L_ve); //not in shadow
 					Spectrum l = lightHit.material.evaluateEmission(lightHit, StaticVecmath.negate(lightDir));
-					//TODO: do ray marching on shadow ray for transmittance?
-					l.mult(MyMath.powE(-sigma*MyMath.sqrt(d2)));
+					float d = MyMath.sqrt(d2);
+					float shadowds = d/10;
+					for(float shadows_i = shadowds; shadows_i <= d; shadows_i += shadowds ) {
+						Point3f shadowp = shadowRay.pointAt(shadows_i);
+						float shadowSigma = sigmaS(shadowp);
+						l.mult(1 - shadowSigma*shadowds);
+					}
 					inscattering.mult(l);
 				}
 				
