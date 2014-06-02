@@ -1,4 +1,4 @@
-package rt.intersectables;
+package rt.intersectables.CSG;
 
 import java.util.ArrayList;
 
@@ -11,7 +11,7 @@ import rt.Spectrum;
 import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
 
-public class CSGUnitCone extends CSGSolid {
+public class CSGUnitCylinder extends CSGSolid {
 
 	private CSGNode root;
 
@@ -21,18 +21,18 @@ public class CSGUnitCone extends CSGSolid {
 	 * @param radius
 	 * @param height
 	 */
-	public CSGUnitCone(Material m) {
+	public CSGUnitCylinder(Material m) {
 		float height = 1;
-		CSGPlane top = new CSGPlane(new Vector3f(0,0.f,-1.f), -height);
+		CSGPlane top = new CSGPlane(new Vector3f(0,0.f,1.f), -height);
 		top.material = m;
-		CSGPlane bottom = new CSGPlane(new Vector3f(0,0.f,1.f), 0);
+		CSGPlane bottom = new CSGPlane(new Vector3f(0,0.f,-1.f), 0);
 		bottom.material = m;
-		CSGInfiniteDoubleCone cone = new CSGInfiniteDoubleCone(m);
-		CSGNode n1 = new CSGNode(top, cone, CSGNode.OperationType.INTERSECT);
+		CSGInfiniteCylinder cyl = new CSGInfiniteCylinder(m);
+		CSGNode n1 = new CSGNode(top, cyl, CSGNode.OperationType.INTERSECT);
 		root = new CSGNode(n1, bottom, CSGNode.OperationType.INTERSECT);
 	}
 
-	public CSGUnitCone() {
+	public CSGUnitCylinder() {
 		this(new Diffuse(new Spectrum(1,1,1)));
 	}
 
@@ -41,9 +41,11 @@ public class CSGUnitCone extends CSGSolid {
 		return root.getIntervalBoundaries(r);
 	}
 	
+	/**
+	 * Again very simple
+	 */
 	@Override
 	public BoundingBox getBoundingBox() {
 		return new BoundingBox(new Point3f(-1,-1,-1), new Point3f(1,1,1));
 	}
-
 }

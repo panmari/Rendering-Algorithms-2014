@@ -5,6 +5,7 @@ import rt.cameras.*;
 import rt.films.BoxFilterFilm;
 import rt.integrators.*;
 import rt.intersectables.*;
+import rt.intersectables.CSG.CSGSphere;
 import rt.lightsources.*;
 import rt.samplers.*;
 import rt.materials.*;

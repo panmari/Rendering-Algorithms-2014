@@ -1,7 +1,8 @@
-package rt.intersectables;
+package rt.intersectables.CSG;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import rt.HitRecord;
 import rt.Intersectable;
 import rt.Material;
@@ -17,45 +18,9 @@ import rt.Ray;
  */
 public abstract class CSGSolid implements Intersectable {
 
-	enum BoundaryType { START, END };
+	public enum BoundaryType { START, END };
 	public enum BelongsTo { LEFT, RIGHT };
 	public Material material;
-	
-	/**
-	 * Boundary of an intersection interval, can be sorted by t easily.
-	 */
-	class IntervalBoundary implements Comparable<IntervalBoundary>
-	{		
-		float t;				// t value of intersection		
-		BoundaryType type;		// Type of boundary of intersection interval (start or end)
-		HitRecord hitRecord;	// The hit record of the intersection
-		BelongsTo belongsTo;
-		
-		public IntervalBoundary() {
-			//whatev, set them manually
-		}
-		
-		public IntervalBoundary(float t, BoundaryType type, HitRecord hitRecord, BelongsTo belongsTo) {
-			this.t = t;
-			this.type = type;
-			this.hitRecord = hitRecord;
-			this.belongsTo = belongsTo;
-		}
-		
-		public String toString() {
-			return "t: " + t + " type: " + type;
-		}
-		
-		public int compareTo(IntervalBoundary b)
-		{
-			if(this.t < b.t) 
-				return -1; 
-			else if(this.t == b.t)
-				return 0;
-			else
-				return 1;
-		}
-	}
 	
 	protected BoundaryType findBoundaryType(HitRecord h, Ray r) {
 		if (h.normal.dot(r.direction) < 0) //started inside double cone, alternatively h.t < 0

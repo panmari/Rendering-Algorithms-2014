@@ -17,6 +17,7 @@ import rt.films.BoxFilterFilm;
 import rt.integrators.PathTracingIntegratorFactory;
 import rt.integrators.PointLightIntegratorFactory;
 import rt.intersectables.*;
+import rt.intersectables.CSG.CSGPlane;
 import rt.lightsources.PointLight;
 import rt.materials.Diffuse;
 import rt.materials.Glossy;

@@ -4,6 +4,9 @@ import javax.vecmath.*;
 
 import rt.*;
 import rt.intersectables.*;
+import rt.intersectables.CSG.CSGInstance;
+import rt.intersectables.CSG.CSGSolid;
+import rt.intersectables.CSG.CSGSphere;
 import rt.tonemappers.*;
 import rt.integrators.*;
 import rt.lightsources.*;

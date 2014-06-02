@@ -1,4 +1,4 @@
-package rt.intersectables;
+package rt.intersectables.CSG;
 
 import java.util.ArrayList;
 
@@ -10,13 +10,8 @@ import javax.vecmath.Vector3f;
 import rt.HitRecord;
 import rt.Material;
 import rt.Ray;
-import rt.Spectrum;
 import rt.accelerators.BoundingBox;
-import rt.intersectables.CSGSolid.BoundaryType;
-import rt.intersectables.CSGSolid.IntervalBoundary;
-import rt.materials.Diffuse;
 import util.MyMath;
-import util.StaticVecmath;
 
 public class CSGInfiniteCylinder extends CSGSolid {
 

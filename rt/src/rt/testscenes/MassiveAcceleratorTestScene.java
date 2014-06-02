@@ -11,6 +11,7 @@ import rt.cameras.PinholeCamera;
 import rt.films.BoxFilterFilm;
 import rt.integrators.*;
 import rt.intersectables.*;
+import rt.intersectables.CSG.CSGPlane;
 import rt.lightsources.*;
 import rt.materials.*;
 import rt.samplers.*;

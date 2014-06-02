@@ -7,6 +7,7 @@ import rt.*;
 import rt.films.*;
 import rt.integrators.*;
 import rt.intersectables.*;
+import rt.intersectables.CSG.CSGSphere;
 import rt.samplers.*;
 import rt.tonemappers.*;
 import rt.cameras.*;

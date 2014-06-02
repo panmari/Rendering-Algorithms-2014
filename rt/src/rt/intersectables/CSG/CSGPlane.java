@@ -1,4 +1,6 @@
-package rt.intersectables;
+package rt.intersectables.CSG;
+
+import java.util.ArrayList;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Point3f;
@@ -10,9 +12,6 @@ import rt.Ray;
 import rt.Spectrum;
 import rt.accelerators.BoundingBox;
 import rt.materials.Diffuse;
-import util.MyMath;
-
-import java.util.ArrayList;
 
 /**
  * A plane for CSG operations. The plane represents a solid that fills a whole half-space.

@@ -1,8 +1,9 @@
-package rt.intersectables;
+package rt.intersectables.CSG;
 
 import java.util.ArrayList;
 
-import javax.vecmath.*;
+import javax.vecmath.Point3f;
+import javax.vecmath.Vector3f;
 
 import rt.Material;
 import rt.Ray;

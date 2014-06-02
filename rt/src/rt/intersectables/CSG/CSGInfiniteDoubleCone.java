@@ -1,10 +1,9 @@
-package rt.intersectables;
+package rt.intersectables.CSG;
 
 import java.util.ArrayList;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point3f;
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;

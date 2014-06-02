@@ -1,13 +1,13 @@
-package rt.intersectables;
+package rt.intersectables.CSG;
 
 import java.util.ArrayList;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 
-import rt.Material;
 import rt.Ray;
 import rt.accelerators.BoundingBox;
+import rt.intersectables.InstanceHelper;
 import rt.materials.Diffuse;
 
 public class CSGInstance extends CSGSolid {
