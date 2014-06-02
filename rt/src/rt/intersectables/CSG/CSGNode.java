@@ -71,22 +71,12 @@ public class CSGNode extends CSGSolid {
 		boolean inLeft, inRight;
 		inLeft = false;
 		inRight = false;
-
-		it = combined.iterator();
-		while (it.hasNext()) {
-			IntervalBoundary b = it.next();
-
+		for (IntervalBoundary b: combined) {
 			if (b.belongsTo == BelongsTo.LEFT) {
-				if (b.type == BoundaryType.START)
-					inLeft = true;
-				else
-					inLeft = false;
+				inLeft = b.type == BoundaryType.START;
 			}
 			if (b.belongsTo == BelongsTo.RIGHT) {
-				if (b.type == BoundaryType.START)
-					inRight = true;
-				else
-					inRight = false;
+				inRight = b.type == BoundaryType.START;
 			}
 
 			switch (operation) {
@@ -126,9 +116,8 @@ public class CSGNode extends CSGSolid {
 		it = combined.iterator();
 		IntervalBoundary prev = new IntervalBoundary();
 		prev.type = BoundaryType.END;
-		IntervalBoundary b;
 		while (it.hasNext()) {
-			b = it.next();
+			IntervalBoundary b = it.next();
 			if (b.type == prev.type)
 				it.remove();
 			prev.type = b.type;
