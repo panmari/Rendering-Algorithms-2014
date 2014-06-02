@@ -41,9 +41,6 @@ public class CSGUnitCylinder extends CSGSolid {
 		return root.getIntervalBoundaries(r);
 	}
 	
-	/**
-	 * Again very simple
-	 */
 	@Override
 	public BoundingBox getBoundingBox() {
 		return new BoundingBox(new Point3f(-1,-1,-1), new Point3f(1,1,1));

@@ -1,6 +1,7 @@
 package rt.intersectables.CSG;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -41,29 +42,18 @@ public class CSGNode extends CSGSolid {
 	 * are merged according to the set operation specified by the node.
 	 */
 	public ArrayList<IntervalBoundary> getIntervalBoundaries(Ray r) {
-		ArrayList<IntervalBoundary> combined = new ArrayList<>();
 
 		// Get interval boundaries of left and right children
-		ArrayList<IntervalBoundary> leftIntervals = left
-				.getIntervalBoundaries(r);
-		ArrayList<IntervalBoundary> rightIntervals = right
-				.getIntervalBoundaries(r);
+		ArrayList<IntervalBoundary> leftIntervals = left.getIntervalBoundaries(r);
+		ArrayList<IntervalBoundary> rightIntervals = right.getIntervalBoundaries(r);
 
-		// Tag interval boundaries with left or right node
-		Iterator<IntervalBoundary> it = leftIntervals.iterator();
-		while (it.hasNext()) {
-			IntervalBoundary b = it.next();
-			b.belongsTo = BelongsTo.LEFT;
-		}
-		it = rightIntervals.iterator();
-		while (it.hasNext()) {
-			IntervalBoundary b = it.next();
-			b.belongsTo = BelongsTo.RIGHT;
-		}
+		ArrayList<IntervalBoundary> combined = new ArrayList<>(leftIntervals.size() + rightIntervals.size());
 
-		// Combine interval boundaries and sort
-		combined.addAll(leftIntervals);
-		combined.addAll(rightIntervals);
+		// Tag interval boundaries with left or right node and combine into one list
+		tagAndCombine(combined, leftIntervals, BelongsTo.LEFT);
+		tagAndCombine(combined, rightIntervals, BelongsTo.RIGHT);
+
+		// sort
 		Collections.sort(combined);
 
 		// Traverse interval boundaries and set inside/outside
@@ -113,7 +103,7 @@ public class CSGNode extends CSGSolid {
 		}
 
 		// Clean up
-		it = combined.iterator();
+		Iterator<IntervalBoundary> it = combined.iterator();
 		IntervalBoundary prev = new IntervalBoundary();
 		prev.type = BoundaryType.END;
 		while (it.hasNext()) {
@@ -124,6 +114,14 @@ public class CSGNode extends CSGSolid {
 		}
 
 		return combined;
+	}
+
+	private void tagAndCombine(Collection<IntervalBoundary> combined,
+			Collection<IntervalBoundary> leftIntervals, BelongsTo tag) {
+		for (IntervalBoundary b: leftIntervals) {
+			b.belongsTo = tag;
+			combined.add(b);
+		}
 	}
 
 	public String toString() {
