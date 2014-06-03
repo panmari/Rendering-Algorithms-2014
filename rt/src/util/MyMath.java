@@ -88,4 +88,7 @@ public class MyMath {
 	public static float powE(float f) {
 		return (float) Math.pow(Math.E, f);
 	}
+	public static float log(float f) {
+		return (float) Math.log(f);
+	}
 }

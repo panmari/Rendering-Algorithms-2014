@@ -33,14 +33,14 @@ public class NoisyTextureTestScene extends Scene {
 	public NoisyTextureTestScene()
 	{
 		// Output file name
-		outputFilename = new String("../output/testscenes/NoisyTextureTestSceneBlurPath");
+		outputFilename = new String("../output/testscenes/NoisyTextureTestSceneBlurFogDiffStepLog");
 		
 		// Image width and height in pixels
 		width = 640;
 		height = 360;
 		
 		// Number of samples per pixel
-		SPP = 2048;
+		SPP = 16;
 		
 		// Specify which camera, film, and tonemapper to use
 		Vector3f eye = new Vector3f(0.f, 0.f, 5.f);
@@ -54,7 +54,7 @@ public class NoisyTextureTestScene extends Scene {
 		
 		// Specify which integrator and sampler to use
 		integratorFactory = new PointLightIntegratorFactory();
-		integratorFactory = new PathTracingIntegratorFactory();
+		//integratorFactory = new PathTracingIntegratorFactory();
 		samplerFactory = new RandomSamplerFactory();		
 		Material chessTexture = null;
 		
@@ -131,8 +131,8 @@ public class NoisyTextureTestScene extends Scene {
 		LightGeometry pointLight3 = new PointLight(new Vector3f(2.f, 2.f, 4.f), new Spectrum(80.f, 80.f, 80.f));
 		lightList = new LightList();
 		lightList.add(pointLight1);
-		lightList.add(pointLight2);
+		//lightList.add(pointLight2);
 		lightList.add(pointLight3);
-		lightList.add(new PointLight(new Vector3f(-5, 3, 3), new Spectrum(35,35,35)));
+		//lightList.add(new PointLight(new Vector3f(-5, 3, 3), new Spectrum(35,35,35)));
 	}
 }
