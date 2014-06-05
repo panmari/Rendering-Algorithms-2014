@@ -91,7 +91,7 @@ public class PointLightIntegrator implements Integrator {
 			Spectrum L = new Spectrum(0);
 			if (FOGGY) {
 				float dist = MyMath.sqrt(StaticVecmath.dist2(r.origin, hitRecord.position));
-				float ds = 0.1f;
+				float ds = stepsize;
 				HitRecord lightHit = lightList.getRandomLight(makePixelSamples(sampler, 2)).sample(null);
 				float prob = 1f/lightList.size();
 				//HitRecord lightHit = lightList.get(1).sample(null);
@@ -112,10 +112,12 @@ public class PointLightIntegrator implements Integrator {
 						Spectrum l = lightHit.material.evaluateEmission(lightHit, StaticVecmath.negate(lightDir));
 						l.mult(1/prob);
 						float d = MyMath.sqrt(d2);
-						float shadowds = 0.2f;
+						float shadowds = stepsize;
 						for(float shadows_i = shadowds; shadows_i <= d; shadows_i += shadowds ) {
 							Point3f shadowp = shadowRay.pointAt(shadows_i);
 							float shadowSigma = sigmaS(shadowp);
+							if (shadowSigma == 0) // lights are above nebula, break if outside
+								break;
 							l.mult(1 - shadowSigma*shadowds);
 						}
 						inscattering.mult(l);
@@ -123,6 +125,8 @@ public class PointLightIntegrator implements Integrator {
 					
 					L.add(inscattering);
 					float sigma_s = sigmaS(p);
+					if (sigma_s == 0 && r.direction.y > 0) // nebula is only on floor, break if outside of nebula.
+						break;
 					T.mult(1 - sigma_s*ds);
 				}
 				L.mult(ds);
@@ -136,6 +140,8 @@ public class PointLightIntegrator implements Integrator {
 	}
 	
 	private final float threshold = 0;
+	private final float stepsize = 0.1f;
+	
 	private Spectrum L_ve(Point3f p) {
 		return new Spectrum(0.002f*dampen(p));
 	}
@@ -144,7 +150,9 @@ public class PointLightIntegrator implements Integrator {
 		float dist = threshold - p.y;
 		if (dist < 0)
 			return 0;
-		return Math.min(1, dist*dist);
+		float s = MyMath.powE(dist) - 1;
+		//System.out.println(s);
+		return s;
 	}
 
 	/**
@@ -155,7 +163,7 @@ public class PointLightIntegrator implements Integrator {
 	public float sigmaS(Point3f p){
 		float d = dampen(p);
 		p.scale(20);
-		float s = (float)(ImprovedNoise.noise(p.x, p.y, p.z) + 1)/3; // sigma at the current point p
+		float s = (float)(ImprovedNoise.noise(p.x, p.y, p.z) + 1)*0.6f; // sigma at the current point p
 		return s*d;
 	}
 
