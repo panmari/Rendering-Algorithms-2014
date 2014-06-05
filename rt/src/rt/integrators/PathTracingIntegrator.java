@@ -2,6 +2,7 @@ package rt.integrators;
 
 import java.util.Random;
 
+import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import rt.HitRecord;
@@ -15,6 +16,8 @@ import rt.Sampler;
 import rt.Scene;
 import rt.Spectrum;
 import rt.samplers.RandomSampler;
+import util.ImprovedNoise;
+import util.MyMath;
 import util.StaticVecmath;
 import util.StdHelper;
 
@@ -60,6 +63,8 @@ public class PathTracingIntegrator implements Integrator {
 			Spectrum x = sampleLight(hit, currentRay.t);
 			Spectrum currentBounceContribution = new Spectrum(alpha);
 			currentBounceContribution.mult(x);
+			if (bounce == 0)
+				currentBounceContribution = doFog(currentRay, hit, currentBounceContribution);
 			outgoing.add(currentBounceContribution);
 			assert !Float.isNaN(outgoing.getLuminance());
 			Float rrProbability = rr.next();
@@ -139,6 +144,82 @@ public class PathTracingIntegrator implements Integrator {
 		s.mult(1f/rrProbability);
 		assert !Float.isNaN(s.getLuminance());
 		return s;
+	}
+
+
+	private Spectrum doFog(Ray r, HitRecord hitRecord, Spectrum outgoing) {
+		Spectrum T = new Spectrum(1);
+		Spectrum L = new Spectrum(0);
+		float dist = MyMath.sqrt(StaticVecmath.dist2(r.origin, hitRecord.position));
+		float ds = stepsize;
+		HitRecord lightHit = lightList.getRandomLight(makePixelSamples(sampler, 2)).sample(null);
+		float prob = 1f/lightList.size();
+		//HitRecord lightHit = lightList.get(1).sample(null);
+		//float prob = 1;// 1f/lightList.size();
+		for (float s_i = ds; s_i <= dist; s_i += ds) {
+			Point3f p = r.pointAt(s_i); //asserts r.dir is normalized!!!
+			Spectrum inscattering = new Spectrum(T);
+			Vector3f lightDir = StaticVecmath.sub(lightHit.position, p);
+			float d2 = lightDir.lengthSquared();
+			lightDir.normalize();
+			Ray shadowRay = new Ray(p, lightDir, r.t, 0, true);
+			HitRecord shadowHit = root.intersect(shadowRay);
+			if (shadowHit != null &&
+					StaticVecmath.dist2(shadowHit.position, hitRecord.position) < d2) //only if closer than light
+				inscattering.mult(0);
+			else {
+				inscattering.mult(L_ve(p)); //not in shadow
+				Spectrum l = lightHit.material.evaluateEmission(lightHit, StaticVecmath.negate(lightDir));
+				l.mult(1/prob);
+				float d = MyMath.sqrt(d2);
+				float shadowds = stepsize;
+				for(float shadows_i = shadowds; shadows_i <= d; shadows_i += shadowds ) {
+					Point3f shadowp = shadowRay.pointAt(shadows_i);
+					float shadowSigma = sigmaS(shadowp);
+					if (shadowSigma == 0) // lights are above nebula, break if outside
+						break;
+					l.mult(1 - shadowSigma*shadowds);
+				}
+				inscattering.mult(l);
+			}
+			
+			L.add(inscattering);
+			float sigma_s = sigmaS(p);
+			if (sigma_s == 0 && r.direction.y > 0) // nebula is only on floor, break if outside of nebula.
+				break;
+			T.mult(1 - sigma_s*ds);
+		}
+		L.mult(ds);
+		outgoing.mult(T); //times surface reflection L_s
+		L.add(outgoing);
+		return L;
+	}
+	
+	private final float threshold = 0;
+	private final float stepsize = .1f; //0.1f;
+	
+	private Spectrum L_ve(Point3f p) {
+		return new Spectrum(0.001f*dampen(p));
+	}
+	
+	private float dampen(Point3f p) {
+		float dist = threshold - p.y;
+		if (dist < 0)
+			return 0;
+		float s = MyMath.powE(dist) - 1;
+		return s;
+	}
+
+	/**
+	 * For now only float is returned, but could be spectrum
+	 * @param p
+	 * @return
+	 */
+	public float sigmaS(Point3f p){
+		float d = dampen(p);
+		p.scale(5);
+		float s = (float)(ImprovedNoise.noise(p.x, p.y, p.z) + 1)*0.3f; // sigma at the current point p
+		return s*d;
 	}
 
 	@Override
