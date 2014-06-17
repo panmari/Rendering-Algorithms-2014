@@ -1,13 +1,16 @@
 package rt;
 
-import rt.testscenes.*;
-import util.HistHelper;
-import util.ImageWriter;
-
-import java.util.*;
 import java.awt.Point;
-import java.awt.image.*;
-import java.io.*;
+import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import rt.testscenes.NoisyTextureTestScene;
+import util.ImageWriter;
 
 /**
  * The main rendering loop. Provides multi-threading support. The {@link Main#scene} to be rendered
@@ -22,32 +25,19 @@ public class Main {
 	public static Scene scene = new NoisyTextureTestScene();
 	public static Point debugPixel;// = new Point(92, 114);
 	public static final int windowSize = 0;
-	
-	static LinkedList<RenderTask> queue;
-	static Counter tasksLeft;
 		
-	static public class Counter
-	{
-		public Counter(int n)
-		{
-			this.n = n;
-		}
-		
-		public int n;
-	}
-	
 	/**
 	 * A render task represents a rectangular image region that is rendered
 	 * by a thread in one chunk.
 	 */
-	static public class RenderTask
+	static public class RenderTask implements Runnable
 	{
 		public int left, right, bottom, top;
 		public Integrator integrator;
 		public Scene scene;
 		public Sampler sampler;
 		
-		public RenderTask(Scene scene, int left, int right, int bottom, int top)
+		public RenderTask(Scene scene, int left, int right, int bottom, int top) 
 		{			
 			this.scene = scene;
 			this.left = left;
@@ -62,54 +52,32 @@ public class Main {
 			sampler = scene.getSamplerFactory().make();
 			sampler.init(left*scene.height + bottom);
 		}
-	}
-	
-	static public class RenderThread implements Runnable
-	{			
-		public void run()
-		{
-			while(true)
-			{
-				RenderTask task;
-				synchronized(queue)
-				{
-					if(queue.size() == 0) break;
-					task = queue.poll();
-				}
-													
-				// Render the image block represented by the task
-				
-				// For all pixels
-				for(int j=task.bottom; j<task.top; j++)
-				{
-					for(int i=task.left; i<task.right; i++)
-					{											
-						float samples[][] = task.integrator.makePixelSamples(task.sampler, task.scene.getSPP());
-						//for going in a s through pixels, adapt i here
-						int iAdapted;
-						if (j % 2 == 1)
-							iAdapted = task.right + task.left - i - 1;
-						else
-							iAdapted = i;
-						// For all samples of the pixel
-						for(int k = 0; k < samples.length; k++)
-						{	
-							// Make ray
-							Ray r = task.scene.getCamera().makeWorldSpaceRay(iAdapted, j, samples[k]);
 
-							// Evaluate ray0
-							Spectrum s = task.integrator.integrate(r);							
-							
-							// Write to film
-							task.scene.getFilm().addSample(iAdapted + samples[k][0], j + samples[k][1], s);
-						}
+		@Override
+		public void run() {
+			for(int j=bottom; j<top; j++)
+			{
+				for(int i=left; i<right; i++)
+				{											
+					float samples[][] = integrator.makePixelSamples(sampler, scene.getSPP());
+					//for going in a s through pixels, adapt i here
+					int iAdapted;
+					if (j % 2 == 1)
+						iAdapted = right + left - i - 1;
+					else
+						iAdapted = i;
+					// For all samples of the pixel
+					for(int k = 0; k < samples.length; k++)
+					{	
+						// Make ray
+						Ray r = scene.getCamera().makeWorldSpaceRay(iAdapted, j, samples[k]);
+
+						// Evaluate ray0
+						Spectrum s = integrator.integrate(r);							
+						
+						// Write to film
+						scene.getFilm().addSample(iAdapted + samples[k][0], j + samples[k][1], s);
 					}
-				}
-				
-				synchronized(tasksLeft)
-				{
-					tasksLeft.n--;
-					if(tasksLeft.n == 0) tasksLeft.notifyAll();
 				}
 			}
 		}
@@ -120,7 +88,7 @@ public class Main {
 		int taskSize = 32;	// Each task renders a square image block of this size
 		int nThreads; 
 		if (debugPixel == null)
-			nThreads = 4;
+			nThreads = Runtime.getRuntime().availableProcessors();
 		else
 			nThreads = 1;	// Number of threads to be used for rendering
 				
@@ -129,54 +97,45 @@ public class Main {
 
 		scene.prepare();
 		
-		int nTasks;
-		queue = new LinkedList<RenderTask>();
+		int nTasks = (int)(Math.ceil(width/(double)taskSize) * Math.ceil(height/(double)taskSize));
+		//ExecutorService executor = java.util.concurrent.Executors.newFixedThreadPool(nThreads);
+		ThreadPoolExecutor executor = new ThreadPoolExecutor(nThreads, nThreads, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(nTasks) );
 		// Make render tasks, split image into blocks to be rendered by the tasks
+		
 		if (debugPixel != null) {
 			scene.outputFilename += "_DEBUG";
-			nTasks = 1;
 			RenderTask debugTask = new RenderTask(scene, debugPixel.x - windowSize, debugPixel.x + 1 + windowSize, 
 														 debugPixel.y - windowSize, debugPixel.y + 1 + windowSize);
-			queue.add(debugTask);
+			executor.execute(debugTask);
 		} else {
-			nTasks = (int)Math.ceil((double)width/(double)taskSize) * (int)Math.ceil((double)height/(double)taskSize);
-			for(int j=0; j<(int)Math.ceil((double)height/(double)taskSize); j++) {
-				for(int i=0; i<(int)Math.ceil((double)width/(double)taskSize); i++) {
+			for(int j=0; j < Math.ceil(height/(float)taskSize); j++) {
+				for(int i=0; i < Math.ceil(width/(float)taskSize); i++) {
 					RenderTask task = new RenderTask(scene, i*taskSize, Math.min((i+1)*taskSize, width), j*taskSize, 
 																		Math.min((j+1)*taskSize, height));
-					queue.add(task);
+					executor.execute(task);
 				}
 			}
 		}
-		tasksLeft = new Counter(nTasks);
 
 		Timer timer = new Timer();
 		timer.reset();
 		
-		// Start render threads
-		for(int i=0; i<nThreads; i++)
-		{
-			new Thread(new RenderThread()).start();
-		}
 		
 		// Wait for threads to end
-		int printed = 0;
 		System.out.printf("Rendering scene %s to file %s: \n", scene.getClass().toString(), scene.outputFilename);
 		System.out.printf("0%%                                                50%%                                           100%%\n");
 		System.out.printf("|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------\n");
-		synchronized(tasksLeft)
-		{
-			while(tasksLeft.n>0)
-			{
-				try
-				{
-					tasksLeft.wait(500);
-				} catch (InterruptedException e) {}
-				
-				int toPrint = (int)( ((float)nTasks-(float)tasksLeft.n)/(float)nTasks*100-printed );
-				for(int i=0; i<toPrint; i++)
-					System.out.printf("*");
-				printed += toPrint;
+		executor.shutdown();
+		int printed = 0;
+		while (!executor.isTerminated()) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			int toPrint = (int) (executor.getCompletedTaskCount()/(float)executor.getTaskCount()*100);
+			for (; printed < toPrint; printed++) {
+				System.out.print("*");
 			}
 		}
 		System.out.println("\nFinishing scene...");
