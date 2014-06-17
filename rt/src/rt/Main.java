@@ -5,7 +5,10 @@ import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -83,7 +86,7 @@ public class Main {
 		}
 	}
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws InterruptedException, ExecutionException, FileNotFoundException, UnsupportedEncodingException
 	{			
 		int taskSize = 32;	// Each task renders a square image block of this size
 		int nThreads; 
@@ -102,6 +105,10 @@ public class Main {
 		ThreadPoolExecutor executor = new ThreadPoolExecutor(nThreads, nThreads, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(nTasks) );
 		// Make render tasks, split image into blocks to be rendered by the tasks
 		
+		Timer timer = new Timer();
+		timer.reset();
+
+		ArrayList<Future<?>> futures = new ArrayList<>(nTasks);
 		if (debugPixel != null) {
 			scene.outputFilename += "_DEBUG";
 			RenderTask debugTask = new RenderTask(scene, debugPixel.x - windowSize, debugPixel.x + 1 + windowSize, 
@@ -112,13 +119,11 @@ public class Main {
 				for(int i=0; i < Math.ceil(width/(float)taskSize); i++) {
 					RenderTask task = new RenderTask(scene, i*taskSize, Math.min((i+1)*taskSize, width), j*taskSize, 
 																		Math.min((j+1)*taskSize, height));
-					executor.execute(task);
+					futures.add(executor.submit(task));
 				}
 			}
 		}
 
-		Timer timer = new Timer();
-		timer.reset();
 		
 		
 		// Wait for threads to end
@@ -127,12 +132,8 @@ public class Main {
 		System.out.printf("|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------\n");
 		executor.shutdown();
 		int printed = 0;
-		while (!executor.isTerminated()) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		for (Future<?> f: futures) {
+			f.get();
 			int toPrint = (int) (executor.getCompletedTaskCount()/(float)executor.getTaskCount()*100);
 			for (; printed < toPrint; printed++) {
 				System.out.print("*");
@@ -151,18 +152,9 @@ public class Main {
 		BufferedImage image = scene.getTonemapper().process(scene.getFilm());
 		
 		ImageWriter.writePng(image, scene.getOutputFilename());
-		try {
-			PrintWriter writer = new PrintWriter(scene.getOutputFilename()+".txt", "UTF-8");
-			writer.print(timing_output);
-			writer.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		PrintWriter writer = new PrintWriter(scene.getOutputFilename()+".txt", "UTF-8");
+		writer.print(timing_output);
+		writer.close();
 		
 	}
 	
