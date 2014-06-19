@@ -108,7 +108,7 @@ public class Main {
 	public static void main(String[] args)
 	{			
 		int taskSize = 4;	// Each task renders a square image block of this size
-		int nThreads = 8;	// Number of threads to be used for rendering
+		int nThreads = Runtime.getRuntime().availableProcessors();	// Number of threads to be used for rendering
 		int width = scene.getFilm().getWidth();
 		int height = scene.getFilm().getHeight();
 
@@ -118,6 +118,8 @@ public class Main {
 		int nTasks = (int)Math.ceil((double)width/(double)taskSize) * (int)Math.ceil((double)height/(double)taskSize);
 		tasksLeft = new Counter(nTasks);
 		queue = new LinkedList<RenderTask>();
+		Timer timer = new Timer();
+		timer.reset();
 		for(int j=0; j<(int)Math.ceil((double)height/(double)taskSize); j++)
 		{
 			for(int i=0; i<(int)Math.ceil((double)width/(double)taskSize); i++)
@@ -127,8 +129,7 @@ public class Main {
 			}
 		}
 		
-		Timer timer = new Timer();
-		timer.reset();
+		
 		
 		// Start render threads
 		for(int i=0; i<nThreads; i++)
