@@ -3,7 +3,6 @@ package rt.basicscenes;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
-import rt.IntersectableList;
 import rt.LightGeometry;
 import rt.LightList;
 import rt.Scene;
@@ -12,6 +11,7 @@ import rt.cameras.FixedCamera;
 import rt.cameras.PinholeCamera;
 import rt.films.BoxFilterFilm;
 import rt.integrators.PointLightIntegratorFactory;
+import rt.intersectables.IntersectableList;
 import rt.intersectables.Plane;
 import rt.intersectables.Sphere;
 import rt.lightsources.PointLight;
@@ -36,7 +36,7 @@ public class PlanesAndSpheres extends Scene {
 		height = 360;
 		
 		// Number of samples per pixel
-		SPP = 8;
+		SPP = 128;
 		
 		// Specify which camera, film, and tonemapper to use
 		camera = new PinholeCamera(new Vector3f(0,0,5), new Vector3f(0,0,0), new Vector3f(0,1,0), 60, 16f/9f, 640, 360);
@@ -49,7 +49,7 @@ public class PlanesAndSpheres extends Scene {
 		
 		// Define the root object (an intersectable) of the scene
 		// Two CSG planes and a dodecahedron
-		rt.IntersectableList list = new IntersectableList();
+		IntersectableList list = new IntersectableList();
 		list.add(new Sphere(new Point3f(0,0,0), 1, new Diffuse()));
 		list.add(new Sphere(new Point3f(2,1,0), 1, new Diffuse()));
 		list.add(new Sphere(new Point3f(-3,0,0), 1, new Diffuse()));

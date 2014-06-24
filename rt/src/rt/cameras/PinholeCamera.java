@@ -57,7 +57,7 @@ public class PinholeCamera implements Camera {
 		Vector3f dir = new Vector3f(d.x, d.y, d.z);
 		dir.sub(eye);
 		//TODO: somehow decide on time in a cleaner fashion
-		return new Ray(new Vector3f(eye), dir, (float) Math.random());
+		return new Ray(new Vector3f(eye), dir);
 	}
 
 }

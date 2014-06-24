@@ -23,7 +23,7 @@ public class Main {
 	/** 
 	 * The scene to be rendered.
 	 */
-	public static Scene scene = new Dodecahedron();
+	public static Scene scene = new PlanesAndSpheres();
 	/**
 	 * A render task represents a rectangular image region that is rendered
 	 * by a thread in one chunk.
@@ -76,7 +76,7 @@ public class Main {
 	
 	public static void main(String[] args) throws InterruptedException, ExecutionException, FileNotFoundException, UnsupportedEncodingException
 	{			
-		int taskSize = 4;	// Each task renders a square image block of this size
+		int taskSize = 64;	// Each task renders a square image block of this size
 		int nThreads = Runtime.getRuntime().availableProcessors();	// Number of threads to be used for rendering
 		int width = scene.getFilm().getWidth();
 		int height = scene.getFilm().getHeight();
