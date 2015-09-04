@@ -19,6 +19,7 @@ public class MeshTriangle implements Intersectable {
 	private Mesh mesh;
 	private int index;
 	private BoundingBox boundingBox;
+	private static final float EPSILON = 1e-6f;
 	
 	/**
 	 * Make a triangle.
@@ -76,6 +77,8 @@ public class MeshTriangle implements Intersectable {
 		col0.sub(a, b);
 		Vector3f col1 = new Vector3f();
 		col1.sub(a, c);
+		//Vector3f betaGammaT = getBetaGammaTMollerTrumbore(r, a, col0, col1); 
+
 		Matrix3f t = new Matrix3f();
 		t.setColumn(0, col0);
 		t.setColumn(1, col1);
@@ -96,6 +99,39 @@ public class MeshTriangle implements Intersectable {
 		}
 		else
 			return null;
+	}
+	
+	// Using Möller-Trumbore intersection algorithm from
+	// http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+	// to compute intersections with mesh triangle.
+	private Vector3f getBetaGammaTMollerTrumbore(Ray r, Point3f a, Vector3f edge1, Vector3f edge2) {
+		edge1.negate();
+		edge2.negate();
+		Vector3f parameter = new Vector3f();
+		parameter.cross(r.direction, edge2);
+		float det = edge1.dot(parameter);
+		if (det < EPSILON) {
+			return null;
+		}
+		
+		float invDet = 1 / det;
+		Vector3f dist = StaticVecmath.sub(r.origin, a);
+		float u = dist.dot(parameter) * invDet;
+		if (u < 0 || u > 1) {
+			return null;
+		}
+		
+		Vector3f vParameter = new Vector3f();
+		vParameter.cross(dist, edge1);
+		float v = r.direction.dot(vParameter) * invDet;
+		if (v < 0 || u + v > 1) {
+			return null;
+		}
+		
+		float t = edge2.dot(vParameter) * invDet;
+		if (t > EPSILON)
+			return new Vector3f(u, v, t);
+		return null;
 	}
 	
 	/**
@@ -130,6 +166,7 @@ public class MeshTriangle implements Intersectable {
 		float t = detA2/detA;
 		return new Vector3f(beta, gamma, t);
 	}
+
 
 	/**
 	 * Not in use, much slower than cramer
