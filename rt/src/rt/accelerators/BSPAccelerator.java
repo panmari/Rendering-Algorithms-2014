@@ -24,6 +24,9 @@ public class BSPAccelerator implements Intersectable {
 	private final int NR_SPLIT_TRIES;
 	private final int n;
 	private final BSPNode root;
+	private final static float COST_INTERIOR = 1.f;
+	private final static float COST_LEAF = 1.f;
+	private final static float COST_INTERSECT = 8.f;
 
 	/**
 	 * Using a default of only 1 split try (per axis), this is fastest for constructing the acceleration structure. 
@@ -62,8 +65,7 @@ public class BSPAccelerator implements Intersectable {
 	 */
 	private BSPNode buildTree(BSPNode node, List<Intersectable> iList, int depth) {
 		if (depth > MAX_DEPTH || iList.size() < MIN_NR_PRIMITIVES) {
-			node.intersectables = iList;
-			return node;
+			return makeLeaf(node, iList);
 		}
 
 		float minCosts = Float.POSITIVE_INFINITY;
@@ -117,11 +119,23 @@ public class BSPAccelerator implements Intersectable {
 				}
 			}
 		}
-		node.setSplit(minAxis, minSplitDist);
-		node.left = buildTree(new BSPNode(minLeftBox), minLeftIntersectables,
-				depth + 1);
-		node.right = buildTree(new BSPNode(minRightBox),
-				minRightIntersectables, depth + 1);
+		float costsSplit = COST_INTERIOR + 2 * COST_LEAF + minCosts * COST_INTERSECT / node.boundingBox.area;
+		float costsNoSplit = COST_LEAF + iList.size() * COST_INTERSECT;
+		
+		if (costsSplit > costsNoSplit) {
+			return makeLeaf(node, iList);
+		} else {
+			node.setSplit(minAxis, minSplitDist);
+			node.left = buildTree(new BSPNode(minLeftBox),
+					minLeftIntersectables, depth + 1);
+			node.right = buildTree(new BSPNode(minRightBox),
+					minRightIntersectables, depth + 1);
+			return node;
+		}
+	}
+	
+	private BSPNode makeLeaf(BSPNode node, List<Intersectable> iList) {
+		node.intersectables = iList;
 		return node;
 	}
 
