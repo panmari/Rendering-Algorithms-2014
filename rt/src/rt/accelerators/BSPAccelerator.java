@@ -21,22 +21,36 @@ public class BSPAccelerator implements Intersectable {
 
 	private final int MAX_DEPTH;
 	private final int MIN_NR_PRIMITIVES = 5;
-	private final int NR_SPLIT_TRIES = 15; // should be < 10
+	private final int NR_SPLIT_TRIES;
 	private final int n;
 	private final BSPNode root;
 
+	/**
+	 * Using a default of only 1 split try (per axis), this is fastest for constructing the acceleration structure. 
+	 * @param a
+	 */
+	public BSPAccelerator(Aggregate a) {
+		this(a, 1);
+	}
+	
 	/**
 	 * The aggregate given is usually a mesh, but may be anything else as
 	 * defined by the aggregate contract.
 	 * 
 	 * @param a
+	 * @param nrSplitTriesPerAxis
 	 */
-	public BSPAccelerator(Aggregate a) {
+	public BSPAccelerator(Aggregate a, int nrSplitTriesPerAxis) {
+		if (nrSplitTriesPerAxis > 15) {
+			throw new IllegalArgumentException("This would take ages, please lower the number of split tries to lower than 15.");
+		}
 		this.n = a.size();
+		this.NR_SPLIT_TRIES = nrSplitTriesPerAxis;
 		this.MAX_DEPTH = (int) Math.round(8 + 1.3f * Math.log(n));
 
 		this.root = new BSPNode(a.getBoundingBox(), Axis.x);
 		buildTree(root, Lists.newArrayList(a.iterator()), 0);
+
 	}
 
 	/**

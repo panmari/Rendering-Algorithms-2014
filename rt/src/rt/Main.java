@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 
 import rt.testscenes.*;
 import util.HistHelper;
+import util.ImageWriter;
 
 import java.util.*;
 import java.awt.Point;
