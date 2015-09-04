@@ -73,7 +73,7 @@ public class StaticVecmath {
 	}
 
 	/**
-	 * sets min to the minimum of min and other (on a per element basis
+	 * Sets min to the minimum of min and other (on a per element basis
 	 * @param min
 	 * @param other
 	 */
@@ -84,7 +84,7 @@ public class StaticVecmath {
 	}
 
 	/**
-	 * sets max to the maximum of max and other (on a per element basis
+	 * Sets max to the maximum of max and other (on a per element basis
 	 * @param max
 	 * @param other
 	 */

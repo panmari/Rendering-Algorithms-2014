@@ -58,9 +58,7 @@ public class MeshTriangle implements Intersectable {
 	}
 	
 	public HitRecord intersect(Ray r)
-	{
-		//return boundingBox.intersect(r);
-		
+	{		
 		float vertices[] = mesh.vertices;
 		
 		// Access the triangle vertices as follows (same for the normals):		
@@ -90,7 +88,7 @@ public class MeshTriangle implements Intersectable {
 		if (betaGammaT != null && isInside(betaGammaT)) {
 			float tHit = betaGammaT.z;
 			Point3f position = r.pointAt(tHit);
-			Vector3f normal = makeNormal(betaGammaT);
+			Vector3f normal = makeNormal(betaGammaT, v0, v1, v2);
 			Vector3f wIn = new Vector3f(r.direction);
 			wIn.normalize();
 			wIn.negate();
@@ -151,14 +149,10 @@ public class MeshTriangle implements Intersectable {
 		return rightHand;
 	}
 	
-	private Vector3f makeNormal(Vector3f betaGammaT) {
+	private Vector3f makeNormal(Vector3f betaGammaT, int v0, int v1, int v2) {
 		float normals[] = mesh.normals;
-
-		int v0 = mesh.indices[index*3];
-		int v1 = mesh.indices[index*3+1];
-		int v2 = mesh.indices[index*3+2];
 		
-		// 2. Access x,y,z coordinates for each vertex
+		// 2. Access x,y,z normals for each vertex
 		Vector3f n_a = new Vector3f(normals[v0*3], normals[v0*3 + 1], normals[v0*3 + 2]);
 		Vector3f n_b = new Vector3f(normals[v1*3], normals[v1*3 + 1], normals[v1*3 + 2]);
 		Vector3f n_c = new Vector3f(normals[v2*3], normals[v2*3 + 1], normals[v2*3 + 2]);
